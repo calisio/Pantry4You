@@ -1,7 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { StatusBar } from 'expo-status-bar';
 import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 import { StyleSheet, Text, View } from 'react-native';
 // TODO: Add SDKs for Firebase products that you want to use
@@ -27,7 +26,6 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
     </View>
   );
 }
