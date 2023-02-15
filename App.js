@@ -1,5 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
+import 'firebase/auth';
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 import { StyleSheet, Text, View } from 'react-native';
@@ -36,6 +37,7 @@ export default function App() {
         <Stack.Navigator>
           <Stack.Screen name="Login" component={Login} />
         </Stack.Navigator>
+        
       </NavigationContainer>
     </View>
   );
