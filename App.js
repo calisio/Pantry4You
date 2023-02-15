@@ -6,7 +6,7 @@ import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import {Login} from './Login/Login';
+import {Login} from './Pages/Login/Login';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
