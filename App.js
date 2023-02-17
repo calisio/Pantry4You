@@ -7,6 +7,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import {Login} from './Pages/Login/Login';
+import {Pantry} from './Pages/Pantry/Pantry';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -35,6 +36,7 @@ export default function App() {
     <View style={styles.container}>
       <NavigationContainer>
         <Stack.Navigator>
+          <Stack.Screen name="My Pantry" component={Pantry} />
           <Stack.Screen name="Login" component={Login} />
         </Stack.Navigator>
         
@@ -53,3 +55,5 @@ const styles = StyleSheet.create({
 });
 
 const db = getFirestore(app);
+
+//function 
