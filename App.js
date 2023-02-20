@@ -6,8 +6,13 @@ import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Login} from './Pages/Login/Login';
+import {Home} from './Pages/Home/Home';
 import {Pantry} from './Pages/Pantry/Pantry';
+import {Search} from './Pages/Search/Search';
+import {Account} from './Pages/Account/Account';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -29,19 +34,72 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
 const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+
+function Pages() {
+  return (
+    //If not logged in, show login screen
+    /*
+    *
+    * TO DO
+    *
+    */
+
+
+    //If logged in, show app
+    <Tab.Navigator>
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{
+          tabBarLabel: 'Home',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="home" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Pantry"
+        component={Pantry}
+        options={{
+          tabBarLabel: 'Pantry',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="food-apple" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Search"
+        component={Search}
+        options={{
+          tabBarLabel: 'Search',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="account-search" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Account"
+        component={Account}
+        options={{
+          tabBarLabel: 'Account',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="account-circle" color={color} size={size} />
+          ),
+        }}
+      />
+    </Tab.Navigator>
+  );
+}
 
 
 export default function App() {
   return (
-    <View style={styles.container}>
+    //<View style={styles.container}>
       <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="My Pantry" component={Pantry} />
-          <Stack.Screen name="Login" component={Login} />
-        </Stack.Navigator>
-        
+        <Pages/>
       </NavigationContainer>
-    </View>
+    //</View>
   );
 }
 

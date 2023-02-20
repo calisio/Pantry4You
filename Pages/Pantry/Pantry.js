@@ -1,20 +1,22 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import firebase from 'firebase/app';
+import {Button, Alert} from 'react-native';
 
 const Pantry = ({navigation}) => {
-
-
-    return(
-        <View
-        style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-            <Text>Test</Text>
-        </View>
+    return (
+      <Button
+        title="Add Items"
+        onPress={openScanner}
+      />
     );
 };
+
+const openScanner = () =>
+    Alert.alert('Scan Receipt', 'implement later', [
+      {
+        text: 'Scan',
+        onPress: () => console.log('Scan Pressed'),
+        style: 'cancel',
+      },
+      {text: 'Cancel', onPress: () => console.log('Cancel Pressed')},
+    ]);
 
 export {Pantry};
