@@ -1,11 +1,23 @@
-import {Button, Alert} from 'react-native';
+import { StyleSheet, Text, View, Button, Alert, TextInput } from 'react-native';
+import { AddManually } from './PantryComponents/AddManually';
+import React, {useState} from 'react';
 
 const Pantry = ({navigation}) => {
+  const [isVisible, setVisibility] = useState(false);
+
     return (
-      <Button
-        title="Add Items"
-        onPress={openScanner}
-      />
+      <View>
+        <Button
+          title="Scan Receipt"
+          onPress={openScanner}
+        />
+        <Button
+          title="Add Items Manually"
+          onPress={() => setVisibility(!isVisible)}
+        />
+        {isVisible ? <AddManually></AddManually>: null}
+      </View>
+
     );
 };
 
@@ -18,5 +30,10 @@ const openScanner = () =>
       },
       {text: 'Cancel', onPress: () => console.log('Cancel Pressed')},
     ]);
+
+// const displayAddManually = () => {
+//     setVisibility(true);
+    
+// };
 
 export {Pantry};
