@@ -38,7 +38,7 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function Pages() {
-  if(false){
+  if(true){
     return (
       <View style={styles.container}>
         <Stack.Navigator initialRouteName="Login">
@@ -49,15 +49,6 @@ function Pages() {
     )
   }
   else return (
-    //If not logged in, show login screen
-    /*
-    *
-    * TO DO
-    *
-    */
-    
-
-    //If logged in, show app
     <Tab.Navigator>
       <Tab.Screen
         name="Home"
