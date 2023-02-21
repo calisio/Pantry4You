@@ -38,15 +38,13 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function Pages() {
-  if(true){
+  if(false){
     return (
       <View style={styles.container}>
-       <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Login" component={Login} options={{ title: 'Login' }} />
-        <Stack.Screen name="CreateAccount" component={CreateAccount} options={{ title: 'Create Account' }} />
-      </Stack.Navigator>
-    </NavigationContainer>
+        <Stack.Navigator initialRouteName="Login">
+          <Stack.Screen name="Login" component={Login} options={{ title: 'Login' }} />
+          <Stack.Screen name="CreateAccount" component={CreateAccount} options={{ title: 'Create Account' }} />
+        </Stack.Navigator>
     </View>
     )
   }
