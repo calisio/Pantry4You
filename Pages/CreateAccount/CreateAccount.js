@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import firebase from 'firebase/app';
-import {getAuth, createUserWithEmailAndPassword} from 'firebase/auth';
-
-const auth = getAuth();
+import {createUserWithEmailAndPassword} from 'firebase/auth';
+import {auth} from '../../App'
 
 function CreateAccount({ navigation }) {
   const [email, setEmail] = useState('');
