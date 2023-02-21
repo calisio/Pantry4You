@@ -1,24 +1,26 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import firebase from 'firebase/app';
 
+import firebase from 'firebase/app';
+import {getAuth, signInWithEmailAndPassword} from 'firebase/auth';
+
+const auth = getAuth();
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    firebase.auth().signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      // User is signed in
-      const user = userCredential.user;
-      console.log(user);
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(errorMessage);
-    });
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in 
+        const user = userCredential.user;
+        // ...
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+      });
   };
 
   return (
@@ -40,7 +42,7 @@ const Login = ({ navigation }) => {
       <Button title="Login" onPress={handleLogin} />
       <Button
         title="Create Account"
-        onPress={() => navigation.navigate('Registration')}
+        onPress={() => navigation.navigate('CreateAccount')}
       />
     </View>
   );
@@ -68,5 +70,4 @@ const styles = StyleSheet.create({
   },
 });
 
-
-export {Login};
+export { Login };
