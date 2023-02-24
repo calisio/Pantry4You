@@ -121,32 +121,3 @@ const styles = StyleSheet.create({
   },
 });
 
-
-
-
-// export async function getTest(db){
-//   const usersCol = collection(db, 'users');
-//   const userSnapshot = await getDocs(usersCol);
-//   const userList = userSnapshot.docs.map(doc => doc.data());
-//   return userList;
-// }
-
-// export async function getTest2(){
-//   const snapshot = await firebase.firestore().collection('users').get();
-//   return snapshot.docs.map(doc => doc.data());
-// }
-
-export async function insertItemIntoPantry(itemName, quantity){
-  //insert item
-  //return new quantity or throw error
-}
-
-export async function deleteItemFromPantry(itemName, quantity){
-  //delete item
-  //return new quantity or throw error
-}
-
-export async function getPantry(){
-  //get contents of pantry
-  //return pantry
-}
