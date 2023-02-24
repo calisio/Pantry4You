@@ -7,6 +7,8 @@ const AddManually = () => {
     const [text, setText] = useState('');
     
 
+    //for MVP assume quantity is always 1
+
 
     return (
         <View style={{padding: 10}}>
@@ -18,6 +20,17 @@ const AddManually = () => {
         />
         <Text style={{padding: 10, fontSize: 42}}>
         </Text>
+        <Button
+            title="SUBMIT"
+            onPress={() => {
+                    if(this.text != ''){
+                        console.log("input not blank");
+                        //send item to db with quantity = 1
+                    }
+
+                }
+            }
+        />
         </View>
     );
 };
