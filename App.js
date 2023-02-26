@@ -12,7 +12,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 //import { initializeApp } from "firebase/app";
 //import 'firebase/auth';
 //import { collection, getDocs, getFirestore } from 'firebase/firestore/lite';
-import { StyleSheet } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Login} from './Pages/Login/Login';
 import {CreateAccount} from './Pages/CreateAccount/CreateAccount';
@@ -29,15 +28,15 @@ import * as React from 'react';
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-// const firebaseConfig = {
-//   apiKey: "AIzaSyCjsh6Mj0fxTwcd5rwbk11ow3UATgpwrw8",
-//   authDomain: "pantry4you-bf048.firebaseapp.com",
-//   projectId: "pantry4you-bf048",
-//   storageBucket: "pantry4you-bf048.appspot.com",
-//   messagingSenderId: "951653716590",
-//   appId: "1:951653716590:web:a5c9df4baaf8b9fef2cc7f",
-//   measurementId: "G-MV5KGDBTTJ"
-// };
+const firebaseConfig = {
+  apiKey: "AIzaSyCjsh6Mj0fxTwcd5rwbk11ow3UATgpwrw8",
+  authDomain: "pantry4you-bf048.firebaseapp.com",
+  projectId: "pantry4you-bf048",
+  storageBucket: "pantry4you-bf048.appspot.com",
+  messagingSenderId: "951653716590",
+  appId: "1:951653716590:web:a5c9df4baaf8b9fef2cc7f",
+  measurementId: "G-MV5KGDBTTJ"
+};
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -53,7 +52,7 @@ const Tab = createBottomTabNavigator();
 //export const db = firebase.firestore();
 
 function Pages() {
-  if(true){
+  if(false){
     return (
       <View style={styles.container}>
         <Stack.Navigator initialRouteName="Login">
