@@ -10,8 +10,8 @@ const AddManually = () => {
     const [item, setItem] = useState('');
     const [quantity, setQuantity] = useState('');
 
-    //TODO: change to active user
-    let pantryRef = db.collection("pantries").doc("ppp0bWqpMhBH2lPSzVQsc1R");
+    //TODO: active user 
+    let pantryRef = db.collection("users/0bWqpMhBH2lPSzVQsc1R/pantry").doc("pantry");
     
 
     const submitHandler = async() => {
