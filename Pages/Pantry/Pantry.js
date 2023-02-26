@@ -5,7 +5,7 @@ import { db } from '../../firebase';
 
 
 const Pantry = ({navigation}) => {
-  
+
   const [isVisible, setFormVisibility] = useState(false);
 
   const [pantryList, setPantryList] = useState([]);
@@ -14,7 +14,7 @@ const Pantry = ({navigation}) => {
   const getPantryList = async() => {
     
     //TODO: replace hardcoded userId w/ currently logged in user
-    let pantriesRef = db.collection("pantries").where('userId', '==', '0bWqpMhBH2lPSzVQsc1R');
+    let pantriesRef = db.collection("pantries").doc("ppp0bWqpMhBH2lPSzVQsc1R");
 
     //---------------this works also-----------------
     // pantriesRef.where('userId', '==', '0bWqpMhBH2lPSzVQsc1R').get()
@@ -29,21 +29,18 @@ const Pantry = ({navigation}) => {
     let pantryObj = await pantriesRef.get();
     //console.log("-------------");
     //console.log((pantryObj.empty ? "empty" : "false"));
-
+    //console.log(pantryObj.data());
     let newPantryList = [];
 
-    //TODO: outer loop only runs once - how to remove?
-    for(const doc of pantryObj.docs){
-      for(let i = 0; i < Object.keys(doc.data()['pantry']).length; i++){
-        let key = Object.keys(doc.data()['pantry'])[i];
-        let val = Object.values(doc.data()['pantry'])[i];
+      for(let i = 0; i < Object.keys(pantryObj.data()).length; i++){
+        let key = Object.keys(pantryObj.data())[i];
+        let val = Object.values(pantryObj.data())[i];
         let newListEntry = [key, val];
         newPantryList.push(newListEntry)
       }
-    }
+    
 
     setPantryList(newPantryList);
-    //console.log(pantryList);
   }
 
 
@@ -64,7 +61,7 @@ const Pantry = ({navigation}) => {
         {isVisible ? <AddManually></AddManually>: null}
         <Text>
           {pantryList.map((item) => (
-            <Text>{item[0]}: {item[1]} {"\n"}</Text>
+            <Text key={item}>{item[0]}: {item[1]} {"\n"}</Text>
           ))}
         </Text>
       </View>
