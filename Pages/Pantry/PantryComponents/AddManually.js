@@ -2,7 +2,8 @@ import { StyleSheet, Text, View, Button, Alert, TextInput } from 'react-native';
 import React, {useState} from 'react';
 import { db } from '../../../firebase';
 import firebase from 'firebase/compat/app';
-import { doc, setDoc, updateDoc } from "firebase/compat/firestore"; 
+import { getAuth } from "firebase/auth";
+
 
 
 // https://reactnative.dev/docs/handling-text-input
@@ -11,9 +12,15 @@ const AddManually = () => {
     const [item, setItem] = useState('');
     const [quantity, setQuantity] = useState('');
 
+    const auth = getAuth();
+    const user = auth.currentUser;
+
     //TODO: active user 
+    //let collectionString = "users/" + user + "/pantry";
+    //let pantryRef = db.collection(collectionString).doc("pantry");
+
     let pantryRef = db.collection("users/0bWqpMhBH2lPSzVQsc1R/pantry").doc("pantry");
-    
+
 
     const submitHandler = async() => {
         //TODO: make sure quantity is a number
