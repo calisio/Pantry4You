@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-
+import { View, Text, TextInput, Button, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import firebase from 'firebase/app';
 import {signInWithEmailAndPassword} from 'firebase/auth';
-import {auth} from '../../App'
+import {auth} from '../../../App'
 
 
 const Login = ({ navigation }) => {
@@ -23,28 +22,35 @@ const Login = ({ navigation }) => {
       });
   };
 
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry={true}
-        value={password}
-        onChangeText={setPassword}
-      />
-      <Button title="Login" onPress={handleLogin} />
-      <Button
-        title="Create Account"
-        onPress={() => navigation.navigate('CreateAccount')}
-      />
-    </View>
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Login</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          secureTextEntry={true}
+          value={password}
+          onChangeText={setPassword}
+        />
+        <Button title="Login" onPress={handleLogin} />
+        <Button
+          title="Create Account"
+          onPress={() => navigation.navigate('CreateAccount')}
+        />
+      </View>
+    </TouchableWithoutFeedback>
+
   );
 };
 
