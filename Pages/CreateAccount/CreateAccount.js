@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import firebase from 'firebase/app';
 import {createUserWithEmailAndPassword} from 'firebase/auth';
-import {auth} from '../../App'
+import {auth} from '../../../App';
+
 
 function CreateAccount({ navigation }) {
   const [email, setEmail] = useState('');
@@ -10,53 +11,64 @@ function CreateAccount({ navigation }) {
 
   function handleCreateAccount() {
     createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-        // Signed in 
-        const user = userCredential.user;
-        // ...
-        })
-        .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // ..
-        });
+      .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      // ...
+      })
+      .then(() => {
+        Alert.alert('Account created', 'Your account has been created successfully');
+      })
+      .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // ..
+      });
   }
 
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+  
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title} >Create Account</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={text => setEmail(text)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={text => setPassword(text)}
-        secureTextEntry
-      />
-      <TouchableOpacity onPress={handleCreateAccount}>
-        <Text>Create Account</Text>
-      </TouchableOpacity>
-    </View>
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Create Account</Text>
+        <Text style={styles.text}> You must have a password longer than 6 characters.</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={text => setEmail(text)}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={password}
+          onChangeText={text => setPassword(text)}
+          secureTextEntry
+        />
+        <TouchableOpacity onPress={handleCreateAccount} style={styles.button}>
+          <Text>Create Account</Text>
+        </TouchableOpacity>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    title: {
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
       fontSize: 24,
       fontWeight: 'bold',
       marginBottom: 24,
-    },
-    input: {
+  },
+  input: {
       width: '80%',
       height: 40,
       borderWidth: 1,
@@ -64,7 +76,16 @@ const styles = StyleSheet.create({
       borderRadius: 8,
       paddingHorizontal: 16,
       marginBottom: 16,
-    },
-  });
+  },
+  text: {
+      fontSize: 15,
+      marginBottom: 15,
+  },
+  button: {
+      backgroundColor: '#CCCCCC',
+      borderRadius: 8,
+      padding: 10,
+  },
+});
 
 export { CreateAccount };
