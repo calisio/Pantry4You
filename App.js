@@ -6,9 +6,10 @@ import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import {Login} from './Pages/Login/Login';
-import {CreateAccount} from './Pages/CreateAccount/CreateAccount';
-
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {Login} from './Pages/SignIn/Login/Login';
+import {CreateAccount} from './Pages/SignIn/CreateAccount/CreateAccount';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -30,18 +31,29 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
 const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+
+function Pages() {
+  if(true){
+    return (
+      <View style={styles.container}>
+        <Stack.Navigator initialRouteName="Login">
+          <Stack.Screen name="Login" component={Login} options={{ title: 'Login' }} />
+          <Stack.Screen name="CreateAccount" component={CreateAccount} options={{ title: 'Create Account' }} />
+        </Stack.Navigator>
+    </View>
+    )
+  }
+}
 
 
 export default function App() {
   return (
-    <View style={styles.container}>
-       <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Login" component={Login} options={{ title: 'Login' }} />
-        <Stack.Screen name="CreateAccount" component={CreateAccount} options={{ title: 'Create Account' }} />
-      </Stack.Navigator>
-    </NavigationContainer>
-    </View>
+    //<View style={styles.container}>
+      <NavigationContainer>
+        <Pages/>
+      </NavigationContainer>
+    //</View>
   );
 }
 
