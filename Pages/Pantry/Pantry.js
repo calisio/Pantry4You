@@ -14,7 +14,7 @@ const Pantry = ({navigation}) => {
   const getPantryList = async() => {
     
     //TODO: replace hardcoded userId w/ currently logged in user
-    let pantriesRef = db.collection("users/0bWqpMhBH2lPSzVQsc1R/pantry").doc("pantry");
+    let pantryRef = db.collection("users/0bWqpMhBH2lPSzVQsc1R/pantry").doc("pantry");
 
     //---------------this works also-----------------
     // pantriesRef.where('userId', '==', '0bWqpMhBH2lPSzVQsc1R').get()
@@ -26,7 +26,7 @@ const Pantry = ({navigation}) => {
     //   console.log(data);
     // })
 
-    let pantryObj = await pantriesRef.get();
+    let pantryObj = await pantryRef.get();
     //console.log("-------------");
     //console.log((pantryObj.empty ? "empty" : "false"));
     //console.log(pantryObj.data());

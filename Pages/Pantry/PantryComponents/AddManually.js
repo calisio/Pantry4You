@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Button, Alert, TextInput } from 'react-native';
 import React, {useState} from 'react';
 import { db } from '../../../firebase';
+import firebase from 'firebase/compat/app';
 import { doc, setDoc, updateDoc } from "firebase/compat/firestore"; 
 
 
@@ -21,20 +22,56 @@ const AddManually = () => {
             console.log(item);
             console.log(quantity);
 
+            let quantityInt = parseInt(quantity);
+
             //TODO: clear TextInput
             //setItem('');
             //setQuantity('');
 
-            //TODO: check if item exists, increment quantity in that case
-            await pantryRef.update({
-                [item]: quantity
-            }, {merge: true})
-            .then(console.log("updated"));
+            let currentItems = await getCurrentPantry();
+            let itemExists = false;
+
+            for(let i = 0; i < currentItems.length; i++){
+                if(currentItems[i][0] == item){
+                    itemExists = true;
+                    break;
+                }
+            }
+
+            if(itemExists){
+                await pantryRef.update({
+                    [item]: firebase.firestore.FieldValue.increment(quantityInt)
+                }, {merge: true})
+                .then(console.log("incremented current field"));
+            }
+            else{
+                await pantryRef.update({
+                    [item]: quantityInt
+                }, {merge: true})
+                .then(console.log("added new field"));
+            }
+
+            
 
         }
         else{
             Alert.alert("Fill out both fields");
         }
+    }
+
+
+    const getCurrentPantry = async() => {
+        let pantryObj = await pantryRef.get();
+        let curPantryList = [];
+
+        for(let i = 0; i < Object.keys(pantryObj.data()).length; i++){
+            let key = Object.keys(pantryObj.data())[i];
+            let val = Object.values(pantryObj.data())[i];
+            let listEntry = [key, val];
+            curPantryList.push(listEntry)
+        }
+
+        return curPantryList;
     }
 
 
