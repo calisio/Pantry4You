@@ -28,7 +28,7 @@ import * as React from 'react';
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
+ const firebaseConfig = {
   apiKey: "AIzaSyCjsh6Mj0fxTwcd5rwbk11ow3UATgpwrw8",
   authDomain: "pantry4you-bf048.firebaseapp.com",
   projectId: "pantry4you-bf048",
@@ -39,8 +39,9 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+
+ const app = initializeApp(firebaseConfig);
+ export const auth = getAuth(app);
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
