@@ -1,4 +1,7 @@
 import {Button} from 'react-native';
+import GetRecipes from './GetRecipes';
+
+GetRecipes();
 
 const Home = ({navigation}) => {
     return (

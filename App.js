@@ -14,6 +14,7 @@ import {Home} from './Pages/Home/Home';
 import {Pantry} from './Pages/Pantry/Pantry';
 import {Search} from './Pages/Search/Search';
 import {Account} from './Pages/Account/Account';
+import {Add} from './Pages/Add/Add';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -38,7 +39,7 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 function Pages() {
-  if(true){
+  if(false){
     return (
       <View style={styles.container}>
         <Stack.Navigator initialRouteName="Login">
@@ -67,6 +68,16 @@ function Pages() {
           tabBarLabel: 'Pantry',
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="food-apple" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Add"
+        component={Add}
+        options={{
+          //tabBarLabel: 'Add',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="hamburger-plus" color={color} size={size} />
           ),
         }}
       />
