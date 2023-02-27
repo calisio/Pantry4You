@@ -3,16 +3,16 @@ import React, {useState} from 'react';
 
 
 const Account = ({navigation, route}) => {
-    // const handleLogout = route.params.handleLogout;
+    const handleLogout = route.params.handleLogout;
 
-    // const handleSubmit = () => {
-    //     console.log('hello')
-    //     handleLogout();
-    // };
+    const handleSubmit = () => {
+        console.log(handleLogout)
+        handleLogout();
+    };
 
     return (
         <View>
-            <Button title="Log Out"  />
+            <Button title="Log Out" onPress={() => handleSubmit()} />
         </View>
     );
 };
