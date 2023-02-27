@@ -8,17 +8,18 @@ import { StyleSheet, Text, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Login} from './Pages/Login/Login';
-import {CreateAccount} from './Pages/CreateAccount/CreateAccount';
+import {Login} from './Pages/SignIn/Login/Login';
+import {CreateAccount} from './Pages/SignIn/CreateAccount/CreateAccount';
 import {Account} from './Pages/Account/Account';
 import { Home } from './Pages/Home/Home';
 import { Pantry } from './Pages/Pantry/Pantry';
 import { Search } from './Pages/Search/Search';
 //import firebase from "firebase/app";
 //import "firebase/firestore";
-import * as React from 'react';
+import React, {useState} from 'react';
+import {signInWithEmailAndPassword} from 'firebase/auth';
+
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -49,12 +50,35 @@ const Tab = createBottomTabNavigator();
 //export const db = firebase.firestore();
 
 function Pages() {
-  if(false){
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const handleLogin = (email, password) => {
+    signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      setIsAuthenticated(true);
+      console.log('user signed in');
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log('error');
+    });
+  };
+  
+  if(!isAuthenticated){
     return (
       <View style={styles.container}>
         <Stack.Navigator initialRouteName="Login">
-          <Stack.Screen name="Login" component={Login} options={{ title: 'Login' }} />
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{ title: 'Login' }}
+            initialParams={{ handleLogin: handleLogin }}
+          />
           <Stack.Screen name="CreateAccount" component={CreateAccount} options={{ title: 'Create Account' }} />
+          <Stack.Screen name="Dashboard" component={CreateAccount} options={{ title: 'Create Account' }} />
         </Stack.Navigator>
     </View>
     )

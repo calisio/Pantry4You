@@ -1,25 +1,17 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import firebase from 'firebase/app';
-import {signInWithEmailAndPassword} from 'firebase/auth';
-import {auth} from '../../../App'
 
 
-const Login = ({ navigation }) => {
+
+const Login = ({ navigation, route }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const handleLogin = route.params.handleLogin;
 
-  const handleLogin = () => {
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in 
-        const user = userCredential.user;
-        // ...
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-      });
+
+  const handleSubmit = () => {
+    handleLogin(email, password);
   };
 
   const dismissKeyboard = () => {
@@ -43,8 +35,8 @@ const Login = ({ navigation }) => {
           value={password}
           onChangeText={setPassword}
         />
-        <Button title="Login" onPress={handleLogin} />
-        <Button
+      <Button title="Login" onPress={() => handleSubmit()} />
+      <Button
           title="Create Account"
           onPress={() => navigation.navigate('CreateAccount')}
         />
