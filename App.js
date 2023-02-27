@@ -19,6 +19,7 @@ import {Account} from './Pages/Account/Account';
 import { Home } from './Pages/Home/Home';
 import { Pantry } from './Pages/Pantry/Pantry';
 import { Search } from './Pages/Search/Search';
+import {Add} from './Pages/Add/Add';
 //import firebase from "firebase/app";
 //import "firebase/firestore";
 import * as React from 'react';
@@ -82,6 +83,16 @@ function Pages() {
           tabBarLabel: 'Pantry',
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="food-apple" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Add"
+        component={Add}
+        options={{
+          //tabBarLabel: 'Add',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="hamburger-plus" color={color} size={size} />
           ),
         }}
       />
