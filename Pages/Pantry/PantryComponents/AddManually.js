@@ -6,6 +6,7 @@ import { getAuth } from "firebase/auth";
 
 
 
+
 // https://reactnative.dev/docs/handling-text-input
 
 const AddManually = () => {
@@ -13,13 +14,15 @@ const AddManually = () => {
     const [quantity, setQuantity] = useState('');
 
     const auth = getAuth();
-    const user = auth.currentUser;
+    const user = auth.currentUser.uid;
 
-    //TODO: active user 
-    //let collectionString = "users/" + user + "/pantry";
-    //let pantryRef = db.collection(collectionString).doc("pantry");
 
-    let pantryRef = db.collection("users/0bWqpMhBH2lPSzVQsc1R/pantry").doc("pantry");
+    let collectionString = "users/" + user + "/pantry";
+    // console.log(user.);
+    // console.log(collectionString);
+    let pantryRef = db.collection(collectionString).doc("pantry");
+
+    //let pantryRef = db.collection("users/0bWqpMhBH2lPSzVQsc1R/pantry").doc("pantry");
 
 
     const submitHandler = async() => {
@@ -28,6 +31,7 @@ const AddManually = () => {
             console.log("------------input-------------------");
             console.log(item);
             console.log(quantity);
+            console.log(user.uid);
 
             let quantityInt = parseInt(quantity);
 

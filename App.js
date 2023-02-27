@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import {getAuth} from 'firebase/auth';
+import {getAuth, onAuthStateChanged} from 'firebase/auth';
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 import { StyleSheet, Text, View, Alert } from 'react-native';
@@ -40,7 +40,24 @@ import {signInWithEmailAndPassword, signOut} from 'firebase/auth';
 // Initialize Firebase
 
  const app = initializeApp(firebaseConfig);
- export const auth = getAuth(app);
+ let uid;
+ const auth = getAuth();
+ export const user = auth.currentUser;
+
+
+//  onAuthStateChanged(auth, (user) => {
+//   if(user){
+//     uid = user.currentUser.uid
+//     console.log(uid);
+//   }
+//   else{
+//     uid = null;
+//   }
+//  })
+
+// export const currUser = uid;
+
+ 
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
