@@ -1,8 +1,19 @@
-import {Text} from 'react-native';
+import { StyleSheet, Text, View, Button } from 'react-native';
+import React, {useState} from 'react';
 
-const Account = ({navigation}) => {
+
+const Account = ({navigation, route}) => {
+    // const handleLogout = route.params.handleLogout;
+
+    // const handleSubmit = () => {
+    //     console.log('hello')
+    //     handleLogout();
+    // };
+
     return (
-        <Text>Account Page</Text>
+        <View>
+            <Button title="Log Out"  />
+        </View>
     );
 };
 

@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import {getAuth} from 'firebase/auth';
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Alert } from 'react-native';
 //import { firebase } from '@react-native-firebase/database';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
@@ -18,7 +18,7 @@ import { Search } from './Pages/Search/Search';
 //import firebase from "firebase/app";
 //import "firebase/firestore";
 import React, {useState} from 'react';
-import {signInWithEmailAndPassword} from 'firebase/auth';
+import {signInWithEmailAndPassword, signOut} from 'firebase/auth';
 
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -64,9 +64,27 @@ function Pages() {
       const errorCode = error.code;
       const errorMessage = error.message;
       console.log('error');
+      Alert.alert('Invalid Login', 'The username or password you have entered is incorrect. Please try again.', [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {text: 'OK', onPress: () => console.log('OK Pressed')},
+      ]);
     });
   };
-  
+
+  const handleLogout = () => {
+    console.log('inside handle log out')
+    signOut(auth).then(() => {
+      // Sign-out successful.
+      setIsAuthenticated(false);
+    }).catch((error) => {
+      // An error happened.
+    });
+  }
+
   if(!isAuthenticated){
     return (
       <View style={styles.container}>
@@ -74,8 +92,9 @@ function Pages() {
           <Stack.Screen
             name="Login"
             component={Login}
+            // {...(props) => <Login {...props} handleLogin={handleLogin} />}
             options={{ title: 'Login' }}
-            initialParams={{ handleLogin: handleLogin }}
+            initialParams={{handleLogin: handleLogin}}
           />
           <Stack.Screen name="CreateAccount" component={CreateAccount} options={{ title: 'Create Account' }} />
           <Stack.Screen name="Dashboard" component={CreateAccount} options={{ title: 'Create Account' }} />
@@ -83,7 +102,7 @@ function Pages() {
     </View>
     )
   }
-  else return (
+  return (
     <Tab.Navigator>
       <Tab.Screen
         name="Home"
@@ -118,12 +137,14 @@ function Pages() {
       <Tab.Screen
         name="Account"
         component={Account}
+        // {...(props) => <Account {...props} handleLogout={handleLogout} />}
         options={{
           tabBarLabel: 'Account',
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="account-circle" color={color} size={size} />
           ),
         }}
+        initialParams={{handleLogout: handleLogout}}
       />
     </Tab.Navigator>
   );

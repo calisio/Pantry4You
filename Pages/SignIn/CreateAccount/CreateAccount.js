@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Keyboard, TouchableWithoutFeedback, Alert } from 'react-native';
 import firebase from 'firebase/app';
 import {createUserWithEmailAndPassword} from 'firebase/auth';
 import {auth} from '../../../App';
@@ -17,12 +17,39 @@ function CreateAccount({ navigation }) {
       // ...
       })
       .then(() => {
-        Alert.alert('Account created', 'Your account has been created successfully');
+        Alert.alert('Account created', 'Your account has been created successfully', [
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Cancel Pressed'),
+            style: 'cancel',
+          },
+          {text: 'OK', onPress: () => console.log('OK Pressed')},
+        ]);
       })
       .catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
-      // ..
+      console.log(errorMessage)
+      if (errorMessage == 'Firebase: Password should be at least 6 characters (auth/weak-password).') {
+        Alert.alert('Unsuccessful Creation of Account', 'Your passord must be at least 6 characters long. Please try again.', [
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Cancel Pressed'),
+            style: 'cancel',
+          },
+          {text: 'OK', onPress: () => console.log('OK Pressed')},
+        ]);
+      }
+      else {
+        Alert.alert('Unsuccessful Creation of Account', 'Your attempt to create an account was unsuccessful. Please try again.', [
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Cancel Pressed'),
+            style: 'cancel',
+          },
+          {text: 'OK', onPress: () => console.log('OK Pressed')},
+        ]);
+      }
       });
   }
 
