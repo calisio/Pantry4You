@@ -4,14 +4,9 @@ import {getAuth} from 'firebase/auth';
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 import { StyleSheet, Text, View } from 'react-native';
-//import { firebase } from '@react-native-firebase/database';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-//import { getAnalytics } from "firebase/analytics";
-//import { initializeApp } from "firebase/app";
-//import 'firebase/auth';
-//import { collection, getDocs, getFirestore } from 'firebase/firestore/lite';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Login} from './Pages/Login/Login';
 import {CreateAccount} from './Pages/CreateAccount/CreateAccount';
@@ -20,9 +15,9 @@ import { Home } from './Pages/Home/Home';
 import { Pantry } from './Pages/Pantry/Pantry';
 import { Search } from './Pages/Search/Search';
 import {Add} from './Pages/Add/Add';
-//import firebase from "firebase/app";
-//import "firebase/firestore";
 import * as React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import firebase from 'firebase/app';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -41,17 +36,26 @@ import * as React from 'react';
 
 // Initialize Firebase
 
- const app = initializeApp(firebaseConfig);
- export const auth = getAuth(app);
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// if (!firebase.apps.length) {
-//   firebase.initializeApp(firebaseConfig);
-// }
+//const auth = getAuth();
+//const user = auth.currentUser.uid;
+console.log(auth.currentUser);
+//console.log(user);
 
-//export const db = firebase.firestore();
+AsyncStorage.getItem('userCredentials').then(credentials => {
+  if (credentials) {
+    // Sign in the user with the stored credentials
+    const { email, password } = JSON.parse(credentials);
+    firebase.auth().signInWithEmailAndPassword(email, password)
+      .then(() => console.log('User signed in automatically'))
+      .catch(error => console.log('Error signing in:', error));
+  }
+});
 
 function Pages() {
   if(false){
