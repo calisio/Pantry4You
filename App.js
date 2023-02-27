@@ -4,16 +4,24 @@ import {getAuth} from 'firebase/auth';
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 import { StyleSheet, Text, View } from 'react-native';
+//import { firebase } from '@react-native-firebase/database';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+//import { getAnalytics } from "firebase/analytics";
+//import { initializeApp } from "firebase/app";
+//import 'firebase/auth';
+//import { collection, getDocs, getFirestore } from 'firebase/firestore/lite';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Login} from './Pages/Login/Login';
 import {CreateAccount} from './Pages/CreateAccount/CreateAccount';
-import {Home} from './Pages/Home/Home';
-import {Pantry} from './Pages/Pantry/Pantry';
-import {Search} from './Pages/Search/Search';
 import {Account} from './Pages/Account/Account';
+import { Home } from './Pages/Home/Home';
+import { Pantry } from './Pages/Pantry/Pantry';
+import { Search } from './Pages/Search/Search';
+//import firebase from "firebase/app";
+//import "firebase/firestore";
+import * as React from 'react';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -37,8 +45,14 @@ export const auth = getAuth(app);
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
+// if (!firebase.apps.length) {
+//   firebase.initializeApp(firebaseConfig);
+// }
+
+//export const db = firebase.firestore();
+
 function Pages() {
-  if(true){
+  if(false){
     return (
       <View style={styles.container}>
         <Stack.Navigator initialRouteName="Login">
@@ -114,4 +128,3 @@ const styles = StyleSheet.create({
   },
 });
 
-const db = getFirestore(app);
