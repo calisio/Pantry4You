@@ -1,4 +1,4 @@
-import { Alert, TextInput, View, Button, Text} from "react-native";
+import { Alert, TextInput, View, Button, Text, Keyboard, TouchableWithoutFeedback} from "react-native";
 import React, {useState} from 'react';
 import { db } from '../../../firebase';
 import { getAuth } from "firebase/auth";

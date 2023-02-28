@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button, Alert, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Button, Alert, TextInput, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import React, {useState} from 'react';
 import { db } from '../../../firebase';
 import firebase from 'firebase/compat/app';
@@ -100,34 +100,39 @@ const AddManually = (props) => {
     }
 
 
+    const dismissKeyboard = () => {
+        Keyboard.dismiss();
+    }
 
     return (
-        <View style={{padding: 10}}>
-        <TextInput 
-            clearButtonMode='always'
-            style={{height: 40}}
-            placeholder="Enter item here"
-            onChangeText={newItem => setItem(newItem)}
-            defaultValue={""}
-            id="item"
-        />
-        <Text style={{padding: 10, fontSize: 42}}>
-        </Text>
-        <TextInput
-            clearButtonMode='always' //this doesn't work - how to clear text input?
-            style={{height: 40}}
-            placeholder="Enter quantity here"
-            onChangeText={newQuantity => setQuantity(newQuantity)}
-            defaultValue={""}
-            id="quantity"
-        />
-        <Text style={{padding: 10, fontSize: 42}}>
-        </Text>
-        <Button
-            title="Add Item"
-            onPress={submitHandler}
-        />
-        </View>
+        <TouchableWithoutFeedback onPress={dismissKeyboard}>
+            <View style={{padding: 10}}>
+                <TextInput 
+                    clearButtonMode='always'
+                    style={{height: 40}}
+                    placeholder="Enter item here"
+                    onChangeText={newItem => setItem(newItem)}
+                    defaultValue={""}
+                    id="item"
+                />
+                <Text style={{padding: 10, fontSize: 42}}>
+                </Text>
+                <TextInput
+                    clearButtonMode='always' //this doesn't work - how to clear text input?
+                    style={{height: 40}}
+                    placeholder="Enter quantity here"
+                    onChangeText={newQuantity => setQuantity(newQuantity)}
+                    defaultValue={""}
+                    id="quantity"
+                />
+                <Text style={{padding: 10, fontSize: 42}}>
+                </Text>
+                <Button
+                    title="Add Item"
+                    onPress={submitHandler}
+                />
+            </View>
+        </TouchableWithoutFeedback>
     );
 };
 

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button, Alert, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Button, Alert, TextInput, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { AddManually } from './PantryComponents/AddManually';
 import React, {useState, useEffect} from 'react';
 import { db } from '../../firebase';
@@ -30,23 +30,29 @@ const Pantry = ({navigation, route}) => {
     getPantryList()
   }, []);
 
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
     return (
-      <View>
-        <Button
-          title="Scan Receipt"
-          onPress={openScanner}
-        />
-        <Button
-          title="Add Items Manually"
-          onPress={() => setFormVisibility(!isVisible)}
-        />
-        {isVisible ? <AddManually updateFunction={getPantryList}></AddManually>: null}
-        <Text>
-          {pantryList.map((item) => (
-            <Text key={item}>{item[0]}: {item[1]} {"\n"} <EditQuantity item={item} updateFunction={getPantryList}></EditQuantity></Text>
-          ))}
-        </Text>
-      </View>
+      <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        <View>
+          <Button
+            title="Scan Receipt"
+            onPress={openScanner}
+          />
+          <Button
+            title="Add Items Manually"
+            onPress={() => setFormVisibility(!isVisible)}
+          />
+          {isVisible ? <AddManually updateFunction={getPantryList}></AddManually>: null}
+          <Text>
+            {pantryList.map((item) => (
+              <Text key={item}>{item[0]}: {item[1]} {"\n"} <EditQuantity item={item} updateFunction={getPantryList}></EditQuantity></Text>
+            ))}
+          </Text>
+        </View>
+      </TouchableWithoutFeedback>
 
     );
 };
