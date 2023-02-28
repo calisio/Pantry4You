@@ -1,18 +1,21 @@
 import { db } from '../../firebase';
 
-const GetRecipes = async function(uid){
+const GetRecipesIds = async function(uid){
     //get list of current ingredients
     let collectionString = "users/" + uid + "/pantry";
     let pantryRef = db.collection(collectionString).doc("pantry");
     let pantryObj = await pantryRef.get();
     let pantryList = [];
     for(let i = 0; i < Object.keys(pantryObj.data()).length; i++){
-       let key = Object.keys(pantryObj.data())[i];
+        if (Object.values(pantryObj.data())[i]<1){
+            continue;
+        }
+        let key = Object.keys(pantryObj.data())[i];
         pantryList.push(key)
     }
-
     //create query with list of ingredients
-    async function fetchRecipes(ingredients){
+    async function fetchRecipesIds(ingredients){
+        let recipeList = [];
         let query = ""
         for (let i=0; i<pantryList.length; i++){
             if (i==0){
@@ -22,7 +25,6 @@ const GetRecipes = async function(uid){
                 query+=(",+" + pantryList[i]);
             }
         }
-        console.log(query);
         try {
             const recipes = await fetch('https://api.spoonacular.com/recipes/findByIngredients?ingredients='+query+'&number=10', {
                 method: 'GET',
@@ -32,12 +34,16 @@ const GetRecipes = async function(uid){
                 }
             });
             const data = await recipes.json();
-            console.log(data);
+            for (let i = 0; i<data.length; i++){
+                recipeList.push(data[i]['id'])
+            }
+            return recipeList;
           } catch (error) {
             console.log(error);
           }
         }
-    fetchRecipes(pantryList);
+    return fetchRecipesIds(pantryList);
+    //return recipes;
 }
 
-export default GetRecipes;
+export default GetRecipesIds;

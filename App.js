@@ -43,8 +43,10 @@ import {Alert} from 'react-native';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function Pages() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+function Pages({isAuthenticated, setIsAuthenticated}) {
+  console.log("PAGES RENDERED");
+  console.log(isAuthenticated);
+  //const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [uid, setUid] = useState('');
 
   //callbacks for child components
@@ -53,7 +55,7 @@ function Pages() {
     AsyncStorage.setItem('userCredentials', JSON.stringify({ email, password }));
   };
 
-  //check if uid is stored on app load
+  //check if uid is stored on pages load
   useEffect(() => {
     AsyncStorage.getItem('userCredentials').then(credentials => {
       //if user credentials are stored, use them to sign in
@@ -81,8 +83,8 @@ function Pages() {
       // Signed in 
       const user = userCredential.user;
       const { email } = user;
-      setIsAuthenticated(true);
       setUid(user.uid);
+      setIsAuthenticated(true);
       console.log("user signed in manually");
       //Store user credentials in storage for reload
       AsyncStorage.setItem('userCredentials', JSON.stringify({ email, password }))
@@ -207,11 +209,15 @@ function Pages() {
 
 
 export default function App() {
-  console.log("APP RELOAD");
+  console.log("APP LOAD");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   return (
     //<View style={styles.container}>
       <NavigationContainer>
-        <Pages/>
+        <Pages 
+          isAuthenticated={isAuthenticated} 
+          setIsAuthenticated={setIsAuthenticated}
+        />
       </NavigationContainer>
     //</View>
   );
