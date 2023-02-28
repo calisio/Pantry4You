@@ -32,10 +32,12 @@ const Pantry = ({navigation, route}) => {
 
     return (
       <View>
+        {/*
         <Button
           title="Scan Receipt"
           onPress={openScanner}
         />
+    */}
         <Button
           title="Add Items Manually"
           onPress={() => setFormVisibility(!isVisible)}
@@ -50,7 +52,7 @@ const Pantry = ({navigation, route}) => {
 
     );
 };
-
+/*
 const openScanner = () =>
     Alert.alert('Scan Receipt', 'implement later', [
       {
@@ -61,6 +63,6 @@ const openScanner = () =>
       {text: 'Cancel', onPress: () => console.log('Cancel Pressed')},
     ]);
 
-
+*/
 
 export {Pantry};
