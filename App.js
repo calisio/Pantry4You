@@ -19,6 +19,7 @@ import React, {useState} from 'react';
 import {signInWithEmailAndPassword, signOut} from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firebase from 'firebase/app';
+import {Alert} from 'react-native';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -65,18 +66,27 @@ const Tab = createBottomTabNavigator();
 console.log(auth.currentUser);
 //console.log(user);
 
-AsyncStorage.getItem('userCredentials').then(credentials => {
-  if (credentials) {
-    // Sign in the user with the stored credentials
-    const { email, password } = JSON.parse(credentials);
-    firebase.auth().signInWithEmailAndPassword(email, password)
-      .then(() => console.log('User signed in automatically'))
-      .catch(error => console.log('Error signing in:', error));
-  }
-});
 
 function Pages() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [uid, setUid] = useState('');
+
+  //check if uid is stored
+  AsyncStorage.getItem('userCredentials').then(credentials => {
+    //if user credentials are stored, use them to sign in
+    if (credentials) {
+      // Sign in the user with the stored credentials
+      const { email, password } = JSON.parse(credentials);
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          console.log('User signed in automatically');
+          setUid(userCredential.user.uid);
+          setIsAuthenticated(true);
+        })
+        .then()
+        .catch(error => console.log('Error signing in:', error));
+    }
+  });
 
   const handleLogin = (email, password) => {
     signInWithEmailAndPassword(auth, email, password)
@@ -84,7 +94,14 @@ function Pages() {
       // Signed in 
       const user = userCredential.user;
       setIsAuthenticated(true);
+      setUid(user.uid);
       console.log('user signed in');
+      //Store user credentials in storage for reload
+      const { email, password } = user;
+      AsyncStorage.setItem('userCredentials', JSON.stringify({ email, password }))
+      //AsyncStorage.setItem('uid', user.uid)
+      .then(() => console.log('User credentials stored'))
+      .catch(error => console.log('Error storing credentials:', error));
     })
     .catch((error) => {
       const errorCode = error.code;
@@ -105,6 +122,8 @@ function Pages() {
     console.log('inside handle log out')
     signOut(auth).then(() => {
       // Sign-out successful.
+      AsyncStorage.clear();
+      setUid('');
       setIsAuthenticated(false);
     }).catch((error) => {
       // An error happened.
@@ -139,6 +158,7 @@ function Pages() {
             <MaterialCommunityIcons name="home" color={color} size={size} />
           ),
         }}
+        uid = {uid}
       />
       <Tab.Screen
         name="Pantry"
