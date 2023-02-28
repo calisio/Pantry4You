@@ -40,7 +40,6 @@ const AddManually = (props) => {
         //TODO: make sure quantity is a number
         if(item != '' && quantity != ''){
             let quantityInt = parseInt(quantity);
-
             //TODO: clear TextInput
             //setItem('');
             //setQuantity('');
@@ -74,6 +73,8 @@ const AddManually = (props) => {
             }
 
             props.updateFunction();
+            setItem('');
+            setQuantity('');
         }
         else{
             Alert.alert("Fill out both fields");
@@ -108,6 +109,7 @@ const AddManually = (props) => {
             <View style={styles.container}>
                
                     <TextInput 
+                        value={item}
                         clearButtonMode='always'
                         style={styles.input}
                         placeholder="Enter item here"
@@ -116,6 +118,7 @@ const AddManually = (props) => {
                         id="item"
                     />
                     <TextInput
+                        value={quantity}
                         clearButtonMode='always' //this doesn't work - how to clear text input?
                         style={styles.input}
                         placeholder="Enter quantity here"

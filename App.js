@@ -165,7 +165,7 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
             ),
           }}
         />
-        <Tab.Screen
+        {/* <Tab.Screen
           name="Add"
           component={Add}
           initialParams={{uid:uid}}
@@ -175,7 +175,7 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
               <MaterialCommunityIcons name="hamburger-plus" color={color} size={size} />
             ),
           }}
-        />
+        /> */}
         <Tab.Screen
           name="Search"
           component={Search}
