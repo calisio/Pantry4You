@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button, Alert, TextInput, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Text, View, Button, Alert, TextInput, Keyboard, TouchableWithoutFeedback, Pressable } from 'react-native';
 import React, {useState} from 'react';
 import { db } from '../../../firebase';
 import firebase from 'firebase/compat/app';
@@ -126,10 +126,13 @@ const AddManually = (props) => {
                         defaultValue={""}
                         id="quantity"
                     />
-                    <Button
+                    <Pressable
+                        style={styles.button}
                         title="Add Item"
                         onPress={submitHandler}
-                    />
+                    >
+                        <Text style={styles.text}>Add Item</Text>
+                    </Pressable>
             </View>
     );
 };
@@ -147,7 +150,15 @@ const styles = StyleSheet.create({
         borderColor: 'gray',
         borderRadius: 8,
         paddingHorizontal: '10%',
-      }
+    },
+    button: {
+        backgroundColor: '#CCCCCC',
+        borderRadius: 8,
+        padding: 10,
+    },
+    text: {
+        alignSelf: 'center',
+    }
 });
 
 export {AddManually};

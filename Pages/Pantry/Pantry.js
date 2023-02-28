@@ -1,8 +1,9 @@
-import { StyleSheet, Text, View, Button, Alert, TextInput, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Text, View, Button, Alert, TextInput, Keyboard, TouchableWithoutFeedback, Pressable } from 'react-native';
 import { AddManually } from './PantryComponents/AddManually';
 import React, {useState, useEffect} from 'react';
 import { db } from '../../firebase';
 import { EditQuantity } from './PantryComponents/EditQuantity';
+import { setDefaultEventParameters } from 'firebase/analytics';
 
 const Pantry = ({navigation, route}) => {
   const uid = route.params.uid;
@@ -41,10 +42,12 @@ const Pantry = ({navigation, route}) => {
             title="Scan Receipt"
             onPress={openScanner}
           /> */}
-          <Button
-            title="Add Items Manually"
+          <Pressable
+            style={styles.button}
             onPress={() => setFormVisibility(!isVisible)}
-          />
+          >
+            <Text style={styles.text}>Add Items Manually</Text>
+          </Pressable>
           {isVisible ? <AddManually style={styles.addManually} updateFunction={getPantryList}></AddManually>: null}
 
           <View style={styles.listContainer}>
@@ -80,6 +83,16 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     flexWrap:'wrap',
     marginTop: '10%',
+  },
+  button: {
+    backgroundColor: '#CCCCCC',
+    borderRadius: 8,
+    padding: 10,
+    width: '40%',
+    marginBottom: '10%'
+  },
+  text: {
+    alignSelf: 'center',
   }
 
 });

@@ -1,4 +1,4 @@
-import { Alert, TextInput, View, Button, Text, StyleSheet} from "react-native";
+import { Alert, TextInput, View, Button, Text, StyleSheet, Pressable} from "react-native";
 import React, {useState} from 'react';
 import { db } from '../../../firebase';
 import { getAuth } from "firebase/auth";
@@ -50,10 +50,13 @@ const EditQuantity = (props) => {
                 defaultValue={""}
                 id="quantity"
             />
-            <Button
+            <Pressable
                 title="Submit"
                 onPress={submitHandler}
-            />
+                style={styles.button}
+            >
+                <Text style={styles.text}>Submit</Text>
+            </Pressable>
         </View>
     );
 };
@@ -62,8 +65,8 @@ const EditQuantity = (props) => {
 
 const styles = StyleSheet.create({
     container: {
-      flexDirection: 'row',
-      alignItems: 'center',
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     input: {
         width: '80%',
@@ -72,7 +75,16 @@ const styles = StyleSheet.create({
         borderColor: 'gray',
         borderRadius: 8,
         paddingHorizontal: '5%',
-      }
+    },
+    button: {
+        backgroundColor: '#CCCCCC',
+        borderRadius: 8,
+        padding: 10,
+    },
+    text: {
+        alignSelf: 'center',
+    }
+
 });
 
 
