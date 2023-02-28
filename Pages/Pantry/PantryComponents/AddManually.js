@@ -105,35 +105,46 @@ const AddManually = (props) => {
     }
 
     return (
-        <TouchableWithoutFeedback onPress={dismissKeyboard}>
-            <View style={{padding: 10}}>
-                <TextInput 
-                    clearButtonMode='always'
-                    style={{height: 40}}
-                    placeholder="Enter item here"
-                    onChangeText={newItem => setItem(newItem)}
-                    defaultValue={""}
-                    id="item"
-                />
-                <Text style={{padding: 10, fontSize: 42}}>
-                </Text>
-                <TextInput
-                    clearButtonMode='always' //this doesn't work - how to clear text input?
-                    style={{height: 40}}
-                    placeholder="Enter quantity here"
-                    onChangeText={newQuantity => setQuantity(newQuantity)}
-                    defaultValue={""}
-                    id="quantity"
-                />
-                <Text style={{padding: 10, fontSize: 42}}>
-                </Text>
-                <Button
-                    title="Add Item"
-                    onPress={submitHandler}
-                />
+            <View style={styles.container}>
+               
+                    <TextInput 
+                        clearButtonMode='always'
+                        style={styles.input}
+                        placeholder="Enter item here"
+                        onChangeText={newItem => setItem(newItem)}
+                        defaultValue={""}
+                        id="item"
+                    />
+                    <TextInput
+                        clearButtonMode='always' //this doesn't work - how to clear text input?
+                        style={styles.input}
+                        placeholder="Enter quantity here"
+                        onChangeText={newQuantity => setQuantity(newQuantity)}
+                        defaultValue={""}
+                        id="quantity"
+                    />
+                    <Button
+                        title="Add Item"
+                        onPress={submitHandler}
+                    />
             </View>
-        </TouchableWithoutFeedback>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      alignItems: 'center',
+    },
+    input: {
+        width: '70%',
+        height: 20,
+        borderWidth: 1,
+        borderColor: 'gray',
+        borderRadius: 8,
+        paddingHorizontal: '10%',
+      }
+});
 
 export {AddManually};

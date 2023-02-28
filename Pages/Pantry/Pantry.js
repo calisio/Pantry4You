@@ -45,9 +45,9 @@ const Pantry = ({navigation, route}) => {
             title="Add Items Manually"
             onPress={() => setFormVisibility(!isVisible)}
           />
-          {isVisible ? <AddManually updateFunction={getPantryList}></AddManually>: null}
+          {isVisible ? <AddManually style={styles.addManually} updateFunction={getPantryList}></AddManually>: null}
 
-          <View style={{flexDirection:'row', flexWrap:'wrap'}}>
+          <View style={styles.listContainer}>
               {pantryList.map((item) => (
                 <Text key={item}>{item[0]}: {item[1]} {"\n"} <EditQuantity item={item} updateFunction={getPantryList}></EditQuantity></Text>
               ))}
@@ -76,6 +76,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     //justifyContent: 'center',
   },
+  listContainer: {
+    flexDirection:'row',
+    flexWrap:'wrap',
+    marginTop: '10%',
+  }
 
 });
 
