@@ -3,19 +3,21 @@ import React, {useState} from 'react';
 import { db } from '../../../firebase';
 import firebase from 'firebase/compat/app';
 import { getAuth } from "firebase/auth";
+import { getPantryList } from '../Pantry';
 
 
 
 
 // https://reactnative.dev/docs/handling-text-input
 
-const AddManually = () => {
+const AddManually = (props) => {
     const [item, setItem] = useState('');
     const [quantity, setQuantity] = useState('');
 
     const auth = getAuth();
     const user = auth.currentUser.uid;
 
+    
 
     let collectionString = "users/" + user + "/pantry";
     let pantryRef = db.collection(collectionString).doc("pantry");
@@ -63,6 +65,8 @@ const AddManually = () => {
                 }
             }
 
+            
+
             if(itemExists){
                 await pantryRef.update({
                     [item]: firebase.firestore.FieldValue.increment(quantityInt)
@@ -77,6 +81,9 @@ const AddManually = () => {
             }
 
             
+            
+            props.updateFunction();
+
 
         }
         else{
@@ -132,3 +139,9 @@ const AddManually = () => {
 };
 
 export {AddManually};
+
+// export function listHook(initValue){
+//     const [list, setList] = useState(initValue);
+
+
+// }
