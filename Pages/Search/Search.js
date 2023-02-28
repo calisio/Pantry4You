@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
@@ -16,9 +16,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-var uid = "vHo5KGwsRhOJb83kOb76ThiFdQy2";
 
-function Search() {
+const Search = ({navigation, route}) => {
+  const uid = route.params.uid;
+  console.log(uid);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
@@ -62,13 +63,13 @@ function Search() {
           const friendDoc = querySnapshot.docs[0];
           const friendData = friendDoc.data();
           const friendUID = friendDoc.id;
-          return updateDoc(userRef, {
-            friends: {
-              [friendEmail]: {
-                email: friendEmail,
-                uid: friendUID,
-              }
-            }
+  
+          // Add new friend to the existing list of friends
+          updateDoc(userRef, {
+            [`friends.${friendEmail}`]: {
+              email: friendEmail,
+              uid: friendUID,
+            },
           });
         } else {
           console.log('No matching user found.');
@@ -81,6 +82,9 @@ function Search() {
         console.error(error);
       });
   }
+  
+  
+  
   
 
   return (
