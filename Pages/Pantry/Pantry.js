@@ -3,6 +3,7 @@ import { AddManually } from './PantryComponents/AddManually';
 import React, {useState, useEffect} from 'react';
 import { db } from '../../firebase';
 import { getAuth } from "firebase/auth";
+// import { currUser } from '../../App';
 
 
 
@@ -12,12 +13,27 @@ const Pantry = ({navigation}) => {
   const [isVisible, setFormVisibility] = useState(false);
   const [pantryList, setPantryList] = useState([]);
 
+  
+
   const auth = getAuth();
-  const user = auth.currentUser;
+  const user = auth.currentUser.uid;
 
-  let pantryRef2 = db.collection("users/0bWqpMhBH2lPSzVQsc1R/pantry");
+  //let pantryRef2 = db.collection("users/0bWqpMhBH2lPSzVQsc1R/pantry");
 
-    pantryRef2.onSnapshot(function(snapshot) {
+  let collectionString = "users/" + user + "/pantry";
+  // console.log("curr user here");
+  // console.log(currUser);
+  // console.log(user);
+  let pantryRef = db.collection(collectionString).doc("pantry");
+
+    // pantryRef2.onSnapshot(function(snapshot) {
+    //     snapshot.docChanges().forEach(function(change) {
+    //         //this leads to a warning about excessive callbacks - potential issue for the future?
+    //         getPantryList();
+    //     })
+    // });
+
+    pantryRef.onSnapshot(function(snapshot) {
         snapshot.docChanges().forEach(function(change) {
             //this leads to a warning about excessive callbacks - potential issue for the future?
             getPantryList();
@@ -26,15 +42,6 @@ const Pantry = ({navigation}) => {
 
   //https://dev.to/gautemeekolsen/til-firestore-get-collection-with-async-await-a5l
   const getPantryList = async() => {
-    
-    //TODO: replace hardcoded userId w/ currently logged in user
-    //let collectionString = "users/" + user + "/pantry";
-    //let pantryRef = db.collection(collectionString).doc("pantry");
-
-    let pantryRef = db.collection("users/0bWqpMhBH2lPSzVQsc1R/pantry").doc("pantry");
-
-    
-
     //---------------this works also-----------------
     // pantriesRef.where('userId', '==', '0bWqpMhBH2lPSzVQsc1R').get()
     // .then((querySnapshot) => {

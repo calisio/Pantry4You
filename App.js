@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import {getAuth} from 'firebase/auth';
+import {getAuth, onAuthStateChanged} from 'firebase/auth';
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 import { StyleSheet, Text, View } from 'react-native';
@@ -8,14 +8,15 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Login} from './Pages/Login/Login';
-import {CreateAccount} from './Pages/CreateAccount/CreateAccount';
+import {Login} from './Pages/SignIn/Login/Login';
+import {CreateAccount} from './Pages/SignIn/CreateAccount/CreateAccount';
 import {Account} from './Pages/Account/Account';
 import { Home } from './Pages/Home/Home';
 import { Pantry } from './Pages/Pantry/Pantry';
 import { Search } from './Pages/Search/Search';
 import {Add} from './Pages/Add/Add';
-import * as React from 'react';
+import React, {useState} from 'react';
+import {signInWithEmailAndPassword, signOut} from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firebase from 'firebase/app';
 
@@ -36,8 +37,25 @@ import firebase from 'firebase/app';
 
 // Initialize Firebase
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+ const app = initializeApp(firebaseConfig);
+ let uid;
+ const auth = getAuth();
+ export const user = auth.currentUser;
+
+
+//  onAuthStateChanged(auth, (user) => {
+//   if(user){
+//     uid = user.currentUser.uid
+//     console.log(uid);
+//   }
+//   else{
+//     uid = null;
+//   }
+//  })
+
+// export const currUser = uid;
+
+ 
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -58,17 +76,59 @@ AsyncStorage.getItem('userCredentials').then(credentials => {
 });
 
 function Pages() {
-  if(false){
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const handleLogin = (email, password) => {
+    signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      setIsAuthenticated(true);
+      console.log('user signed in');
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log('error');
+      Alert.alert('Invalid Login', 'The username or password you have entered is incorrect. Please try again.', [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {text: 'OK', onPress: () => console.log('OK Pressed')},
+      ]);
+    });
+  };
+
+  const handleLogout = () => {
+    console.log('inside handle log out')
+    signOut(auth).then(() => {
+      // Sign-out successful.
+      setIsAuthenticated(false);
+    }).catch((error) => {
+      // An error happened.
+    });
+  }
+
+  if(!isAuthenticated){
     return (
       <View style={styles.container}>
         <Stack.Navigator initialRouteName="Login">
-          <Stack.Screen name="Login" component={Login} options={{ title: 'Login' }} />
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            // {...(props) => <Login {...props} handleLogin={handleLogin} />}
+            options={{ title: 'Login' }}
+            initialParams={{handleLogin: handleLogin}}
+          />
           <Stack.Screen name="CreateAccount" component={CreateAccount} options={{ title: 'Create Account' }} />
+          <Stack.Screen name="Dashboard" component={CreateAccount} options={{ title: 'Create Account' }} />
         </Stack.Navigator>
     </View>
     )
   }
-  else return (
+  return (
     <Tab.Navigator>
       <Tab.Screen
         name="Home"
@@ -113,12 +173,14 @@ function Pages() {
       <Tab.Screen
         name="Account"
         component={Account}
+        // {...(props) => <Account {...props} handleLogout={handleLogout} />}
         options={{
           tabBarLabel: 'Account',
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="account-circle" color={color} size={size} />
           ),
         }}
+        initialParams={{handleLogout: handleLogout}}
       />
     </Tab.Navigator>
   );
