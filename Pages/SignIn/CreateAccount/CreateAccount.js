@@ -2,27 +2,39 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Keyboard, TouchableWithoutFeedback, Alert } from 'react-native';
 import firebase from 'firebase/app';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, deleteDoc, collection } from 'firebase/firestore';
 import { auth } from '../../../App';
 
 
-function CreateAccount({ navigation }) {
+function CreateAccount({ navigation, route }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const onUidChange = route.params.onUidChange;
 
   async function handleCreateAccount() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-
       const db = getFirestore();
       const userRef = doc(db, "users", user.uid);
-
+      //add user to db
       await setDoc(userRef, {
         email: email,
         password: password
       });
 
+      //create empty pantry subcollection for user
+      const pantryRef = collection(userRef, 'pantry');
+      setDoc(doc(pantryRef, 'pantry'), {})
+      .then(() => {
+        console.log('Empty subcollection created');
+      })
+      .catch((error) => {
+        console.error('Error creating empty subcollection: ', error);
+      });
+
+      onUidChange(user.uid, email, password);
       console.log("User added to authentication and users collection");
       Alert.alert('Account created', 'Your account has been created successfully', [
         {

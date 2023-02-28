@@ -1,4 +1,4 @@
-import {Button} from 'react-native';
+import {Button, Alert} from 'react-native';
 
 const Add = ({navigation}) => {
     return (
