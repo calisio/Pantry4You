@@ -3,7 +3,6 @@ import React, {useState} from 'react';
 import { db } from '../../../firebase';
 import firebase from 'firebase/compat/app';
 import { getAuth } from "firebase/auth";
-import { getPantryList } from '../Pantry';
 
 
 
@@ -32,7 +31,7 @@ const AddManually = (props) => {
               if(sub.docs.length == 0){
                 console.log("0 subcoll");
                 db.collection('users').doc(user).collection('pantry').doc('pantry').set({
-                  [itemInput]: [quantityInput]
+                  [itemInput]: quantityInput
                 })
               }
               else{
@@ -54,7 +53,7 @@ const AddManually = (props) => {
             //setQuantity('');
 
             await createPantryIfItDoesntExist(item, quantityInt);
-
+            console.log("check");
             let currentItems = await getCurrentPantry();
             let itemExists = false;
 
@@ -80,11 +79,7 @@ const AddManually = (props) => {
                 .then(console.log("added new field"));
             }
 
-            
-            
             props.updateFunction();
-
-
         }
         else{
             Alert.alert("Fill out both fields");
@@ -139,9 +134,3 @@ const AddManually = (props) => {
 };
 
 export {AddManually};
-
-// export function listHook(initValue){
-//     const [list, setList] = useState(initValue);
-
-
-// }
