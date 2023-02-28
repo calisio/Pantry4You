@@ -16,7 +16,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-var uid = "gM5RarV9VAej9eJgQZ66fjSnZN43";
+var uid = "vHo5KGwsRhOJb83kOb76ThiFdQy2";
 
 function Search() {
   const [searchQuery, setSearchQuery] = useState('');

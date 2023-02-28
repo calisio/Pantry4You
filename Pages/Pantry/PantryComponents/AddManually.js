@@ -18,8 +18,7 @@ const AddManually = (props) => {
 
     
 
-    let collectionString = "users/" + user + "/pantry";
-    let pantryRef = db.collection(collectionString).doc("pantry");
+    
 
     const createPantryIfItDoesntExist = async(itemInput, quantityInput) => {
         db.collection('users').doc(user).get()
@@ -33,6 +32,7 @@ const AddManually = (props) => {
                 db.collection('users').doc(user).collection('pantry').doc('pantry').set({
                   [itemInput]: quantityInput
                 })
+
               }
               else{
                 return;
@@ -64,9 +64,12 @@ const AddManually = (props) => {
                 }
             }
 
-            
+            let collectionString = "users/" + user + "/pantry";
+            let pantryRef = db.collection(collectionString).doc("pantry");
 
             if(itemExists){
+
+
                 await pantryRef.update({
                     [item]: firebase.firestore.FieldValue.increment(quantityInt)
                 }, {merge: true})
@@ -88,6 +91,10 @@ const AddManually = (props) => {
 
 
     const getCurrentPantry = async() => {
+
+        let collectionString = "users/" + user + "/pantry";
+        let pantryRef = db.collection(collectionString).doc("pantry");
+        
         let pantryObj = await pantryRef.get();
         let curPantryList = [];
 
