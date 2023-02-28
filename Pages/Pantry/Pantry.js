@@ -3,10 +3,6 @@ import { AddManually } from './PantryComponents/AddManually';
 import React, {useState, useEffect} from 'react';
 import { db } from '../../firebase';
 import { getAuth } from "firebase/auth";
-// import { currUser } from '../../App';
-
-
-
 
 const Pantry = ({navigation}) => {
 
@@ -18,44 +14,13 @@ const Pantry = ({navigation}) => {
   const auth = getAuth();
   const user = auth.currentUser.uid;
 
-  //let pantryRef2 = db.collection("users/0bWqpMhBH2lPSzVQsc1R/pantry");
-
   let collectionString = "users/" + user + "/pantry";
-  // console.log("curr user here");
-  // console.log(currUser);
-  // console.log(user);
   let pantryRef = db.collection(collectionString).doc("pantry");
-
-    // pantryRef2.onSnapshot(function(snapshot) {
-    //     snapshot.docChanges().forEach(function(change) {
-    //         //this leads to a warning about excessive callbacks - potential issue for the future?
-    //         getPantryList();
-    //     })
-    // });
-
-    pantryRef.onSnapshot(function(snapshot) {
-        snapshot.docChanges().forEach(function(change) {
-            //this leads to a warning about excessive callbacks - potential issue for the future?
-            getPantryList();
-        })
-    });
 
   //https://dev.to/gautemeekolsen/til-firestore-get-collection-with-async-await-a5l
   const getPantryList = async() => {
-    //---------------this works also-----------------
-    // pantriesRef.where('userId', '==', '0bWqpMhBH2lPSzVQsc1R').get()
-    // .then((querySnapshot) => {
-    //   const data = querySnapshot.docs.map((doc) => ({
-    //     id: doc.id,
-    //     ...doc.data(),
-    //   }));
-    //   console.log(data);
-    // })
 
     let pantryObj = await pantryRef.get();
-    //console.log("-------------");
-    //console.log((pantryObj.empty ? "empty" : "false"));
-    //console.log(pantryObj.data());
     let newPantryList = [];
 
       for(let i = 0; i < Object.keys(pantryObj.data()).length; i++){
@@ -66,7 +31,6 @@ const Pantry = ({navigation}) => {
       }
     setPantryList(newPantryList);
   }
-
 
   useEffect(() => {
     getPantryList()
@@ -82,7 +46,7 @@ const Pantry = ({navigation}) => {
           title="Add Items Manually"
           onPress={() => setFormVisibility(!isVisible)}
         />
-        {isVisible ? <AddManually></AddManually>: null}
+        {isVisible ? <AddManually updateFunction={getPantryList}></AddManually>: null}
         <Text>
           {pantryList.map((item) => (
             <Text key={item}>{item[0]}: {item[1]} {"\n"}</Text>

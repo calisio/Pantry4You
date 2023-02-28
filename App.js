@@ -39,9 +39,9 @@ import {Alert} from 'react-native';
 // Initialize Firebase
 
  const app = initializeApp(firebaseConfig);
- let uid;
- const auth = getAuth();
- export const user = auth.currentUser;
+//  let uid;
+ export const auth = getAuth();
+//  export const user = auth.currentUser;
 
 
 //  onAuthStateChanged(auth, (user) => {

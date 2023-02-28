@@ -9,36 +9,51 @@ import { getAuth } from "firebase/auth";
 
 // https://reactnative.dev/docs/handling-text-input
 
-const AddManually = () => {
+const AddManually = (props) => {
     const [item, setItem] = useState('');
     const [quantity, setQuantity] = useState('');
 
     const auth = getAuth();
     const user = auth.currentUser.uid;
 
+    
 
     let collectionString = "users/" + user + "/pantry";
-    // console.log(user.);
-    // console.log(collectionString);
     let pantryRef = db.collection(collectionString).doc("pantry");
 
-    //let pantryRef = db.collection("users/0bWqpMhBH2lPSzVQsc1R/pantry").doc("pantry");
+    const createPantryIfItDoesntExist = async(itemInput, quantityInput) => {
+        db.collection('users').doc(user).get()
+        .then(doc => {
+          if(doc.exists){
+            console.log("doc exists");
+            db.collection('users').doc(user).collection('pantry').get()
+            .then(sub => {
+              if(sub.docs.length == 0){
+                console.log("0 subcoll");
+                db.collection('users').doc(user).collection('pantry').doc('pantry').set({
+                  [itemInput]: quantityInput
+                })
+              }
+              else{
+                return;
+              }
+            });
+          }
+        });
+      }
 
 
     const submitHandler = async() => {
         //TODO: make sure quantity is a number
         if(item != '' && quantity != ''){
-            console.log("------------input-------------------");
-            console.log(item);
-            console.log(quantity);
-            console.log(user.uid);
-
             let quantityInt = parseInt(quantity);
 
             //TODO: clear TextInput
             //setItem('');
             //setQuantity('');
 
+            await createPantryIfItDoesntExist(item, quantityInt);
+            console.log("check");
             let currentItems = await getCurrentPantry();
             let itemExists = false;
 
@@ -48,6 +63,8 @@ const AddManually = () => {
                     break;
                 }
             }
+
+            
 
             if(itemExists){
                 await pantryRef.update({
@@ -62,8 +79,7 @@ const AddManually = () => {
                 .then(console.log("added new field"));
             }
 
-            
-
+            props.updateFunction();
         }
         else{
             Alert.alert("Fill out both fields");
