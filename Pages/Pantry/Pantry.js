@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Button, Alert, TextInput } from 'react-native';
 import { AddManually } from './PantryComponents/AddManually';
 import React, {useState, useEffect} from 'react';
 import { db } from '../../firebase';
-import { getAuth } from "firebase/auth";
+import { EditQuantity } from './PantryComponents/EditQuantity';
 
 const Pantry = ({navigation, route}) => {
   const uid = route.params.uid;
@@ -43,7 +43,7 @@ const Pantry = ({navigation, route}) => {
         {isVisible ? <AddManually updateFunction={getPantryList}></AddManually>: null}
         <Text>
           {pantryList.map((item) => (
-            <Text key={item}>{item[0]}: {item[1]} {"\n"}</Text>
+            <Text key={item}>{item[0]}: {item[1]} {"\n"} <EditQuantity item={item} updateFunction={getPantryList}></EditQuantity></Text>
           ))}
         </Text>
       </View>

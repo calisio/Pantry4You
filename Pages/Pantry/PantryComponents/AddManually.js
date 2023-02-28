@@ -4,9 +4,6 @@ import { db } from '../../../firebase';
 import firebase from 'firebase/compat/app';
 import { getAuth } from "firebase/auth";
 
-
-
-
 // https://reactnative.dev/docs/handling-text-input
 
 const AddManually = (props) => {
@@ -15,10 +12,6 @@ const AddManually = (props) => {
 
     const auth = getAuth();
     const user = auth.currentUser.uid;
-
-    
-
-    
 
     const createPantryIfItDoesntExist = async(itemInput, quantityInput) => {
         db.collection('users').doc(user).get()
@@ -68,8 +61,6 @@ const AddManually = (props) => {
             let pantryRef = db.collection(collectionString).doc("pantry");
 
             if(itemExists){
-
-
                 await pantryRef.update({
                     [item]: firebase.firestore.FieldValue.increment(quantityInt)
                 }, {merge: true})
@@ -94,7 +85,7 @@ const AddManually = (props) => {
 
         let collectionString = "users/" + user + "/pantry";
         let pantryRef = db.collection(collectionString).doc("pantry");
-        
+
         let pantryObj = await pantryRef.get();
         let curPantryList = [];
 
@@ -133,7 +124,7 @@ const AddManually = (props) => {
         <Text style={{padding: 10, fontSize: 42}}>
         </Text>
         <Button
-            title="SUBMIT"
+            title="Add Item"
             onPress={submitHandler}
         />
         </View>
