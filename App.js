@@ -15,7 +15,7 @@ import { Home } from './Pages/Home/Home';
 import { Pantry } from './Pages/Pantry/Pantry';
 import { Search } from './Pages/Search/Search';
 import {Add} from './Pages/Add/Add';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {signInWithEmailAndPassword, signOut} from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firebase from 'firebase/app';
@@ -37,69 +37,55 @@ import {Alert} from 'react-native';
 };
 
 // Initialize Firebase
-
  const app = initializeApp(firebaseConfig);
-//  let uid;
  export const auth = getAuth();
-//  export const user = auth.currentUser;
-
-
-//  onAuthStateChanged(auth, (user) => {
-//   if(user){
-//     uid = user.currentUser.uid
-//     console.log(uid);
-//   }
-//   else{
-//     uid = null;
-//   }
-//  })
-
-// export const currUser = uid;
-
- 
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-
-//const auth = getAuth();
-//const user = auth.currentUser.uid;
-console.log(auth.currentUser);
-//console.log(user);
-
 
 function Pages() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [uid, setUid] = useState('');
 
-  //check if uid is stored
-  AsyncStorage.getItem('userCredentials').then(credentials => {
-    //if user credentials are stored, use them to sign in
-    if (credentials) {
-      // Sign in the user with the stored credentials
-      const { email, password } = JSON.parse(credentials);
-      signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          console.log('User signed in automatically');
-          setUid(userCredential.user.uid);
-          setIsAuthenticated(true);
-        })
-        .then()
-        .catch(error => console.log('Error signing in:', error));
-    }
+  //callbacks for child components
+  function handleUidChange(uid, email, password){
+    setUid(uid);
+    AsyncStorage.setItem('userCredentials', JSON.stringify({ email, password }));
+  };
+
+  //check if uid is stored on app load
+  useEffect(() => {
+    AsyncStorage.getItem('userCredentials').then(credentials => {
+      //if user credentials are stored, use them to sign in
+      if (credentials) {
+        // Sign in the user with the stored credentials
+        const { email, password } = JSON.parse(credentials);
+        signInWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            console.log('User signed in automatically');
+            setUid(userCredential.user.uid);
+            setIsAuthenticated(true);
+          })
+          .catch(error => console.log('Error signing in:', error));
+      }
+      else{
+        console.log("not logged in");
+      }
+    });
   });
 
+  //login handler
   const handleLogin = (email, password) => {
     signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       // Signed in 
       const user = userCredential.user;
+      const { email } = user;
       setIsAuthenticated(true);
       setUid(user.uid);
-      console.log('user signed in');
+      console.log("user signed in manually");
       //Store user credentials in storage for reload
-      const { email, password } = user;
       AsyncStorage.setItem('userCredentials', JSON.stringify({ email, password }))
-      //AsyncStorage.setItem('uid', user.uid)
       .then(() => console.log('User credentials stored'))
       .catch(error => console.log('Error storing credentials:', error));
     })
@@ -119,7 +105,6 @@ function Pages() {
   };
 
   const handleLogout = () => {
-    console.log('inside handle log out')
     signOut(auth).then(() => {
       // Sign-out successful.
       AsyncStorage.clear();
@@ -141,73 +126,88 @@ function Pages() {
             options={{ title: 'Login' }}
             initialParams={{handleLogin: handleLogin}}
           />
-          <Stack.Screen name="CreateAccount" component={CreateAccount} options={{ title: 'Create Account' }} />
-          <Stack.Screen name="Dashboard" component={CreateAccount} options={{ title: 'Create Account' }} />
+          <Stack.Screen 
+            name="CreateAccount" 
+            component={CreateAccount} 
+            options={{ title: 'Create Account' }} 
+            initialParams={{onUidChange: handleUidChange}}
+            />
+          {/*<Stack.Screen name="Dashboard" component={CreateAccount} options={{ title: 'Create Account' }} onUidChange = {handleUidChange}/>*/}
         </Stack.Navigator>
     </View>
     )
   }
-  return (
-    <Tab.Navigator>
-      <Tab.Screen
-        name="Home"
-        component={Home}
-        options={{
-          tabBarLabel: 'Home',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home" color={color} size={size} />
-          ),
-        }}
-        uid = {uid}
-      />
-      <Tab.Screen
-        name="Pantry"
-        component={Pantry}
-        options={{
-          tabBarLabel: 'Pantry',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="food-apple" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Add"
-        component={Add}
-        options={{
-          //tabBarLabel: 'Add',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="hamburger-plus" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Search"
-        component={Search}
-        options={{
-          tabBarLabel: 'Search',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="account-search" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Account"
-        component={Account}
-        // {...(props) => <Account {...props} handleLogout={handleLogout} />}
-        options={{
-          tabBarLabel: 'Account',
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="account-circle" color={color} size={size} />
-          ),
-        }}
-        initialParams={{handleLogout: handleLogout}}
-      />
-    </Tab.Navigator>
-  );
+  else{
+    return (
+      <Tab.Navigator>
+        <Tab.Screen
+          name="Home"
+          component={Home}
+          initialParams={{uid:uid}}
+          options={{
+            tabBarLabel: 'Home',
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="home" color={color} size={size} />
+            ),
+          }}
+          uid = {uid}
+        />
+        <Tab.Screen
+          name="Pantry"
+          component={Pantry}
+          initialParams={{uid:uid}}
+          options={{
+            tabBarLabel: 'Pantry',
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="food-apple" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Add"
+          component={Add}
+          initialParams={{uid:uid}}
+          options={{
+            //tabBarLabel: 'Add',
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="hamburger-plus" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Search"
+          component={Search}
+          initialParams={{uid:uid}}
+          options={{
+            tabBarLabel: 'Search',
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="account-search" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Account"
+          component={Account}
+          // {...(props) => <Account {...props} handleLogout={handleLogout} />}
+          options={{
+            tabBarLabel: 'Account',
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="account-circle" color={color} size={size} />
+            ),
+          }}
+          initialParams={{
+            handleLogout: handleLogout,
+            uid:uid
+          }}
+        />
+      </Tab.Navigator>
+    );
+  }
 }
 
 
 export default function App() {
+  console.log("APP RELOAD");
   return (
     //<View style={styles.container}>
       <NavigationContainer>

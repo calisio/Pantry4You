@@ -1,16 +1,11 @@
-import {Button} from 'react-native';
+import {Text} from 'react-native';
 import GetRecipes from './GetRecipes';
 
-GetRecipes();
-
-const Home = ({navigation}) => {
+const Home = ({navigation, route}) => {
+  const uid = route.params.uid;
+  GetRecipes(uid);
     return (
-      <Button
-        title="Update Pantry"
-        onPress={() =>
-          navigation.navigate('Pantry')
-        }
-      />
+      <Text>Hello, {uid}</Text>
     );
 };
 

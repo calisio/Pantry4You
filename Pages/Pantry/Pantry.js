@@ -4,25 +4,19 @@ import React, {useState, useEffect} from 'react';
 import { db } from '../../firebase';
 import { getAuth } from "firebase/auth";
 
-const Pantry = ({navigation}) => {
-
+const Pantry = ({navigation, route}) => {
+  const uid = route.params.uid;
   const [isVisible, setFormVisibility] = useState(false);
   const [pantryList, setPantryList] = useState([]);
 
-  
-
-  const auth = getAuth();
-  const user = auth.currentUser.uid;
-
-  let collectionString = "users/" + user + "/pantry";
+  let collectionString = "users/" + uid + "/pantry";
   let pantryRef = db.collection(collectionString).doc("pantry");
-
   //https://dev.to/gautemeekolsen/til-firestore-get-collection-with-async-await-a5l
   const getPantryList = async() => {
 
     let pantryObj = await pantryRef.get();
     let newPantryList = [];
-
+    console.log(pantryObj.data());
       for(let i = 0; i < Object.keys(pantryObj.data()).length; i++){
         let key = Object.keys(pantryObj.data())[i];
         let val = Object.values(pantryObj.data())[i];
