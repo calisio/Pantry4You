@@ -36,21 +36,22 @@ const Pantry = ({navigation, route}) => {
 
     return (
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
-        <View>
-          <Button
+        <View style={styles.container}>
+          {/* <Button
             title="Scan Receipt"
             onPress={openScanner}
-          />
+          /> */}
           <Button
             title="Add Items Manually"
             onPress={() => setFormVisibility(!isVisible)}
           />
           {isVisible ? <AddManually updateFunction={getPantryList}></AddManually>: null}
-          <Text>
-            {pantryList.map((item) => (
-              <Text key={item}>{item[0]}: {item[1]} {"\n"} <EditQuantity item={item} updateFunction={getPantryList}></EditQuantity></Text>
-            ))}
-          </Text>
+
+          <View style={{flexDirection:'row', flexWrap:'wrap'}}>
+              {pantryList.map((item) => (
+                <Text key={item}>{item[0]}: {item[1]} {"\n"} <EditQuantity item={item} updateFunction={getPantryList}></EditQuantity></Text>
+              ))}
+          </View>
         </View>
       </TouchableWithoutFeedback>
 
@@ -68,5 +69,14 @@ const openScanner = () =>
     ]);
 
 
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    //justifyContent: 'center',
+  },
+
+});
 
 export {Pantry};

@@ -1,4 +1,4 @@
-import { Alert, TextInput, View, Button, Text, Keyboard, TouchableWithoutFeedback} from "react-native";
+import { Alert, TextInput, View, Button, Text, StyleSheet} from "react-native";
 import React, {useState} from 'react';
 import { db } from '../../../firebase';
 import { getAuth } from "firebase/auth";
@@ -41,17 +41,15 @@ const EditQuantity = (props) => {
     }
 
     return(
-        <View>
+        <View style={styles.container}>
             <TextInput
                 clearButtonMode='always'
-                style={{height: 30}}
+                style={styles.input}
                 placeholder="Input new quantity"
                 onChangeText={newQuantity => setQuantity(newQuantity)}
                 defaultValue={""}
                 id="quantity"
             />
-            <Text style={{padding: 10, fontSize: 42}}>
-            </Text>
             <Button
                 title="Submit"
                 onPress={submitHandler}
@@ -59,5 +57,23 @@ const EditQuantity = (props) => {
         </View>
     );
 };
+
+
+
+const styles = StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    input: {
+        width: '80%',
+        height: 20,
+        borderWidth: 1,
+        borderColor: 'gray',
+        borderRadius: 8,
+        paddingHorizontal: '5%',
+      }
+});
+
 
 export {EditQuantity};
