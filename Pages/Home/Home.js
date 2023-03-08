@@ -22,6 +22,7 @@ const Home = ({navigation, route}) => {
           }
           });
           const data = await recipe.json();
+          console.log(data['extendedIngredients']);
           const recipeObj = {
             title: data['title'],
             imgUrl: data['image'],

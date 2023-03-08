@@ -17,16 +17,16 @@ const GetRecipesIds = async function(uid){
     async function fetchRecipesIds(ingredients){
         let recipeList = [];
         let query = ""
-        for (let i=0; i<pantryList.length; i++){
+        for (let i=0; i<ingredients.length; i++){
             if (i==0){
-                query+=pantryList[i];
+                query+=ingredients[i];
             }
             else{
-                query+=(",+" + pantryList[i]);
+                query+=(",+" + ingredients[i]);
             }
         }
         try {
-            const recipes = await fetch('https://api.spoonacular.com/recipes/findByIngredients?ingredients='+query+'&number=10', {
+            const recipes = await fetch('https://api.spoonacular.com/recipes/findByIngredients?ingredients='+query+'&number=10&ranking=2', {
                 method: 'GET',
                 headers: {
                 'Content-Type': 'application/json',
