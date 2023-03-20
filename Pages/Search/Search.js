@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCjsh6Mj0fxTwcd5rwbk11ow3UATgpwrw8",
@@ -19,7 +19,6 @@ const db = getFirestore(app);
 
 const Search = ({navigation, route}) => {
   const uid = route.params.uid;
-  console.log(uid);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
@@ -61,16 +60,20 @@ const Search = ({navigation, route}) => {
       .then(querySnapshot => {
         if (!querySnapshot.empty) {
           const friendDoc = querySnapshot.docs[0];
-          const friendData = friendDoc.data();
           const friendUID = friendDoc.id;
   
-          // Add new friend to the existing list of friends
-          updateDoc(userRef, {
-            [`friends.${friendEmail}`]: {
-              email: friendEmail,
-              uid: friendUID,
-            },
-          });
+          // Retrieve the existing friends array, add the new friend UID, and update the document
+          getDoc(userRef)
+            .then((userDoc) => {
+              const userData = userDoc.data();
+              const friends = userData.friends || [];
+              if (!friends.includes(friendUID)) {
+                friends.push(friendUID);
+                updateDoc(userRef, { friends });
+              } else {
+                console.log('Friend is already added.');
+              }
+            });
         } else {
           console.log('No matching user found.');
         }
@@ -82,6 +85,9 @@ const Search = ({navigation, route}) => {
         console.error(error);
       });
   }
+  
+  
+  
   
   
   
