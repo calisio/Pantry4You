@@ -27,42 +27,35 @@ const Account = ({navigation, route}) => {
         console.log('fetch followers');
         console.log(uid);
         const fetchFollowers = async () => {
-        try {
-            const q = query(collection(db, 'users'), where('friends', 'array-contains', uid));
-            const querySnapshot = await getDocs(q);
-            const matchingUsers = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setFollowers(matchingUsers);
-            console.log(matchingUsers);
-        } catch (error) {
-            console.error(error);
-        }
+            try {
+                const q = query(collection(db, 'users'), where('friends', 'array-contains', uid));
+                const querySnapshot = await getDocs(q);
+                const matchingUsers = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                setFollowers(matchingUsers);
+                console.log(matchingUsers);
+            } catch (error) {
+                console.error(error);
+            }
         };
         const fetchFollowing = async () => {
             try {
                 const friendsDoc = await getDoc(doc(db, 'users', uid));
                 const friendsData = friendsDoc.data().friends;
-                setFollowing(friendsData);
+                if (friendsData) {
+                    const followingData = await Promise.all(friendsData.map(async friend => {
+                        const friendDoc = await getDoc(doc(db, 'users', friend.friendUID));
+                        return friendDoc.data().email;
+                    }));
+                    setFollowing(followingData);
+                }
                 console.log('Following useState:' + following);
             } catch (error) {
                 console.error(error);
             }
         };        
-    
         fetchFollowers();
         fetchFollowing();
     },[navigation, route]);
-
-    const renderFollower = ({ item }) => (
-        <View>
-          <Text>{item.name}</Text>
-        </View>
-      );
-      
-      const renderFollowing = ({ item }) => (
-        <View>
-          <Text>{item.name}</Text>
-        </View>
-      );
 
     const handleSubmit = () => {
         console.log(handleLogout)
@@ -78,7 +71,7 @@ const Account = ({navigation, route}) => {
           const friendsArray = currentUserData.friends;
           console.log('friend wanted to be removed: ' + friendUid)
           // find the index of the friend to be removed
-          const index = friendsArray.findIndex(friend => friend === friendUid);
+          const index = friendsArray.findIndex(friend => friend.friendEmail === friendUid);
           console.log('index of friend:' + index)
       
           if (index != -1) {
@@ -88,6 +81,7 @@ const Account = ({navigation, route}) => {
             // update the friends array in Firestore database
             await updateDoc(currentUserRef, { friends: currentUserData.friends });
             console.log('Friend removed successfully!');
+            setFollowing(following.filter(friend => friend !== friendUid));
           }
           else {
             console.log('no friend found')
@@ -102,18 +96,26 @@ const Account = ({navigation, route}) => {
             <Button title="Log Out" onPress={() => handleSubmit()} />
             <Text> Hello, {uid} </Text>
             <Text> Followers:</Text>
-            {followers.map((follower) => (
+            {followers.length > 0 ? (
+            followers.map((follower) => (
                 <View key={follower.id}>
                 <Text>{follower.name}</Text>
                 </View>
-            ))}
+            ))
+            ) : (
+            <Text>You do not have any followers.</Text>
+            )}
             <Text> Following:</Text>
-            {following.map((follow) => (
+            {following.length > 0 ? (
+            following.map((follow) => (
                 <View key={follow}>
                 <Text>{follow}</Text>
                 <Button title="Unfollow" onPress={() => handleUnfollow(follow, uid)}></Button>
                 </View>
-            ))}
+            ))
+            ) : (
+            <Text>You are not following anyone.</Text>
+            )}
         </View>
     );
 

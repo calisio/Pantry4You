@@ -67,8 +67,9 @@ const Search = ({navigation, route}) => {
             .then((userDoc) => {
               const userData = userDoc.data();
               const friends = userData.friends || [];
-              if (!friends.includes(friendUID)) {
-                friends.push(friendUID);
+              const friendData = { friendUID: friendUID, friendEmail: friendEmail };
+              if (!friends.some(f => f.friendUID === friendUID)) {
+                friends.push(friendData);
                 updateDoc(userRef, { friends });
               } else {
                 console.log('Friend is already added.');
