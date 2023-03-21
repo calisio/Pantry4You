@@ -1,7 +1,7 @@
-import { FlatList, StyleSheet, Text, View, Button, FlatList, Image, Linking, SafeAreaView, StatusBar } from 'react-native';
+import { StyleSheet, Text, View, Button, FlatList, Image, Linking, SafeAreaView, StatusBar } from 'react-native';
 import { getFirestore, collection, query, where, getDocs, getDoc, doc, updateDoc } from 'firebase/firestore';
 import { initializeApp } from "firebase/app";
-import React, {useState, useEffect, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 
 const firebaseConfig = {
     apiKey: "AIzaSyCjsh6Mj0fxTwcd5rwbk11ow3UATgpwrw8",
@@ -12,8 +12,6 @@ const firebaseConfig = {
     appId: "1:951653716590:web:a5c9df4baaf8b9fef2cc7f",
     measurementId: "G-MV5KGDBTTJ"
   };
-  import { collection, getDocs } from "firebase/firestore";
-import { db } from '../../firebase';
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);  
 
