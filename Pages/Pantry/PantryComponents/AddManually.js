@@ -4,6 +4,7 @@ import { db } from '../../../firebase';
 import firebase from 'firebase/compat/app';
 import { getAuth } from "firebase/auth";
 import { SelectList } from 'react-native-dropdown-select-list';
+import { getFoodUnit } from '../../../utils/getFoodUnit';
 
 
 // https://reactnative.dev/docs/handling-text-input
@@ -59,44 +60,59 @@ const AddManually = (props) => {
         //TODO: make sure quantity is a number
         if(item != '' && quantity != '' && selectedUnit != ''){
             let quantityInt = parseInt(quantity);
-            //TODO: clear TextInput
-            //setItem('');
-            //setQuantity('');
 
-            await createPantryIfItDoesntExist(item, quantityInt);
-            console.log("check");
-            let currentItems = await getCurrentPantry();
-            let itemExists = false;
+            let foodUnit = await getFoodUnit(item);
+            // console.log("unit:");
+            // console.log(foodUnit);
 
-            console.log("&&&&&&&&&&&&");
-            for(let i = 0; i < currentItems.length; i++){
-                if(Object.values(currentItems[i])[0] == item){
-                    itemExists = true;
-                    break;
+            if(foodUnit == selectedUnit){
+                
+
+                //TODO: clear TextInput
+                //setItem('');
+                //setQuantity('');
+
+                await createPantryIfItDoesntExist(item, quantityInt);
+                console.log("check");
+                let currentItems = await getCurrentPantry();
+                let itemExists = false;
+
+                // console.log("&&&&&&&&&&&&");
+                for(let i = 0; i < currentItems.length; i++){
+                    if(Object.values(currentItems[i])[0] == item){
+                        itemExists = true;
+                        break;
+                    }
                 }
-            }
 
-            console.log(itemExists);
+                // console.log(itemExists);
 
-            let collectionString = "users/" + user + "/pantry";
-            let itemRef = db.collection(collectionString).doc(item);
+                let collectionString = "users/" + user + "/pantry";
+                let itemRef = db.collection(collectionString).doc(item);
 
-            if(itemExists){
-                await itemRef.update({
-                    [selectedUnit]: firebase.firestore.FieldValue.increment(quantityInt)
-                }, {merge: true})
-                .then(console.log("incremented current field"));
+                if(itemExists){
+                    await itemRef.update({
+                        [selectedUnit]: firebase.firestore.FieldValue.increment(quantityInt)
+                    }, {merge: true})
+                    .then(console.log("incremented current field"));
+                }
+                else{
+                    await itemRef.set({
+                        [selectedUnit]: quantityInt
+                    }, {merge: true})
+                    .then(console.log("added new field"));
+                }
+
+                props.updateFunction();
+                setItem('');
+                setQuantity('');
+                setSelectedUnit('');
             }
             else{
-                await itemRef.set({
-                    [selectedUnit]: quantityInt
-                }, {merge: true})
-                .then(console.log("added new field"));
+                console.log("units bad");
+                let alertString = "Please enter the quantity in " + foodUnit;
+                Alert.alert(alertString);
             }
-
-            props.updateFunction();
-            setItem('');
-            setQuantity('');
         }
         else{
             Alert.alert("Fill out all fields");
