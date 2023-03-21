@@ -1,6 +1,6 @@
 import { db } from '../../firebase';
 
-const GetRecipesIds = async function(uid){
+const GetRecipes = async function(uid){
     //get list of current ingredients
     let collectionString = "users/" + uid + "/pantry";
     let pantryRef = db.collection(collectionString).doc("pantry");
@@ -14,7 +14,7 @@ const GetRecipesIds = async function(uid){
         pantryList.push(key)
     }
     //create query with list of ingredients
-    async function fetchRecipesIds(ingredients){
+    async function fetchRecipes(ingredients){
         let recipeList = [];
         let query = ""
         for (let i=0; i<ingredients.length; i++){
@@ -35,15 +35,24 @@ const GetRecipesIds = async function(uid){
             });
             const data = await recipes.json();
             for (let i = 0; i<data.length; i++){
-                recipeList.push(data[i]['id'])
+                let tempRecipe = {
+                    title: data[i]['title'],
+                    imgUrl: data[i]['image'],
+                    recipeId: data[i]['id'],
+                    missedCount: data[i]['missedIngredientCount'],
+                    missed: data[i]['missedIngredients'],
+                    used: data[i]['usedIngredients'],
+                    recipeUrl: ""
+                  };
+                recipeList.push(tempRecipe)
             }
+            //console.log(recipeList);
             return recipeList;
           } catch (error) {
             console.log(error);
           }
         }
-    return fetchRecipesIds(pantryList);
-    //return recipes;
+    return fetchRecipes(pantryList);
 }
 
-export default GetRecipesIds;
+export default GetRecipes;
