@@ -25,15 +25,22 @@ const AddManually = (props) => {
     const auth = getAuth();
     const user = auth.currentUser.uid;
 
+
+
+    async function getUnit(item){
+        return db.collection('foodUnits').doc('pantry').get()
+        .then((doc) => doc.get({item}));
+    }
+
     const createPantryIfItDoesntExist = async(itemInput, quantityInput) => {
         db.collection('users').doc(user).get()
         .then(doc => {
           if(doc.exists){
-            console.log("doc exists");
+            console.log("user exists");
             db.collection('users').doc(user).collection('pantry').get()
             .then(sub => {
               if(sub.docs.length == 0){
-                console.log("0 subcoll");
+                console.log("pantry empty");
                 db.collection('users').doc(user).collection('pantry').doc(item).set({
                   [selectedUnit]: quantityInput
                 })
@@ -61,25 +68,28 @@ const AddManually = (props) => {
             let currentItems = await getCurrentPantry();
             let itemExists = false;
 
+            console.log("&&&&&&&&&&&&");
             for(let i = 0; i < currentItems.length; i++){
-                if(currentItems[i][0] == item){
+                if(Object.values(currentItems[i])[0] == item){
                     itemExists = true;
                     break;
                 }
             }
 
+            console.log(itemExists);
+
             let collectionString = "users/" + user + "/pantry";
-            let pantryRef = db.collection(collectionString).doc("pantry");
+            let itemRef = db.collection(collectionString).doc(item);
 
             if(itemExists){
-                await pantryRef.update({
-                    [item]: firebase.firestore.FieldValue.increment(quantityInt)
+                await itemRef.update({
+                    [selectedUnit]: firebase.firestore.FieldValue.increment(quantityInt)
                 }, {merge: true})
                 .then(console.log("incremented current field"));
             }
             else{
-                await pantryRef.update({
-                    [item]: quantityInt
+                await itemRef.set({
+                    [selectedUnit]: quantityInt
                 }, {merge: true})
                 .then(console.log("added new field"));
             }
@@ -97,17 +107,32 @@ const AddManually = (props) => {
     const getCurrentPantry = async() => {
 
         let collectionString = "users/" + user + "/pantry";
-        let pantryRef = db.collection(collectionString).doc("pantry");
+        let pantryRef = db.collection(collectionString);
 
-        let pantryObj = await pantryRef.get();
+        // let pantryObj = await pantryRef.get();
         let curPantryList = [];
 
-        for(let i = 0; i < Object.keys(pantryObj.data()).length; i++){
-            let key = Object.keys(pantryObj.data())[i];
-            let val = Object.values(pantryObj.data())[i];
-            let listEntry = [key, val];
-            curPantryList.push(listEntry)
+        // for(let i = 0; i < Object.keys(pantryObj.data()).length; i++){
+        //     let key = Object.keys(pantryObj.data())[i];
+        //     let val = Object.values(pantryObj.data())[i];
+        //     let listEntry = [key, val];
+        //     curPantryList.push(listEntry)
+        // }
+
+        let tempDoc;
+
+        await pantryRef.get().then((querySnapshot) => {
+            tempDoc = querySnapshot.docs.map((doc) => {
+                return { id: doc.id }
+            })
+        })
+
+        console.log("cur pantry start-------------");
+        for(let i=0; i < tempDoc.length; i++){
+            curPantryList.push(tempDoc[i]);
+            console.log(tempDoc[i]);
         }
+        console.log("cur pantry end-------------");
 
         return curPantryList;
     }
