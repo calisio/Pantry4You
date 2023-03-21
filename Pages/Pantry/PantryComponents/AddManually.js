@@ -64,34 +64,23 @@ const AddManually = (props) => {
 
             let foodUnit = await getFoodUnit(item);
 
-            
-            // console.log("unit:");
-            // console.log(foodUnit);
-
             if(foodUnit == selectedUnit || foodUnit == "insertNewUnit"){
                 
                 if(foodUnit == "insertNewUnit"){
                     setFoodUnit(item, selectedUnit);
                 }
 
-                //TODO: clear TextInput
-                //setItem('');
-                //setQuantity('');
-
                 await createPantryIfItDoesntExist(item, quantityInt);
                 console.log("check");
                 let currentItems = await getCurrentPantry();
                 let itemExists = false;
 
-                // console.log("&&&&&&&&&&&&");
                 for(let i = 0; i < currentItems.length; i++){
                     if(Object.values(currentItems[i])[0] == item){
                         itemExists = true;
                         break;
                     }
                 }
-
-                // console.log(itemExists);
 
                 let collectionString = "users/" + user + "/pantry";
                 let itemRef = db.collection(collectionString).doc(item);
@@ -112,7 +101,8 @@ const AddManually = (props) => {
                 props.updateFunction();
                 setItem('');
                 setQuantity('');
-                setSelectedUnit('');
+                //TODO: how to reset dropdown?  this clears the var, but dropdown display doesn't change
+                //setSelectedUnit('');
             }
             else{
                 console.log("units bad");
