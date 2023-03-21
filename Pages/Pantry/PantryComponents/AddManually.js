@@ -5,6 +5,7 @@ import firebase from 'firebase/compat/app';
 import { getAuth } from "firebase/auth";
 import { SelectList } from 'react-native-dropdown-select-list';
 import { getFoodUnit } from '../../../utils/getFoodUnit';
+import { setFoodUnit } from '../../../utils/setFoodUnit';
 
 
 // https://reactnative.dev/docs/handling-text-input
@@ -62,11 +63,16 @@ const AddManually = (props) => {
             let quantityInt = parseInt(quantity);
 
             let foodUnit = await getFoodUnit(item);
+
+            
             // console.log("unit:");
             // console.log(foodUnit);
 
-            if(foodUnit == selectedUnit){
+            if(foodUnit == selectedUnit || foodUnit == "insertNewUnit"){
                 
+                if(foodUnit == "insertNewUnit"){
+                    setFoodUnit(item, selectedUnit);
+                }
 
                 //TODO: clear TextInput
                 //setItem('');

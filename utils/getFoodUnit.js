@@ -2,7 +2,10 @@ import { db } from "../firebase";
 
 
 export async function getFoodUnit(item){
-    let unitList = await db.collection('foodUnits').doc('units').get();
+
+    const unitListRef = db.collection('foodUnits').doc('units')
+
+    let unitList = await unitListRef.get();
     // console.log(Object.keys(unitList.data()));
     if(unitList.data().hasOwnProperty(item)){
         console.log("unit exists");
@@ -11,7 +14,7 @@ export async function getFoodUnit(item){
     }
     else{
         console.log("unit DNE");
-        //TODO: insert new unit
-        return "null"; //intentionally string null - so we can see in db
+        //New unit is inserted in AddManully by calling setFoodUnit
+        return "insertNewUnit"; 
     }
 }
