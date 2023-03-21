@@ -3,12 +3,24 @@ import React, {useState} from 'react';
 import { db } from '../../../firebase';
 import firebase from 'firebase/compat/app';
 import { getAuth } from "firebase/auth";
+import { SelectList } from 'react-native-dropdown-select-list';
+
 
 // https://reactnative.dev/docs/handling-text-input
 
 const AddManually = (props) => {
     const [item, setItem] = useState('');
     const [quantity, setQuantity] = useState('');
+    const [selectedUnit, setSelectedUnit] = useState('');
+
+    //https://www.npmjs.com/package/react-native-dropdown-select-list
+    const units = [
+        {key:'1', value:'cup'},
+        {key:'2', value:'tbsp'},
+        {key:'3', value:'lb'},
+        {key:'4', value:'g'},
+        {key:'5', value:'item'}
+    ]
 
     const auth = getAuth();
     const user = auth.currentUser.uid;
@@ -22,8 +34,8 @@ const AddManually = (props) => {
             .then(sub => {
               if(sub.docs.length == 0){
                 console.log("0 subcoll");
-                db.collection('users').doc(user).collection('pantry').doc('pantry').set({
-                  [itemInput]: quantityInput
+                db.collection('users').doc(user).collection('pantry').doc(item).set({
+                  [selectedUnit]: quantityInput
                 })
 
               }
@@ -38,7 +50,7 @@ const AddManually = (props) => {
 
     const submitHandler = async() => {
         //TODO: make sure quantity is a number
-        if(item != '' && quantity != ''){
+        if(item != '' && quantity != '' && selectedUnit != ''){
             let quantityInt = parseInt(quantity);
             //TODO: clear TextInput
             //setItem('');
@@ -125,6 +137,11 @@ const AddManually = (props) => {
                         onChangeText={newQuantity => setQuantity(newQuantity)}
                         defaultValue={""}
                         id="quantity"
+                    />
+                    <SelectList
+                        setSelected={(val) => setSelectedUnit(val)}
+                        data={units}
+                        save="value"
                     />
                     <Pressable
                         style={styles.button}
