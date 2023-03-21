@@ -11,19 +11,44 @@ const Pantry = ({navigation, route}) => {
   const [pantryList, setPantryList] = useState([]);
 
   let collectionString = "users/" + uid + "/pantry";
-  let pantryRef = db.collection(collectionString).doc("pantry");
+  let pantryRef = db.collection(collectionString);
   //https://dev.to/gautemeekolsen/til-firestore-get-collection-with-async-await-a5l
   const getPantryList = async() => {
 
-    let pantryObj = await pantryRef.get();
+    // let pantryObj = await pantryRef.get();
+
     let newPantryList = [];
-    console.log(pantryObj.data());
-      for(let i = 0; i < Object.keys(pantryObj.data()).length; i++){
-        let key = Object.keys(pantryObj.data())[i];
-        let val = Object.values(pantryObj.data())[i];
-        let newListEntry = [key, val];
-        newPantryList.push(newListEntry)
-      }
+
+    let tempDoc;
+
+    await pantryRef.get().then((querySnapshot) => {
+      tempDoc = querySnapshot.docs.map((doc) => {
+        return { id: doc.id, ...doc.data()}
+      })
+    })
+
+    for(let i=0; i < tempDoc.length; i++){
+      let item = Object.values(tempDoc[i])[0];
+      let qty = Object.values(tempDoc[i])[1];
+      let unit = Object.keys(tempDoc[i])[1];
+      // console.log(item);
+      // console.log(qty);
+      // console.log(unit);
+      let newListEntry = [item, qty, unit];
+      newPantryList.push(newListEntry);
+    }
+    console.log(tempDoc)
+    //need to get id here
+
+    // console.log(pantryObj.docs.map(doc => doc.data()));
+    console.log("----------------");
+      // for(let i = 0; i < Object.keys(pantryObj.data()).length; i++){
+      //   let item = Object.keys(pantryObj.data())[i];
+      //   let qty = Object.values(pantryObj.data())[i];
+      //   let unit = Object.values()
+      //   let newListEntry = [key, val];
+      //   newPantryList.push(newListEntry)
+      // }
     setPantryList(newPantryList);
   }
 
@@ -52,7 +77,7 @@ const Pantry = ({navigation, route}) => {
 
           <View style={styles.listContainer}>
               {pantryList.map((item) => (
-                <Text key={item}>{item[0]}: {item[1]} {"\n"} <EditQuantity item={item} updateFunction={getPantryList}></EditQuantity></Text>
+                <Text key={item}>{item[0]}: {item[1]} {item[2]} {"\n"} <EditQuantity item={item} updateFunction={getPantryList}></EditQuantity></Text>
               ))}
           </View>
         </View>

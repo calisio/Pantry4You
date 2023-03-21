@@ -3,27 +3,48 @@ import React, {useState} from 'react';
 import { db } from '../../../firebase';
 import firebase from 'firebase/compat/app';
 import { getAuth } from "firebase/auth";
+import { SelectList } from 'react-native-dropdown-select-list';
+import { getFoodUnit } from '../../../utils/getFoodUnit';
+import { setFoodUnit } from '../../../utils/setFoodUnit';
+
 
 // https://reactnative.dev/docs/handling-text-input
 
 const AddManually = (props) => {
     const [item, setItem] = useState('');
     const [quantity, setQuantity] = useState('');
+    const [selectedUnit, setSelectedUnit] = useState('');
+
+    //https://www.npmjs.com/package/react-native-dropdown-select-list
+    const units = [
+        {key:'1', value:'cup'},
+        {key:'2', value:'tbsp'},
+        {key:'3', value:'lb'},
+        {key:'4', value:'g'},
+        {key:'5', value:'item'}
+    ]
 
     const auth = getAuth();
     const user = auth.currentUser.uid;
+
+
+
+    // async function getUnit(item){
+    //     return db.collection('foodUnits').doc('pantry').get()
+    //     .then((doc) => doc.get({item}));
+    // }
 
     const createPantryIfItDoesntExist = async(itemInput, quantityInput) => {
         db.collection('users').doc(user).get()
         .then(doc => {
           if(doc.exists){
-            console.log("doc exists");
+            console.log("user exists");
             db.collection('users').doc(user).collection('pantry').get()
             .then(sub => {
               if(sub.docs.length == 0){
-                console.log("0 subcoll");
-                db.collection('users').doc(user).collection('pantry').doc('pantry').set({
-                  [itemInput]: quantityInput
+                console.log("pantry empty");
+                db.collection('users').doc(user).collection('pantry').doc(item).set({
+                  [selectedUnit]: quantityInput
                 })
 
               }
@@ -38,46 +59,59 @@ const AddManually = (props) => {
 
     const submitHandler = async() => {
         //TODO: make sure quantity is a number
-        if(item != '' && quantity != ''){
+        if(item != '' && quantity != '' && selectedUnit != ''){
             let quantityInt = parseInt(quantity);
-            //TODO: clear TextInput
-            //setItem('');
-            //setQuantity('');
 
-            await createPantryIfItDoesntExist(item, quantityInt);
-            console.log("check");
-            let currentItems = await getCurrentPantry();
-            let itemExists = false;
+            let foodUnit = await getFoodUnit(item);
 
-            for(let i = 0; i < currentItems.length; i++){
-                if(currentItems[i][0] == item){
-                    itemExists = true;
-                    break;
+            if(foodUnit == selectedUnit || foodUnit == "insertNewUnit"){
+                
+                if(foodUnit == "insertNewUnit"){
+                    setFoodUnit(item, selectedUnit);
                 }
-            }
 
-            let collectionString = "users/" + user + "/pantry";
-            let pantryRef = db.collection(collectionString).doc("pantry");
+                await createPantryIfItDoesntExist(item, quantityInt);
+                console.log("check");
+                let currentItems = await getCurrentPantry();
+                let itemExists = false;
 
-            if(itemExists){
-                await pantryRef.update({
-                    [item]: firebase.firestore.FieldValue.increment(quantityInt)
-                }, {merge: true})
-                .then(console.log("incremented current field"));
+                for(let i = 0; i < currentItems.length; i++){
+                    if(Object.values(currentItems[i])[0] == item){
+                        itemExists = true;
+                        break;
+                    }
+                }
+
+                let collectionString = "users/" + user + "/pantry";
+                let itemRef = db.collection(collectionString).doc(item);
+
+                if(itemExists){
+                    await itemRef.update({
+                        [selectedUnit]: firebase.firestore.FieldValue.increment(quantityInt)
+                    }, {merge: true})
+                    .then(console.log("incremented current field"));
+                }
+                else{
+                    await itemRef.set({
+                        [selectedUnit]: quantityInt
+                    }, {merge: true})
+                    .then(console.log("added new field"));
+                }
+
+                props.updateFunction();
+                setItem('');
+                setQuantity('');
+                //TODO: how to reset dropdown?  this clears the var, but dropdown display doesn't change
+                //setSelectedUnit('');
             }
             else{
-                await pantryRef.update({
-                    [item]: quantityInt
-                }, {merge: true})
-                .then(console.log("added new field"));
+                console.log("units bad");
+                let alertString = "Please enter the quantity in " + foodUnit;
+                Alert.alert(alertString);
             }
-
-            props.updateFunction();
-            setItem('');
-            setQuantity('');
         }
         else{
-            Alert.alert("Fill out both fields");
+            Alert.alert("Fill out all fields");
         }
     }
 
@@ -85,17 +119,32 @@ const AddManually = (props) => {
     const getCurrentPantry = async() => {
 
         let collectionString = "users/" + user + "/pantry";
-        let pantryRef = db.collection(collectionString).doc("pantry");
+        let pantryRef = db.collection(collectionString);
 
-        let pantryObj = await pantryRef.get();
+        // let pantryObj = await pantryRef.get();
         let curPantryList = [];
 
-        for(let i = 0; i < Object.keys(pantryObj.data()).length; i++){
-            let key = Object.keys(pantryObj.data())[i];
-            let val = Object.values(pantryObj.data())[i];
-            let listEntry = [key, val];
-            curPantryList.push(listEntry)
+        // for(let i = 0; i < Object.keys(pantryObj.data()).length; i++){
+        //     let key = Object.keys(pantryObj.data())[i];
+        //     let val = Object.values(pantryObj.data())[i];
+        //     let listEntry = [key, val];
+        //     curPantryList.push(listEntry)
+        // }
+
+        let tempDoc;
+
+        await pantryRef.get().then((querySnapshot) => {
+            tempDoc = querySnapshot.docs.map((doc) => {
+                return { id: doc.id }
+            })
+        })
+
+        console.log("cur pantry start-------------");
+        for(let i=0; i < tempDoc.length; i++){
+            curPantryList.push(tempDoc[i]);
+            console.log(tempDoc[i]);
         }
+        console.log("cur pantry end-------------");
 
         return curPantryList;
     }
@@ -125,6 +174,11 @@ const AddManually = (props) => {
                         onChangeText={newQuantity => setQuantity(newQuantity)}
                         defaultValue={""}
                         id="quantity"
+                    />
+                    <SelectList
+                        setSelected={(val) => setSelectedUnit(val)}
+                        data={units}
+                        save="value"
                     />
                     <Pressable
                         style={styles.button}
