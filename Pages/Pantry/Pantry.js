@@ -12,13 +12,11 @@ const Pantry = ({navigation, route}) => {
 
   let collectionString = "users/" + uid + "/pantry";
   let pantryRef = db.collection(collectionString);
+  
   //https://dev.to/gautemeekolsen/til-firestore-get-collection-with-async-await-a5l
   const getPantryList = async() => {
 
-    // let pantryObj = await pantryRef.get();
-
     let newPantryList = [];
-
     let tempDoc;
 
     await pantryRef.get().then((querySnapshot) => {
@@ -31,24 +29,9 @@ const Pantry = ({navigation, route}) => {
       let item = Object.values(tempDoc[i])[0];
       let qty = Object.values(tempDoc[i])[1];
       let unit = Object.keys(tempDoc[i])[1];
-      // console.log(item);
-      // console.log(qty);
-      // console.log(unit);
       let newListEntry = [item, qty, unit];
       newPantryList.push(newListEntry);
     }
-    console.log(tempDoc)
-    //need to get id here
-
-    // console.log(pantryObj.docs.map(doc => doc.data()));
-    console.log("----------------");
-      // for(let i = 0; i < Object.keys(pantryObj.data()).length; i++){
-      //   let item = Object.keys(pantryObj.data())[i];
-      //   let qty = Object.values(pantryObj.data())[i];
-      //   let unit = Object.values()
-      //   let newListEntry = [key, val];
-      //   newPantryList.push(newListEntry)
-      // }
     setPantryList(newPantryList);
   }
 
