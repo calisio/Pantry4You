@@ -2,6 +2,7 @@ import { Alert, TextInput, View, Button, Text, StyleSheet, Pressable} from "reac
 import React, {useState} from 'react';
 import { db } from '../../../firebase';
 import { getAuth } from "firebase/auth";
+import { getFoodUnit } from "../../../utils/getFoodUnit";
 
 
 
@@ -17,16 +18,16 @@ const EditQuantity = (props) => {
                 return;
             }
             else{
+                let editedItem = props.item[0];
+                const unit = await getFoodUnit(editedItem);
                 const auth = getAuth();
                 const user = auth.currentUser.uid;
                 let collectionString = "users/" + user + "/pantry";
-                let pantryRef = db.collection(collectionString).doc("pantry");
-                let editedItem = props.item[0];
-                console.log("EDITED");
-                console.log(editedItem);
-
-                await pantryRef.update({
-                    [editedItem]: quantityInt
+                let itemRef = db.collection(collectionString).doc(editedItem);
+                console.log("EDITED ", editedItem);
+                console.log(unit);
+                await itemRef.update({
+                    [unit]: quantityInt
                 }, {merge: true})
                 .then(console.log("edited quantity"))
                 .then(() => {

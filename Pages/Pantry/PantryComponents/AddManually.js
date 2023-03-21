@@ -27,10 +27,10 @@ const AddManually = (props) => {
 
 
 
-    async function getUnit(item){
-        return db.collection('foodUnits').doc('pantry').get()
-        .then((doc) => doc.get({item}));
-    }
+    // async function getUnit(item){
+    //     return db.collection('foodUnits').doc('pantry').get()
+    //     .then((doc) => doc.get({item}));
+    // }
 
     const createPantryIfItDoesntExist = async(itemInput, quantityInput) => {
         db.collection('users').doc(user).get()
@@ -99,7 +99,7 @@ const AddManually = (props) => {
             setQuantity('');
         }
         else{
-            Alert.alert("Fill out both fields");
+            Alert.alert("Fill out all fields");
         }
     }
 
