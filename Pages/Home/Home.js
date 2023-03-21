@@ -1,9 +1,9 @@
 import {Text, FlatList, SafeAreaView, View, Image, Linking, StyleSheet, StatusBar,} from 'react-native';
-import GetRecipesIds from './GetRecipesIds';
+import GetRecipes from './GetRecipes';
 import React, {useState, useEffect} from 'react';
 //import { useTheme } from '@mui/material/styles';
 //import Box from '@mui/material/Box';
-import { Box, Spinner, Heading, HStack, Center, AspectRatio } from 'native-base';
+import { Box, Spinner, Heading, HStack, Center, AspectRatio, Skeleton, VStack } from 'native-base';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { addDoc, deleteDoc, doc, getDocs, query, where, collection } from 'firebase/firestore';
 import { db } from '../../firebase';
@@ -61,12 +61,11 @@ const Home = ({navigation, route}) => {
 
   //function used to get recipes
   async function fetchRecipes() {
-    const recipesIds = await GetRecipesIds(uid);
-    let recipeListTemp = [];
-    for (let i = 0; i < recipesIds.length; i++) {
+    let recipesObjs = await GetRecipes(uid);
+    for (let i = 0; i < recipesObjs.length; i++) {
       try {
         // Ensure recipeId is a string
-        const recipeIdString = String(recipesIds[i]);
+        const recipeIdString = String(recipesObjs[i]['recipeId']);
         const recipe = await fetch('https://api.spoonacular.com/recipes/' + recipeIdString + '/information?includeNutrition=false', {
           method: 'GET',
           headers: {
@@ -75,18 +74,12 @@ const Home = ({navigation, route}) => {
           },
         });
         const data = await recipe.json();
-        const recipeObj = {
-          title: data['title'],
-          imgUrl: data['image'],
-          recipeUrl: data['sourceUrl'],
-          recipeId: data['id'],
-        };
-        recipeListTemp.push(recipeObj);
+        recipesObjs[i]['recipeUrl']=data['sourceUrl'];
       } catch (error) {
         console.log(error);
       }
     }
-    setRecipeList(recipeListTemp);
+    setRecipeList(recipesObjs);
     setIsLoading(false);
   }
   
@@ -100,12 +93,13 @@ const Home = ({navigation, route}) => {
   const handleRefresh = async () => {
     console.log("REFRESH");
     setIsRefreshing(true);
+    //setIsLoading(true);
     await fetchRecipes();
+    //setIsLoading(false);
     setIsRefreshing(false);
   };
 
   const RecipeView = ({item}) => (
-    <>
     <Box
       justifyContent= 'center'
       alignItems= 'center'
@@ -114,70 +108,57 @@ const Home = ({navigation, route}) => {
       borderColor="coolGray.200" 
       borderWidth="1"
     >
-      <AspectRatio w="100%" ratio={16 / 9}>
-        <Image source={{
-          uri: item.imgUrl
-        }} alt="image" />
-      </AspectRatio>
+      <Box>
+        <AspectRatio w="100%" ratio={16 / 9}>
+          <Image source={{
+            uri: item.imgUrl
+          }} alt="image" />
+        </AspectRatio>
+        <Center bg="rgba(255, 255, 255, 0.4)"
+        _text={{
+          color: "red.600",
+          fontWeight: "700",
+          fontSize: "xs"
+        }} 
+        position="absolute" 
+        bottom="0" 
+        right="0"
+        px="3" 
+        py="1.5">
+            {item.missedCount} missing
+        </Center>
+        <Center 
+        position="absolute" 
+        top="0" 
+        right="0"
+        px="3" 
+        py="1.5">
+          <MaterialCommunityIcons
+            name="heart-outline"
+            color="#f44336"
+            size={24}
+            onPress={() => handleFavorite(item.recipeId)}
+          />
+        </Center>
+      </Box>
       <Heading>{item.title}</Heading>
     </Box>
-    {/*
-    <Box
-    sx={{
-      //paddingLeft: 2,
-      //paddingRight: 2,
-      //width: '70%',
-      //display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      //flexWrap: 'wrap'
-    }}
-    >
-      <Paper elevation={2}>
-      <Grid container spacing={2}>
-        <Grid item xs={4}>
-          <Image
-            source={{ uri: item.imgUrl }}
-            style={{ width: 'auto', height: 100 }}
-          />
-        </Grid>
-        <Grid item xs={8}>
-          <Stack spacing={2}>
-            <Text>
-              {item.title}
-            </Text>
-            <Text
-              onPress={() => Linking.openURL(item.recipeUrl)}>
-              {item.soureName}
-            </Text>
-          </Stack>
-        </Grid>
-        <Grid item xs={12}>
-          <Text>INGREDIENT LIST</Text>
-        </Grid>
-      </Grid>
-      </Paper>
-    </Box>
-
-
-    <View style={styles.favoriteButton}>
-        <MaterialCommunityIcons
-          name="heart-outline"
-          color="#f44336"
-          size={24}
-          onPress={() => handleFavorite(item.recipeId)}
-        />
-      </View>
-  */}
-  </>
   );
 
 
   return (
       <HStack justifyContent="center" alignItems="center" h="full">
       {isLoading ? (
-        <Center>
-          <Spinner size="lg" />
+        <Center w="100%">
+          <VStack w="90%" maxW="400" borderWidth="1" space={8} overflow="hidden" rounded="md" _dark={{
+            borderColor: "coolGray.500"
+            }} _light={{
+            borderColor: "coolGray.200"
+          }}>
+            <Skeleton h="40" />
+            <Skeleton.Text px="4" />
+            <Skeleton px="4" my="4" rounded="md" startColor="primary.100" />
+          </VStack>
         </Center>
       ) : (
         <Box padding="5" >
