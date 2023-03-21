@@ -1,17 +1,13 @@
 import {Text, FlatList, SafeAreaView, View, Image, Linking, StyleSheet, StatusBar,} from 'react-native';
 import GetRecipesIds from './GetRecipesIds';
 import React, {useState, useEffect} from 'react';
-import { useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
-import Button from '@mui/material/Button';
-import CircularProgress from '@mui/material/CircularProgress';
-import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
+//import { useTheme } from '@mui/material/styles';
+//import Box from '@mui/material/Box';
+import { Box, Spinner, Heading, HStack, Center, AspectRatio } from 'native-base';
 
 const Home = ({navigation, route}) => {
   console.log("HOME RENDERED");
-  const theme = useTheme();
+  //const theme = useTheme();
   const uid = route.params.uid;
   const [recipeList, setRecipeList] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -63,6 +59,23 @@ const Home = ({navigation, route}) => {
   };
 
   const RecipeView = ({item}) => (
+    <>
+    <Box
+      justifyContent= 'center'
+      alignItems= 'center'
+      maxW="80" 
+      rounded="lg"
+      borderColor="coolGray.200" 
+      borderWidth="1"
+    >
+      <AspectRatio w="100%" ratio={16 / 9}>
+        <Image source={{
+          uri: item.imgUrl
+        }} alt="image" />
+      </AspectRatio>
+      <Heading>{item.title}</Heading>
+    </Box>
+    {/*
     <Box
     sx={{
       //paddingLeft: 2,
@@ -99,25 +112,19 @@ const Home = ({navigation, route}) => {
       </Grid>
       </Paper>
     </Box>
+  */}
+  </>
   );
 
 
   return (
-    <SafeAreaView style={styles.container}>
+      <HStack justifyContent="center" alignItems="center" h="full">
       {isLoading ? (
-        <Box sx = {{
-          display:"flex",
-          alignItems:"center",
-          justifyContent:"center",
-          height:"100vh"
-        }}
-      >
-        <CircularProgress color="primary" />
-      </Box>
+        <Center>
+          <Spinner size="lg" />
+        </Center>
       ) : (
-        <Box sx={{
-          padding:5
-        }}>
+        <Box padding="5" >
           <FlatList
             data={recipeList}
             renderItem={RecipeView}
@@ -130,23 +137,8 @@ const Home = ({navigation, route}) => {
           />
         </Box>
       )}
-    </SafeAreaView>
+      </HStack>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginTop: StatusBar.currentHeight || 0,
-  },
-  item: {
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-  },
-  title: {
-    fontSize: 32,
-  },
-});
 
 export {Home};
