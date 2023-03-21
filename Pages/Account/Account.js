@@ -125,102 +125,111 @@ const Account = ({navigation, route}) => {
 
   return (
     <View style={styles.container}>
-      <Button title="Log Out" onPress={() => handleSubmit()} />
-      <Text style={styles.header}> Hello, {email} </Text>
-            <Text> Followers:</Text>
+        <Button title="Log Out" onPress={() => handleSubmit()} />
+        <Text style={styles.header}> Hello, {email} </Text>
+        <Text style={styles.subtitle}> Followers:</Text>
+        <View style={styles.list}>
             {followers.length > 0 ? (
             followers.map((follower) => (
-                <View key={follower.id}>
-                <Text>{follower.name}</Text>
+                <View key={follower.id} style={styles.listItem}>
+                <Text style={styles.listText}>{follower.name}</Text>
                 </View>
             ))
             ) : (
-            <Text>You do not have any followers.</Text>
+            <Text style={styles.noItems}>You do not have any followers.</Text>
             )}
-            <Text> Following:</Text>
+        </View>
+        <Text style={styles.subtitle}> Following:</Text>
+        <View style={styles.list}>
             {following.length > 0 ? (
             following.map((follow) => (
-                <View key={follow}>
-                <Text>{follow}</Text>
-                <Button title="Unfollow" onPress={() => handleUnfollow(follow, uid)}></Button>
+                <View key={follow} style={styles.listItem}>
+                <Text style={styles.listText}>{follow}</Text>
+                <Button title="Unfollow" onPress={() => handleUnfollow(follow, uid)} style={styles.followButton} />
                 </View>
             ))
             ) : (
-            <Text>You are not following anyone.</Text>
+            <Text style={styles.noItems}>You are not following anyone.</Text>
             )}
-      <SafeAreaView style={styles.listContainer}>
-        <FlatList
-          data={favorites}
-          renderItem={RecipeView}
-          keyExtractor={(item) => item.recipeId}
-          ListHeaderComponent={() => <View style={{ height: 10 }} />}
-          ListFooterComponent={() => <View style={{ height: 10 }} />}
-          ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
-        />
-      </SafeAreaView>
-    </View>
+        </View>
+        <SafeAreaView style={styles.listContainer}>
+            <FlatList
+            data={favorites}
+            renderItem={RecipeView}
+            keyExtractor={(item) => item.recipeId}
+            ListHeaderComponent={() => <View style={{ height: 10 }} />}
+            ListFooterComponent={() => <View style={{ height: 10 }} />}
+            ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+            />
+        </SafeAreaView>
+        </View>
   );
-
-    // const styles = StyleSheet.create({
-    //     container: {
-    //       flex: 1,
-    //       marginTop: 20,
-    //       marginHorizontal: 16,
-    //     },
-    //     // header: {
-    //     //   fontSize: 20,
-    //     //   fontWeight: 'bold',
-    //     //   marginBottom: 10,
-    //     // },
-    //     item: {
-    //       backgroundColor: '#f9c2ff',
-    //       padding: 20,
-    //       marginVertical: 8,
-    //       marginHorizontal: 16,
-    //     },
-    //     title: {
-    //       fontSize: 16,
-    //       fontWeight: 'bold',
-    //     },
-    //   });
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 50,
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  listContainer: {
-    flex: 1,
-    marginTop: StatusBar.currentHeight || 0,
-  },
-  recipeContainer: {
-    padding: 20,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    marginHorizontal: 16,
-  },
-  recipeTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  recipeImage: {
-    width: '100%',
-    height: 200,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  recipeInstructions: {
-    color: 'blue',
-    textDecorationLine: 'underline',
-  },
-});
+    container: {
+      flex: 1,
+      paddingTop: 50,
+      paddingHorizontal: 20,
+    },
+    header: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      marginBottom: 20,
+    },
+    subtitle: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginBottom: 10,
+    },
+    listContainer: {
+      flex: 1,
+      marginTop: StatusBar.currentHeight || 0,
+    },
+    list: {
+      marginVertical: 10,
+    },
+    listItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: 5,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ccc',
+    },
+    listText: {
+      fontSize: 16,
+    },
+    followButton: {
+      paddingHorizontal: 10,
+    },
+    noItems: {
+      color: '#ccc',
+      fontStyle: 'italic',
+      textAlign: 'center',
+    },
+    recipeContainer: {
+      padding: 20,
+      backgroundColor: '#fff',
+      borderRadius: 10,
+      marginHorizontal: 16,
+    },
+    recipeTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      marginBottom: 10,
+    },
+    recipeImage: {
+      width: '100%',
+      height: 200,
+      borderRadius: 10,
+      marginBottom: 10,
+    },
+    recipeInstructions: {
+      color: 'blue',
+      textDecorationLine: 'underline',
+    },
+  });  
 
 export {Account};
