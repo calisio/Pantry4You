@@ -12,12 +12,13 @@ const Login = ({ navigation, route }) => {
 
   const handleSubmit = () => {
     handleLogin(email, password);
+    return "nope"
   };
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
-
+  
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
       <View style={styles.container}>
@@ -42,7 +43,6 @@ const Login = ({ navigation, route }) => {
         />
       </View>
     </TouchableWithoutFeedback>
-
   );
 };
 

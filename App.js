@@ -39,6 +39,7 @@ import { NativeBaseProvider, extendTheme } from "native-base";
 };
 
 //theme for app
+
 const theme = extendTheme({
   colors: {
     primary: {
@@ -69,8 +70,8 @@ const theme = extendTheme({
 });
 
 // Initialize Firebase
- const app = initializeApp(firebaseConfig);
- export const auth = getAuth();
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth();
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -78,7 +79,6 @@ const Tab = createBottomTabNavigator();
 function Pages({isAuthenticated, setIsAuthenticated}) {
   console.log("PAGES RENDERED");
   const theme = useTheme();
-  console.log(theme);
   console.log(isAuthenticated);
   //const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [uid, setUid] = useState('');
@@ -158,12 +158,12 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
 
   if(!isAuthenticated){
     return (
-      <View>
+      
+      //<View>
         <Stack.Navigator initialRouteName="Login">
           <Stack.Screen
             name="Login"
             component={Login}
-            // {...(props) => <Login {...props} handleLogin={handleLogin} />}
             options={{ title: 'Login' }}
             initialParams={{handleLogin: handleLogin}}
           />
@@ -173,9 +173,9 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
             options={{ title: 'Create Account' }} 
             initialParams={{onUidChange: handleUidChange}}
             />
-          {/*<Stack.Screen name="Dashboard" component={CreateAccount} options={{ title: 'Create Account' }} onUidChange = {handleUidChange}/>*/}
         </Stack.Navigator>
-    </View>
+      //</View>
+      
     )
   }
   else{
@@ -252,12 +252,10 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
   }
 }
 
-
 export default function App() {
   console.log("APP LOAD");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   return (
-    //<View style={styles.container}>
     <NativeBaseProvider theme={theme}>
       <NavigationContainer>
         <Pages 
