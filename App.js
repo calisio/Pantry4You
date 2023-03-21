@@ -20,6 +20,8 @@ import {signInWithEmailAndPassword, signOut} from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firebase from 'firebase/app';
 import {Alert} from 'react-native';
+import { useTheme } from '@react-navigation/native';
+import { NativeBaseProvider, extendTheme } from "native-base";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -36,6 +38,36 @@ import {Alert} from 'react-native';
   measurementId: "G-MV5KGDBTTJ"
 };
 
+//theme for app
+const theme = extendTheme({
+  colors: {
+    primary: {
+      50: '#fff1dd',
+      100: '#ffd9b0',
+      200: '#ffc080',
+      300: '#fea64e',
+      400: '#fe8e1f',
+      500: '#e57507',
+      600: '#b25a02',
+      700: '#804000',
+      800: '#4e2600',
+      900: '#1e0b00',
+    },
+    secondary: {
+      50: '#def3ff',
+      100: '#b0d9ff',
+      200: '#80c0ff',
+      300: '#50a6fe',
+      400: '#268dfc',
+      500: '#1374e4',
+      600: '#085ab2',
+      700: '#004080',
+      800: '#00274f',
+      900: '#000e1f',
+    },
+  },
+});
+
 // Initialize Firebase
  const app = initializeApp(firebaseConfig);
  export const auth = getAuth();
@@ -45,6 +77,8 @@ const Tab = createBottomTabNavigator();
 
 function Pages({isAuthenticated, setIsAuthenticated}) {
   console.log("PAGES RENDERED");
+  const theme = useTheme();
+  console.log(theme);
   console.log(isAuthenticated);
   //const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [uid, setUid] = useState('');
@@ -119,7 +153,7 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
 
   if(!isAuthenticated){
     return (
-      <View style={styles.container}>
+      <View>
         <Stack.Navigator initialRouteName="Login">
           <Stack.Screen
             name="Login"
@@ -141,15 +175,17 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
   }
   else{
     return (
-      <Tab.Navigator>
+      <Tab.Navigator
+        activeTintColor="red"
+      >
         <Tab.Screen
           name="Home"
           component={Home}
           initialParams={{uid:uid}}
           options={{
             tabBarLabel: 'Home',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="home" color={color} size={size} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <MaterialCommunityIcons name={focused ? 'home' : 'home-outline'} color="#e57507" size={size} />
             ),
           }}
           uid = {uid}
@@ -160,8 +196,8 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
           initialParams={{uid:uid}}
           options={{
             tabBarLabel: 'Pantry',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="food-apple" color={color} size={size} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <MaterialCommunityIcons name={focused ? 'food-apple' : 'food-apple-outline'} color="#e57507" size={size} />
             ),
           }}
         />
@@ -182,8 +218,8 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
           initialParams={{uid:uid}}
           options={{
             tabBarLabel: 'Search',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="account-search" color={color} size={size} />
+            tabBarIcon: ({ theme, size, focused }) => (
+              <MaterialCommunityIcons name={focused ? 'account-search' : 'account-search-outline'} color="#e57507" size={size} />
             ),
           }}
         />
@@ -193,8 +229,11 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
           // {...(props) => <Account {...props} handleLogout={handleLogout} />}
           options={{
             tabBarLabel: 'Account',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="account-circle" color={color} size={size} />
+            //tabBarIcon: ({ color, size }) => (
+            //  <MaterialCommunityIcons name="account-circle" color={theme.palette.primary.main} size={size} />
+            //),
+            tabBarIcon: ({ theme, size, focused }) => (
+              <MaterialCommunityIcons name={focused ? 'account-circle' : 'account-circle-outline'} color="#e57507" size={size} />
             ),
           }}
           initialParams={{
@@ -213,22 +252,13 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   return (
     //<View style={styles.container}>
+    <NativeBaseProvider theme={theme}>
       <NavigationContainer>
         <Pages 
           isAuthenticated={isAuthenticated} 
           setIsAuthenticated={setIsAuthenticated}
         />
       </NavigationContainer>
-    //</View>
+    </NativeBaseProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    width: '100%',
-    justifyContent: 'center',
-  },
-});
-

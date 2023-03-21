@@ -1,7 +1,7 @@
-import { FlatList, StyleSheet, Text, View, Button } from 'react-native';
+import { FlatList, StyleSheet, Text, View, Button, FlatList, Image, Linking, SafeAreaView, StatusBar } from 'react-native';
 import { getFirestore, collection, query, where, getDocs, getDoc, doc, updateDoc } from 'firebase/firestore';
 import { initializeApp } from "firebase/app";
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useEffect} from 'react';
 
 const firebaseConfig = {
     apiKey: "AIzaSyCjsh6Mj0fxTwcd5rwbk11ow3UATgpwrw8",
@@ -12,14 +12,15 @@ const firebaseConfig = {
     appId: "1:951653716590:web:a5c9df4baaf8b9fef2cc7f",
     measurementId: "G-MV5KGDBTTJ"
   };
-  
+  import { collection, getDocs } from "firebase/firestore";
+import { db } from '../../firebase';
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);  
 
 const Account = ({navigation, route}) => {
     console.log("account page rendered");
-    const handleLogout = route.params.handleLogout;
-    const uid = route.params.uid;
+  const handleLogout = route.params.handleLogout;
+  const uid = route.params.uid;
     const [followers, setFollowers] = useState([]);
     const [following, setFollowing] = useState([]);
       
@@ -56,11 +57,44 @@ const Account = ({navigation, route}) => {
         fetchFollowers();
         fetchFollowing();
     },[navigation, route]);
+  const [favorites, setFavorites] = useState([]);
 
-    const handleSubmit = () => {
-        console.log(handleLogout)
-        handleLogout();
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      try {
+        const favoritesRef = collection(db, `users/${uid}/favorites`);
+        const favoritesSnapshot = await getDocs(favoritesRef);
+        const favoritesList = [];
+        favoritesSnapshot.forEach((doc) => {
+          favoritesList.push(doc.data());
+        });
+        setFavorites(favoritesList);
+      } catch (error) {
+        console.log(error);
+      }
     };
+
+    fetchFavorites();
+  }, []);
+
+  const RecipeView = ({item}) => (
+    <View style={styles.recipeContainer}>
+      <Text style={styles.recipeTitle}>{item.title}</Text>
+      <Image
+        source={{ uri: item.imgUrl }}
+        style={styles.recipeImage}
+      />
+      <Text style={styles.recipeInstructions}
+        onPress={() => Linking.openURL(item.recipeUrl)}>
+        Instructions
+      </Text>
+    </View>
+  );
+
+  const handleSubmit = () => {
+    console.log(handleLogout)
+    handleLogout();
+  };
     
     const handleUnfollow = async (friendUid, currentUserUid) => {
         try {
@@ -91,10 +125,10 @@ const Account = ({navigation, route}) => {
         }
       }
 
-    return (
-        <View>
-            <Button title="Log Out" onPress={() => handleSubmit()} />
-            <Text> Hello, {uid} </Text>
+  return (
+    <View style={styles.container}>
+      <Button title="Log Out" onPress={() => handleSubmit()} />
+      <Text style={styles.header}> Hello, {uid} </Text>
             <Text> Followers:</Text>
             {followers.length > 0 ? (
             followers.map((follower) => (
@@ -116,8 +150,18 @@ const Account = ({navigation, route}) => {
             ) : (
             <Text>You are not following anyone.</Text>
             )}
-        </View>
-    );
+      <SafeAreaView style={styles.listContainer}>
+        <FlatList
+          data={favorites}
+          renderItem={RecipeView}
+          keyExtractor={(item) => item.recipeId}
+          ListHeaderComponent={() => <View style={{ height: 10 }} />}
+          ListFooterComponent={() => <View style={{ height: 10 }} />}
+          ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+        />
+      </SafeAreaView>
+    </View>
+  );
 
     // const styles = StyleSheet.create({
     //     container: {
@@ -142,5 +186,43 @@ const Account = ({navigation, route}) => {
     //     },
     //   });
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: 50,
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  listContainer: {
+    flex: 1,
+    marginTop: StatusBar.currentHeight || 0,
+  },
+  recipeContainer: {
+    padding: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    marginHorizontal: 16,
+  },
+  recipeTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  recipeImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  recipeInstructions: {
+    color: 'blue',
+    textDecorationLine: 'underline',
+  },
+});
 
 export {Account};
