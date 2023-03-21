@@ -3,7 +3,7 @@ import GetRecipes from './GetRecipes';
 import React, {useState, useEffect} from 'react';
 //import { useTheme } from '@mui/material/styles';
 //import Box from '@mui/material/Box';
-import { Box, Spinner, Heading, HStack, Center, AspectRatio, Skeleton, VStack } from 'native-base';
+import { Box, Spinner, Heading, HStack, Center, AspectRatio, Skeleton, VStack, Pressable } from 'native-base';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { addDoc, deleteDoc, doc, getDocs, query, where, collection } from 'firebase/firestore';
 import { db } from '../../firebase';
@@ -100,6 +100,7 @@ const Home = ({navigation, route}) => {
   };
 
   const RecipeView = ({item}) => (
+    <Pressable onPress={() => console.log("I'm Pressed")}>
     <Box
       justifyContent= 'center'
       alignItems= 'center'
@@ -143,6 +144,7 @@ const Home = ({navigation, route}) => {
       </Box>
       <Heading>{item.title}</Heading>
     </Box>
+    </Pressable>
   );
 
 
