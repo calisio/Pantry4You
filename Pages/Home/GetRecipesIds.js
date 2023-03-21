@@ -26,7 +26,7 @@ const GetRecipesIds = async function(uid){
             }
         }
         try {
-            const recipes = await fetch('https://api.spoonacular.com/recipes/findByIngredients?ingredients='+query+'&number=10&ranking=2', {
+            const recipes = await fetch('https://api.spoonacular.com/recipes/findByIngredients?ingredients='+query+'&number=5&ranking=2', {
                 method: 'GET',
                 headers: {
                 'Content-Type': 'application/json',

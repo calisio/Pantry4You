@@ -20,6 +20,8 @@ import {signInWithEmailAndPassword, signOut} from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firebase from 'firebase/app';
 import {Alert} from 'react-native';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useTheme } from '@react-navigation/native';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -36,6 +38,18 @@ import {Alert} from 'react-native';
   measurementId: "G-MV5KGDBTTJ"
 };
 
+//theme for app
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#ffb56a',
+    },
+    secondary: {
+      main: '#6ab5ff',
+    },
+  },
+});
+
 // Initialize Firebase
  const app = initializeApp(firebaseConfig);
  export const auth = getAuth();
@@ -45,6 +59,8 @@ const Tab = createBottomTabNavigator();
 
 function Pages({isAuthenticated, setIsAuthenticated}) {
   console.log("PAGES RENDERED");
+  const theme = useTheme();
+  console.log(theme);
   console.log(isAuthenticated);
   //const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [uid, setUid] = useState('');
@@ -141,15 +157,17 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
   }
   else{
     return (
-      <Tab.Navigator>
+      <Tab.Navigator
+        activeTintColor="red"
+      >
         <Tab.Screen
           name="Home"
           component={Home}
           initialParams={{uid:uid}}
           options={{
             tabBarLabel: 'Home',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="home" color={color} size={size} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <MaterialCommunityIcons name={focused ? 'home' : 'home-outline'} color="red" size={size} />
             ),
           }}
           uid = {uid}
@@ -160,8 +178,8 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
           initialParams={{uid:uid}}
           options={{
             tabBarLabel: 'Pantry',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="food-apple" color={color} size={size} />
+            tabBarIcon: ({ color, size, focused }) => (
+              <MaterialCommunityIcons name={focused ? 'food-apple' : 'food-apple-outline'} color="red" size={size} />
             ),
           }}
         />
@@ -182,8 +200,8 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
           initialParams={{uid:uid}}
           options={{
             tabBarLabel: 'Search',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="account-search" color={color} size={size} />
+            tabBarIcon: ({ theme, size, focused }) => (
+              <MaterialCommunityIcons name={focused ? 'account-search' : 'account-search-outline'} color="red" size={size} />
             ),
           }}
         />
@@ -193,8 +211,11 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
           // {...(props) => <Account {...props} handleLogout={handleLogout} />}
           options={{
             tabBarLabel: 'Account',
-            tabBarIcon: ({ color, size }) => (
-              <MaterialCommunityIcons name="account-circle" color={color} size={size} />
+            //tabBarIcon: ({ color, size }) => (
+            //  <MaterialCommunityIcons name="account-circle" color={theme.palette.primary.main} size={size} />
+            //),
+            tabBarIcon: ({ theme, size, focused }) => (
+              <MaterialCommunityIcons name={focused ? 'account-circle' : 'account-circle-outline'} color="red" size={size} />
             ),
           }}
           initialParams={{
@@ -213,13 +234,14 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   return (
     //<View style={styles.container}>
+    <ThemeProvider theme={theme}>
       <NavigationContainer>
         <Pages 
           isAuthenticated={isAuthenticated} 
           setIsAuthenticated={setIsAuthenticated}
         />
       </NavigationContainer>
-    //</View>
+    </ThemeProvider>
   );
 }
 
@@ -231,4 +253,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-
