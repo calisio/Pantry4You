@@ -3,16 +3,31 @@ import { db } from '../../firebase';
 const GetRecipesIds = async function(uid){
     //get list of current ingredients
     let collectionString = "users/" + uid + "/pantry";
-    let pantryRef = db.collection(collectionString).doc("pantry");
-    let pantryObj = await pantryRef.get();
+    let pantryRef = db.collection(collectionString);
+    // let pantryObj = await pantryRef.get();
     let pantryList = [];
-    for(let i = 0; i < Object.keys(pantryObj.data()).length; i++){
-        if (Object.values(pantryObj.data())[i]<1){
-            continue;
-        }
-        let key = Object.keys(pantryObj.data())[i];
-        pantryList.push(key)
+    // for(let i = 0; i < Object.keys(pantryObj.data()).length; i++){
+    //     if (Object.values(pantryObj.data())[i]<1){
+    //         continue;
+    //     }
+    //     let key = Object.keys(pantryObj.data())[i];
+    //     pantryList.push(key)
+    // }
+
+    let tempDoc;
+
+    await pantryRef.get().then((querySnapshot) => {
+      tempDoc = querySnapshot.docs.map((doc) => {
+        return { id: doc.id, ...doc.data()}
+      })
+    })
+
+    for(let i=0; i < tempDoc.length; i++){
+      let item = Object.values(tempDoc[i])[0];
+      pantryList.push(item);
     }
+  
+
     //create query with list of ingredients
     async function fetchRecipesIds(ingredients){
         let recipeList = [];
