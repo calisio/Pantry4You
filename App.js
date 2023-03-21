@@ -82,10 +82,12 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
   console.log(isAuthenticated);
   //const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [uid, setUid] = useState('');
+  const [email, setEmail] = useState('');
 
   //callbacks for child components
   function handleUidChange(uid, email, password){
     setUid(uid);
+    setEmail(email);
     AsyncStorage.setItem('userCredentials', JSON.stringify({ email, password }));
   };
 
@@ -100,6 +102,7 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
           .then((userCredential) => {
             console.log('User signed in automatically');
             setUid(userCredential.user.uid);
+            setEmail(email);
             setIsAuthenticated(true);
           })
           .catch(error => console.log('Error signing in:', error));
@@ -118,6 +121,7 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
       const user = userCredential.user;
       const { email } = user;
       setUid(user.uid);
+      setEmail(email);
       setIsAuthenticated(true);
       console.log("user signed in manually");
       //Store user credentials in storage for reload
@@ -145,6 +149,7 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
       // Sign-out successful.
       AsyncStorage.clear();
       setUid('');
+      setEmail('');
       setIsAuthenticated(false);
     }).catch((error) => {
       // An error happened.
@@ -238,7 +243,8 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
           }}
           initialParams={{
             handleLogout: handleLogout,
-            uid:uid
+            uid:uid,
+            email:email,
           }}
         />
       </Tab.Navigator>

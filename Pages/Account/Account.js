@@ -12,19 +12,19 @@ const firebaseConfig = {
     appId: "1:951653716590:web:a5c9df4baaf8b9fef2cc7f",
     measurementId: "G-MV5KGDBTTJ"
   };
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);  
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);  
 
 const Account = ({navigation, route}) => {
     console.log("account page rendered");
-  const handleLogout = route.params.handleLogout;
-  const uid = route.params.uid;
+    const handleLogout = route.params.handleLogout;
+    const uid = route.params.uid;
+    const email = route.params.email;
     const [followers, setFollowers] = useState([]);
     const [following, setFollowing] = useState([]);
       
     useEffect(() => {
         console.log('fetch followers');
-        console.log(uid);
         const fetchFollowers = async () => {
             try {
                 const q = query(collection(db, 'users'), where('friends', 'array-contains', uid));
@@ -126,7 +126,7 @@ const Account = ({navigation, route}) => {
   return (
     <View style={styles.container}>
       <Button title="Log Out" onPress={() => handleSubmit()} />
-      <Text style={styles.header}> Hello, {uid} </Text>
+      <Text style={styles.header}> Hello, {email} </Text>
             <Text> Followers:</Text>
             {followers.length > 0 ? (
             followers.map((follower) => (
