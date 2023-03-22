@@ -41,14 +41,14 @@ function CreateAccount({ navigation, route }) {
       });
 
       //create empty pantry subcollection for user
-      const pantryRef = collection(userRef, 'pantry');
-      setDoc(doc(pantryRef, 'pantry'), {})
-      .then(() => {
-        console.log('Empty subcollection created');
-      })
-      .catch((error) => {
-        console.error('Error creating empty subcollection: ', error);
-      });
+      // const pantryRef = collection(userRef, 'pantry');
+      // setDoc(doc(pantryRef, 'pantry'), {})
+      // .then(() => {
+      //   console.log('Empty subcollection created');
+      // })
+      // .catch((error) => {
+      //   console.error('Error creating empty subcollection: ', error);
+      // });
 
       onUidChange(user.uid, email, password);
       console.log("User added to authentication and users collection");
