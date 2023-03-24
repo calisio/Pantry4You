@@ -25,14 +25,14 @@ function CreateAccount({ navigation, route }) {
       });
 
       //create empty pantry subcollection for user
-      const pantryRef = collection(userRef, 'pantry');
-      setDoc(doc(pantryRef, 'pantry'), {})
-      .then(() => {
-        console.log('Empty subcollection created');
-      })
-      .catch((error) => {
-        console.error('Error creating empty subcollection: ', error);
-      });
+      // const pantryRef = collection(userRef, 'pantry');
+      // setDoc(doc(pantryRef, 'pantry'), {})
+      // .then(() => {
+      //   console.log('Empty subcollection created');
+      // })
+      // .catch((error) => {
+      //   console.error('Error creating empty subcollection: ', error);
+      // });
       //create empty notifications subcollection for user
       const notificationsRef = collection(userRef, 'notifications');
       const friendRequestsDoc = doc(notificationsRef, 'friendRequests');

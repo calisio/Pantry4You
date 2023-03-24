@@ -8,6 +8,10 @@ import { getFoodUnit } from '../../../utils/getFoodUnit';
 import { setFoodUnit } from '../../../utils/setFoodUnit';
 
 
+const dismissKeyboard = () => {
+    Keyboard.dismiss();
+}
+
 // https://reactnative.dev/docs/handling-text-input
 
 const AddManually = (props) => {
@@ -142,33 +146,29 @@ const AddManually = (props) => {
         console.log("cur pantry start-------------");
         for(let i=0; i < tempDoc.length; i++){
             curPantryList.push(tempDoc[i]);
-            console.log(tempDoc[i]);
+            // console.log(tempDoc[i]);
         }
-        console.log("cur pantry end-------------");
+        // console.log("cur pantry end-------------");
 
         return curPantryList;
     }
 
 
-    const dismissKeyboard = () => {
-        Keyboard.dismiss();
-    }
+    
 
     return (
             <View style={styles.container}>
                
                     <TextInput 
                         value={item}
-                        clearButtonMode='always'
                         style={styles.input}
                         placeholder="Enter item here"
-                        onChangeText={newItem => setItem(newItem)}
+                        onChangeText={newItem => setItem(newItem.toLowerCase())}
                         defaultValue={""}
                         id="item"
                     />
                     <TextInput
                         value={quantity}
-                        clearButtonMode='always' //this doesn't work - how to clear text input?
                         style={styles.input}
                         placeholder="Enter quantity here"
                         onChangeText={newQuantity => setQuantity(newQuantity)}
@@ -179,6 +179,7 @@ const AddManually = (props) => {
                         setSelected={(val) => setSelectedUnit(val)}
                         data={units}
                         save="value"
+                        
                     />
                     <Pressable
                         style={styles.button}
