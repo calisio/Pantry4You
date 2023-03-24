@@ -14,6 +14,7 @@ import {Account} from './Pages/Account/Account';
 import { Home } from './Pages/Home/Home';
 import { Pantry } from './Pages/Pantry/Pantry';
 import { Search } from './Pages/Search/Search';
+import { Notifications } from './Pages/Notifications/Notifications';
 import {Add} from './Pages/Add/Add';
 import React, {useState, useEffect} from 'react';
 import {signInWithEmailAndPassword, signOut} from 'firebase/auth';
@@ -225,6 +226,17 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
             tabBarLabel: 'Search',
             tabBarIcon: ({ theme, size, focused }) => (
               <MaterialCommunityIcons name={focused ? 'account-search' : 'account-search-outline'} color="#e57507" size={size} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Notifications"
+          component={Notifications}
+          initialParams={{uid:uid}}
+          options={{
+            tabBarLabel: 'Notifications',
+            tabBarIcon: ({ theme, size, focused }) => (
+              <MaterialCommunityIcons name={focused ? 'bell' : 'bell-outline'} color="#e57507" size={size} />
             ),
           }}
         />

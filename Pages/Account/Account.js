@@ -35,12 +35,12 @@ const Account = ({navigation, route}) => {
             } catch (error) {
                 console.error(error);
             }
-        };
+        };      
         const fetchFollowing = async () => {
             try {
                 const friendsDoc = await getDoc(doc(db, 'users', uid));
-                const friendsData = friendsDoc.data().friends;
-                if (friendsData) {
+                // const friendsData = friendsDoc.data().friends;
+                if (friendsDoc.data().friends) {
                     const followingData = await Promise.all(friendsData.map(async friend => {
                         const friendDoc = await getDoc(doc(db, 'users', friend.friendUID));
                         return friendDoc.data().email;

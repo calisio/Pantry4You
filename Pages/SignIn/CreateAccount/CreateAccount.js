@@ -5,22 +5,6 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore, doc, setDoc, deleteDoc, collection } from 'firebase/firestore';
 import { auth } from '../../../App';
 
-const actionCodeSettings = {
-  // URL you want to redirect back to. The domain (www.example.com) for this
-  // URL must be in the authorized domains list in the Firebase Console.
-  url: 'https://www.example.com/finishSignUp?cartId=1234',
-  // This must be true.
-  handleCodeInApp: true,
-  iOS: {
-    bundleId: 'com.example.ios'
-  },
-  android: {
-    packageName: 'com.example.android',
-    installApp: true,
-    minimumVersion: '12'
-  },
-  dynamicLinkDomain: 'example.page.link'
-};
 
 function CreateAccount({ navigation, route }) {
   const [email, setEmail] = useState('');
@@ -49,6 +33,27 @@ function CreateAccount({ navigation, route }) {
       .catch((error) => {
         console.error('Error creating empty subcollection: ', error);
       });
+      //create empty notifications subcollection for user
+      const notificationsRef = collection(userRef, 'notifications');
+      const friendRequestsDoc = doc(notificationsRef, 'friendRequests');
+      const pantryRequestsDoc = doc(notificationsRef, 'pantryRequests');
+
+      // Create documents for friend requests and pantry requests
+      setDoc(friendRequestsDoc, {})
+        .then(() => {
+          console.log('Empty friend requests document created');
+        })
+        .catch((error) => {
+          console.error('Error creating empty friend requests document: ', error);
+        });
+
+      setDoc(pantryRequestsDoc, {})
+        .then(() => {
+          console.log('Empty pantry requests document created');
+        })
+        .catch((error) => {
+          console.error('Error creating empty pantry requests document: ', error);
+        });
 
       onUidChange(user.uid, email, password);
       console.log("User added to authentication and users collection");
