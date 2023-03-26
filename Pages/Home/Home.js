@@ -1,53 +1,35 @@
-import {Text, FlatList, SafeAreaView, View, Image, Linking, StyleSheet, StatusBar,} from 'react-native';
+import { FlatList, View, Image } from 'react-native';
 import GetRecipes from './GetRecipes';
-import React, {useState, useEffect} from 'react';
-//import { useTheme } from '@mui/material/styles';
-//import Box from '@mui/material/Box';
-import { Box, Spinner, Heading, HStack, Center, AspectRatio, Skeleton, VStack, Pressable } from 'native-base';
+import React, { useState, useEffect } from 'react';
+import { Box, Heading, HStack, Center, AspectRatio, Skeleton, VStack, Pressable, Modal, Flex, Divider, Button, Text, Link } from 'native-base';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { addDoc, deleteDoc, doc, getDocs, query, where, collection } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { Alert } from 'react-native';
 
-const Home = ({navigation, route}) => {
+const Home = ({ navigation, route }) => {
   console.log("HOME RENDERED");
   //const theme = useTheme();
   const uid = route.params.uid;
   const [recipeList, setRecipeList] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
 
 
-  const handleFavorite = async (recipeId) => {
+  const handleFavorite = async (recipe) => {
     try {
-      // Ensure recipeId is a string
-      const recipeIdString = String(recipeId);
-  
       // Check if the "favorites" subcollection exists
       const favoritesRef = collection(db, `users/${uid}/favorites`);
       const favoritesSnapshot = await getDocs(favoritesRef);
-      const recipeExists = favoritesSnapshot.docs.some(doc => String(doc.data().recipeId) === recipeIdString);
-  
+      const recipeExists = favoritesSnapshot.docs.some(doc => String(doc.data().recipeId) === recipe.recipeId);
+
       // If the recipe is not already in the "favorites" subcollection, add it
       if (!recipeExists) {
-        // Get the recipe details
-        const recipe = await fetch('https://api.spoonacular.com/recipes/' + recipeIdString + '/information?includeNutrition=false', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': '2b747b3902c148758955f81fcac5bb4f',
-          },
-        });
-        const data = await recipe.json();
-        const recipeObj = {
-          title: data['title'],
-          imgUrl: data['image'],
-          recipeUrl: data['sourceUrl'],
-          recipeId: data['id'],
-        };
-  
+
         // Add the recipe to the "favorites" subcollection
-        await addDoc(favoritesRef, recipeObj);
+        await addDoc(favoritesRef, recipe);
         console.log('Recipe added to favorites');
       } else {
         console.log('Recipe already in favorites');
@@ -57,32 +39,20 @@ const Home = ({navigation, route}) => {
       console.log(error);
     }
   };
-  
+
 
   //function used to get recipes
   async function fetchRecipes() {
     let recipesObjs = await GetRecipes(uid);
-    for (let i = 0; i < recipesObjs.length; i++) {
-      try {
-        // Ensure recipeId is a string
-        const recipeIdString = String(recipesObjs[i]['recipeId']);
-        const recipe = await fetch('https://api.spoonacular.com/recipes/' + recipeIdString + '/information?includeNutrition=false', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': '2b747b3902c148758955f81fcac5bb4f',
-          },
-        });
-        const data = await recipe.json();
-        recipesObjs[i]['recipeUrl']=data['sourceUrl'];
-      } catch (error) {
-        console.log(error);
-      }
-    }
     setRecipeList(recipesObjs);
     setIsLoading(false);
   }
-  
+
+  async function handlePress(recipeObj) {
+    setSelectedRecipe(recipeObj);
+    setShowModal(true);
+  }
+
 
   //on load, get recipes
   useEffect(() => {
@@ -99,62 +69,64 @@ const Home = ({navigation, route}) => {
     setIsRefreshing(false);
   };
 
-  const RecipeView = ({item}) => (
-    <Pressable onPress={() => console.log("I'm Pressed")}>
-    <Box
-      justifyContent= 'center'
-      alignItems= 'center'
-      maxW="80" 
-      rounded="lg"
-      borderColor="coolGray.200" 
-      borderWidth="1"
-    >
-      <Box>
-        <AspectRatio w="100%" ratio={16 / 9}>
-          <Image source={{
-            uri: item.imgUrl
-          }} alt="image" />
-        </AspectRatio>
-        <Center bg="rgba(255, 255, 255, 0.4)"
-        _text={{
-          color: "red.600",
-          fontWeight: "700",
-          fontSize: "xs"
-        }} 
-        position="absolute" 
-        bottom="0" 
-        right="0"
-        px="3" 
-        py="1.5">
-            {item.missedCount} missing
-        </Center>
-        <Center 
-        position="absolute" 
-        top="0" 
-        right="0"
-        px="3" 
-        py="1.5">
-          <MaterialCommunityIcons
-            name="heart-outline"
-            color="#f44336"
-            size={24}
-            onPress={() => handleFavorite(item.recipeId)}
-          />
-        </Center>
+  const RecipeView = ({ item }) => (
+    <Pressable onPress={() => handlePress(item)} >
+      <Box
+        justifyContent='center'
+        alignItems='center'
+        maxW="80"
+        rounded="lg"
+        borderColor="coolGray.200"
+        borderWidth="1"
+      >
+        <Box>
+          <AspectRatio w="100%" ratio={16 / 9}>
+            <Image source={{
+              uri: item.imgUrl
+            }} alt="image" />
+          </AspectRatio>
+          {item.missedCount > 0 && (
+            <Center bg="rgba(255, 255, 255, 0.4)"
+              _text={{
+                color: "red.600",
+                fontWeight: "700",
+                fontSize: "xs"
+              }}
+              position="absolute"
+              bottom="0"
+              right="0"
+              px="3"
+              py="1.5">
+              {item.missedCount} missing
+            </Center>
+          )}
+          <Center
+            position="absolute"
+            top="0"
+            right="0"
+            px="3"
+            py="1.5">
+            <MaterialCommunityIcons
+              name="heart-outline"
+              color="#f44336"
+              size={24}
+              onPress={() => handleFavorite(item)}
+            />
+          </Center>
+        </Box>
+        <Heading>{item.title}</Heading>
       </Box>
-      <Heading>{item.title}</Heading>
-    </Box>
-    </Pressable>
+    </Pressable >
   );
 
 
   return (
-      <HStack justifyContent="center" alignItems="center" h="full">
+    <HStack justifyContent="center" alignItems="center" h="full">
       {isLoading ? (
         <Center w="100%">
           <VStack w="90%" maxW="400" borderWidth="1" space={8} overflow="hidden" rounded="md" _dark={{
             borderColor: "coolGray.500"
-            }} _light={{
+          }} _light={{
             borderColor: "coolGray.200"
           }}>
             <Skeleton h="40" />
@@ -163,7 +135,7 @@ const Home = ({navigation, route}) => {
           </VStack>
         </Center>
       ) : (
-        <Box padding="5" >
+        <Center>
           <FlatList
             data={recipeList}
             renderItem={RecipeView}
@@ -173,11 +145,61 @@ const Home = ({navigation, route}) => {
             ItemSeparatorComponent={() => <View style={{ height: 50 }} />}
             onRefresh={handleRefresh}
             refreshing={isRefreshing}
+            showsVerticalScrollIndicator={false}
           />
-        </Box>
+          <Modal isOpen={showModal} onClose={() => setShowModal(false)} size='full'>
+            <Modal.Content>
+              <Modal.CloseButton />
+              {selectedRecipe && (
+                <>
+                  <Modal.Header>
+                    <Heading size="md">{selectedRecipe.title}</Heading>
+                    <Link href={selectedRecipe.recipeUrl}>Instructions</Link>
+                  </Modal.Header>
+                  <Modal.Body>
+                    <VStack space={4}>
+                      <Flex mx="3" direction="row" justify="space-evenly">
+                        <Box flex={1}>
+                          <Center>
+                            <Heading size='xs' color='green.500'>Used</Heading>
+                          </Center>
+                          <View>
+                            {selectedRecipe.used.map((item, index) => (
+                              <Text key={index} fontSize="md">{'\u2022'} {item.name}</Text>
+                            ))}
+                          </View>
+                        </Box>
+                        <Divider orientation="vertical" mx="3" _light={{
+                          bg: "muted.800"
+                        }} _dark={{
+                          bg: "muted.50"
+                        }} />
+                        <Box flex={1}>
+                          <Center>
+                            <Heading size='xs' color='red.500'>Missing</Heading>
+                          </Center>
+                          <View>
+                            {selectedRecipe.missed.map((item, index) => (
+                              <React.Fragment key={index}>
+                                <Text fontSize="md">{'\u2022'} {item.name}</Text>
+                                {item.friendsWithIngredient.map((friend, i) => (
+                                  <Text key={i} fontSize="sm" ml={4}>{friend.email}</Text>
+                                ))}
+                              </React.Fragment>
+                            ))}
+                          </View>
+                        </Box>
+                      </Flex>
+                    </VStack>
+                  </Modal.Body>
+                </>
+              )}
+            </Modal.Content>
+          </Modal>
+        </Center>
       )}
-      </HStack>
+    </HStack>
   );
 };
 
-export {Home};
+export { Home };
