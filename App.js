@@ -80,7 +80,6 @@ const Tab = createBottomTabNavigator();
 function Pages({isAuthenticated, setIsAuthenticated}) {
   console.log("PAGES RENDERED");
   const theme = useTheme();
-  console.log(isAuthenticated);
   //const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [uid, setUid] = useState('');
   const [email, setEmail] = useState('');
@@ -108,9 +107,6 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
           })
           .catch(error => console.log('Error signing in:', error));
       }
-      else{
-        console.log("not logged in");
-      }
     });
   });
 
@@ -133,7 +129,6 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
     .catch((error) => {
       const errorCode = error.code;
       const errorMessage = error.message;
-      console.log('error');
       Alert.alert('Invalid Login', 'The username or password you have entered is incorrect. Please try again.', [
         {
           text: 'Cancel',
