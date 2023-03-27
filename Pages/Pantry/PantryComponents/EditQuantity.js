@@ -10,7 +10,9 @@ const EditQuantity = (props) => {
     const [quantity, setQuantity] = useState('');
 
     const submitHandler = async() => {
-        if(quantity != '') //TODO: || is not a number
+        let reg = /^\d+$/;
+        console.log("------------------", reg.test(quantity), "------------");
+        if(quantity != '' && reg.test(quantity)) //TODO: || is not a number
         {
             let quantityInt = parseInt(quantity);
             if(quantityInt < 0){
@@ -50,7 +52,7 @@ const EditQuantity = (props) => {
             }
         }
         else{
-            Alert.alert("Please enter a number")
+            Alert.alert("Please enter a numeric value");
         }
     }
 

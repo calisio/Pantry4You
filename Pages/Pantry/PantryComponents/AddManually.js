@@ -63,6 +63,11 @@ const AddManually = (props) => {
 
     const submitHandler = async() => {
         //TODO: make sure quantity is a number
+        let reg = /^\d+$/;
+        if(!reg.test(quantity)){
+            Alert.alert("Please enter a numeric quantity");
+            return;
+        }
         if(item != '' && quantity != '' && selectedUnit != ''){
             let quantityInt = parseInt(quantity);
 
