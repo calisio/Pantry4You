@@ -17,6 +17,19 @@ const EditQuantity = (props) => {
                 Alert.alert("New quantity cannot be less than 0");
                 return;
             }
+            else if(quantityInt == 0){
+                const auth = getAuth();
+                const user = auth.currentUser.uid;
+                let editedItem = props.item[0];
+                db.collection('users').doc(user).collection('pantry').doc(editedItem).delete().then(() => {
+                    console.log(editedItem, " deleted");
+                    props.updateFunction();
+                })
+                .catch((error) => {
+                    console.log("error deleting ", editedItem);
+                    console.log(error);
+                })
+            }
             else{
                 let editedItem = props.item[0];
                 const unit = await getFoodUnit(editedItem);
