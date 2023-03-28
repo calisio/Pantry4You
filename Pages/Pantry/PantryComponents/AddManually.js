@@ -245,7 +245,10 @@ const AddManually = (props) => {
         "wines": "cup",
         "club soda": "cup",
         "coffee": "cup",
-        "tea": "oz"
+        "tea": "oz",
+        "lemons": "item",
+        "salt": "tbsp",
+        "limes": "item"
     }
     const allFoods = Object.keys(allFoodUnits);
 
