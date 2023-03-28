@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Button, FlatList, Image, Linking, SafeAreaView,
 import { getFirestore, collection, query, where, getDocs, getDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { initializeApp } from "firebase/app";
 import React, {useState, useEffect} from 'react';
-import { Pressable, Box, AspectRatio, Center, Heading, VStack, Button } from 'native-base';
+import { Pressable, Box, AspectRatio, Center, Heading, VStack } from 'native-base';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
