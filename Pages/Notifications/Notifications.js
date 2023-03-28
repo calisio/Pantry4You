@@ -123,7 +123,8 @@ const Notifications = ({navigation, route}) => {
           )}
         />
       )}  
-      {notifications.length > 0 && (
+      {/* this should be used to update the requested items */}
+      {/* {notifications.length > 0 && (
         <FlatList
           data={notifications}
           keyExtractor={(notification) => notification.notificationId}
@@ -134,7 +135,7 @@ const Notifications = ({navigation, route}) => {
             </View>
           )}
         />
-      )}
+      )} */}
   
       {friendRequests.length === 0 && notifications.length === 0 && (
         <Text style={styles.noNotifications}>No notifications yet</Text>
