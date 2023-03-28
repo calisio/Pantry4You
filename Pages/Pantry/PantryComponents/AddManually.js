@@ -62,7 +62,6 @@ const AddManually = (props) => {
 
 
     const submitHandler = async() => {
-        //TODO: make sure quantity is a number
         let reg = /^\d+$/;
         if(!reg.test(quantity)){
             Alert.alert("Please enter a numeric quantity");
@@ -73,7 +72,10 @@ const AddManually = (props) => {
 
             let foodUnit = await getFoodUnit(item);
 
-            if(foodUnit == selectedUnit || foodUnit == "insertNewUnit"){
+            if(foodUnit == null){
+                return;
+            }
+            else if(foodUnit == selectedUnit){
                 
                 if(foodUnit == "insertNewUnit"){
                     setFoodUnit(item, selectedUnit);
