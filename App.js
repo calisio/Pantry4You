@@ -216,7 +216,7 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
         <Tab.Screen
           name="Search"
           component={Search}
-          initialParams={{uid:uid}}
+          initialParams={{uid:uid, email:email}}
           options={{
             tabBarLabel: 'Search',
             tabBarIcon: ({ theme, size, focused }) => (
@@ -227,7 +227,7 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
         <Tab.Screen
           name="Notifications"
           component={Notifications}
-          initialParams={{uid:uid}}
+          initialParams={{uid:uid, email:email}}
           options={{
             tabBarLabel: 'Notifications',
             tabBarIcon: ({ theme, size, focused }) => (

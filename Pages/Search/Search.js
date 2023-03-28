@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
+import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc, deleteDoc } from 'firebase/firestore';
+import { db } from '../../firebase';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCjsh6Mj0fxTwcd5rwbk11ow3UATgpwrw8",
@@ -13,22 +14,24 @@ const firebaseConfig = {
   measurementId: "G-MV5KGDBTTJ"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// const app = initializeApp(firebaseConfig);
 
 
 const Search = ({navigation, route}) => {
-  const uid = route.params.uid;
+  const currentUserUID = route.params.uid;
+  const currentUserEmail = route.params.email;
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [requestSent, setRequestSent] = useState(false);
+  const [isHandlingRequest, setIsHandlingRequest] = useState(false);
 
   function handleSearch() {
+    console.log(searchQuery)
     // Make sure search query is not empty or invalid
     if (!searchQuery || !/\S+@\S+\.\S+/.test(searchQuery)) {
       setSearchResults([]);
       return;
     }
-
     // Query Firestore for users with matching emails
     const q = query(collection(db, 'users'), where('email', '==', searchQuery.toLowerCase()));
     getDocs(q)
@@ -38,10 +41,11 @@ const Search = ({navigation, route}) => {
           querySnapshot.forEach(doc => {
             const userData = doc.data();
             matchingUsers.push({
-              id: doc.id,
+              uid: doc.id,
               email: userData.email
             });
           });
+          console.log(matchingUsers);
           setSearchResults(matchingUsers);
         } else {
           setSearchResults([]);
@@ -52,49 +56,115 @@ const Search = ({navigation, route}) => {
       });
   }
 
-  function handleAddFriend(friendEmail) {
-    const userRef = doc(db, 'users', uid);
-    const friendRef = collection(db, 'users');
-    const q = query(friendRef, where('email', '==', friendEmail.toLowerCase()));
-    getDocs(q)
-      .then(querySnapshot => {
-        if (!querySnapshot.empty) {
-          const friendDoc = querySnapshot.docs[0];
-          const friendUID = friendDoc.id;
+  // function handleAddFriend(friendEmail) {
+  //   const userRef = doc(db, 'users', uid);
+  //   const friendRef = collection(db, 'users');
+  //   const q = query(friendRef, where('email', '==', friendEmail.toLowerCase()));
+  //   getDocs(q)
+  //     .then(querySnapshot => {
+  //       if (!querySnapshot.empty) {
+  //         const friendDoc = querySnapshot.docs[0];
+  //         const friendUID = friendDoc.id;
   
-          // Retrieve the existing friends array, add the new friend UID, and update the document
-          getDoc(userRef)
-            .then((userDoc) => {
-              const userData = userDoc.data();
-              const friends = userData.friends || [];
-              const friendData = { friendUID: friendUID, friendEmail: friendEmail };
-              if (!friends.some(f => f.friendUID === friendUID)) {
-                friends.push(friendData);
-                updateDoc(userRef, { friends });
-              } else {
-                console.log('Friend is already added.');
-              }
-            });
-        } else {
-          console.log('No matching user found.');
-        }
-      })
-      .then(() => {
-        console.log('Friend added successfully.');
-      })
-      .catch(error => {
-        console.error(error);
-      });
+  //         // Retrieve the existing friends array, add the new friend UID, and update the document
+  //         getDoc(userRef)
+  //           .then((userDoc) => {
+  //             const userData = userDoc.data();
+  //             const friends = userData.friends || [];
+  //             const friendData = { friendUID: friendUID, friendEmail: friendEmail };
+  //             if (!friends.some(f => f.friendUID === friendUID)) {
+  //               friends.push(friendData);
+  //               updateDoc(userRef, { friends });
+  //             } else {
+  //               console.log('Friend is already added.');
+  //             }
+  //           });
+  //       } else {
+  //         console.log('No matching user found.');
+  //       }
+  //     })
+  //     .then(() => {
+  //       console.log('Friend added successfully.');
+  //     })
+  //     .catch(error => {
+  //       console.error(error);
+  //     });
+  // }
+
+  function handleRequestFriend(friendEmail, friendUID) {
+    console.log(requestSent)
+
+    let documentString = "users/" + friendUID + "/notifications";
+    console.log(documentString)
+    let friendRequestsRef = db.collection(documentString);
+  
+    friendRequestsRef.add({
+      requestType: 'friend',
+      userUID: currentUserUID,
+      userEmail: currentUserEmail
+    }).then(function() {
+      console.log("Frank food updated");
+      setRequestSent(true);
+    });
   }
   
-  
-  
-  
-  
-  
+
+  function handleRemoveRequest(friendEmail, friendUID) {
+    // const userRef = doc(db, 'users', uid);
+    // const friendUID = friendRequests[friendEmail];
+
+    let notificationsCollection = "users/" + friendUID + "/notifications";
+    const q = query(
+      collection(db, notificationsCollection),
+      where('requestType', '==', 'friend'),
+      where('userUID', '==', currentUserUID)
+    );
+
+    getDocs(q)
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          deleteDoc(doc.ref)
+            .then(() => {
+              console.log("Document deleted");
+              setRequestSent(false);
+            })
+            .catch((error) => {
+              console.error("Error deleting document: ", error);
+            });
+        });
+      })
+      .catch((error) => {
+        console.error("Error getting documents: ", error);
+      });
+
+    // // Retrieve the existing friend requests object, remove the friend request, and update the document
+    // getDoc(userRef)
+    //   .then((userDoc) => {
+    //     const userData = userDoc.data();
+    //     const friendRequests = userData.friendRequests || {};
+    //     if (friendRequests[friendEmail]) {
+    //       delete friendRequests[friendEmail];
+    //       updateDoc(userRef, { friendRequests });
+    //       setRequestSent(false);
+    //     } else {
+    //       console.log('No matching friend request found.');
+    //     }
+    //   })
+    //   .then(() => {
+    //     console.log('Friend request removed successfully.');
+    //   })
+    //   .catch(error => {
+    //     console.error(error);
+    //   });
+  }
   
 
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
   return (
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
     <View style={styles.container}>
       <Text style={styles.title}>Search for Friends</Text>
       <TextInput
@@ -103,7 +173,7 @@ const Search = ({navigation, route}) => {
         value={searchQuery}
         onChangeText={text => setSearchQuery(text)}
       />
-      <TouchableOpacity onPress={handleSearch}>
+      <TouchableOpacity onPress={() => {handleSearch()}}>
         <Text style={styles.searchButton}>Search</Text>
       </TouchableOpacity>
       {searchResults.length > 0 ? (
@@ -113,8 +183,8 @@ const Search = ({navigation, route}) => {
               <View style={styles.resultEmailContainer}>
                 <Text style={styles.resultEmail}>{user.email}</Text>
               </View>
-              <TouchableOpacity onPress={() => handleAddFriend(user.email)} style={styles.resultButton}>
-                <Text style={styles.resultButtonText}>Add Friend</Text>
+              <TouchableOpacity onPress={() => {requestSent ? handleRemoveRequest(user.email, user.uid) : handleRequestFriend(user.email, user.uid)}}>
+                <Text style={styles.resultButtonText}>{requestSent ? 'Request Sent' : 'Request'}</Text>
               </TouchableOpacity>
             </View>
           ))}
@@ -123,6 +193,7 @@ const Search = ({navigation, route}) => {
         <Text style={styles.noResults}>{!searchQuery ? 'Please provide a valid email' : 'Sorry, there are no users with that email'}</Text>
       )}
     </View>
+    </TouchableWithoutFeedback>
   );
       }
 

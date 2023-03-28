@@ -19,8 +19,10 @@ function CreateAccount({ navigation, route }) {
       const db = getFirestore();
       const userRef = doc(db, "users", user.uid);
       //add user to db
+      const emailLower = email.toLowerCase()
+      console.log(emailLower);
       await setDoc(userRef, {
-        email: email,
+        email: emailLower,
         password: password
       });
 

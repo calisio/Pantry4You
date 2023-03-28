@@ -39,7 +39,7 @@ const Account = ({navigation, route}) => {
         const fetchFollowing = async () => {
             try {
                 const friendsDoc = await getDoc(doc(db, 'users', uid));
-                // const friendsData = friendsDoc.data().friends;
+                const friendsData = friendsDoc.data().friends;
                 if (friendsDoc.data().friends) {
                     const followingData = await Promise.all(friendsData.map(async friend => {
                         const friendDoc = await getDoc(doc(db, 'users', friend.friendUID));
