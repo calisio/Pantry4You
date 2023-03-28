@@ -1,4 +1,4 @@
-import { Alert, TextInput, View, Button, Text, StyleSheet, Pressable} from "react-native";
+import { Alert, TextInput, View, Text, StyleSheet, Pressable} from "react-native";
 import React, {useState} from 'react';
 import { db } from '../../../firebase';
 import { getAuth } from "firebase/auth";
@@ -8,6 +8,7 @@ import { getFoodUnit } from "../../../utils/getFoodUnit";
 
 const EditQuantity = (props) => {
     const [quantity, setQuantity] = useState('');
+    console.log(props.item);
 
     const submitHandler = async() => {
         let reg = /^\d+$/;
@@ -22,7 +23,7 @@ const EditQuantity = (props) => {
             else if(quantityInt == 0){
                 const auth = getAuth();
                 const user = auth.currentUser.uid;
-                let editedItem = props.item[0];
+                let editedItem = props.item;
                 db.collection('users').doc(user).collection('pantry').doc(editedItem).delete().then(() => {
                     console.log(editedItem, " deleted");
                     props.updateFunction();
@@ -33,7 +34,7 @@ const EditQuantity = (props) => {
                 })
             }
             else{
-                let editedItem = props.item[0];
+                let editedItem = props.item;
                 const unit = await getFoodUnit(editedItem);
                 const auth = getAuth();
                 const user = auth.currentUser.uid;
@@ -46,6 +47,7 @@ const EditQuantity = (props) => {
                 }, {merge: true})
                 .then(console.log("edited quantity"))
                 .then(() => {
+                    setQuantity('');
                     props.updateFunction();
                 });
 
@@ -58,21 +60,22 @@ const EditQuantity = (props) => {
 
     return(
         <View style={styles.container}>
-            <TextInput
-                clearButtonMode='always'
-                style={styles.input}
-                placeholder="Input new quantity"
-                onChangeText={newQuantity => setQuantity(newQuantity)}
-                defaultValue={""}
-                id="quantity"
-            />
             <Pressable
                 title="Submit"
                 onPress={submitHandler}
                 style={styles.button}
             >
-                <Text style={styles.text}>Submit</Text>
+                <Text style={styles.text}>Change #</Text>
             </Pressable>
+            <Text> {props.unit} </Text>
+            <TextInput
+                clearButtonMode='always'
+                style={styles.input}
+                placeholder={quantity}
+                onChangeText={newQuantity => setQuantity(newQuantity)}
+                defaultValue={""}
+                id="quantity"
+            />
         </View>
     );
 };
@@ -81,24 +84,35 @@ const EditQuantity = (props) => {
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 'row',
+        marginTop:'5%',
+        flexDirection: 'row-reverse',
         alignItems: 'center',
+        zIndex: 0,
+        // borderColor: '#000000',
+        // borderWidth: '2px',
+        // width: '80%'
     },
     input: {
-        width: '80%',
-        height: 20,
+        width: '17%',
         borderWidth: 1,
         borderColor: 'gray',
         borderRadius: 8,
         paddingHorizontal: '5%',
+        zIndex: 0,
+        marginLeft: 0
     },
     button: {
         backgroundColor: '#CCCCCC',
         borderRadius: 8,
-        padding: 10,
+        padding: 5,
+        zIndex: 0,
+        width: '50%',
+        marginHorizontal: '2%'
     },
     text: {
         alignSelf: 'center',
+        textAlign: 'center',
+        textAlignVertical: 'center'
     }
 
 });

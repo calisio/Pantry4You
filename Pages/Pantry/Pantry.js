@@ -1,14 +1,17 @@
-import { StyleSheet, Text, View, Button, Alert, TextInput, Keyboard, TouchableWithoutFeedback, Pressable } from 'react-native';
+import { StyleSheet, Text, View, Keyboard, TouchableWithoutFeedback} from 'react-native';
 import { AddManually } from './PantryComponents/AddManually';
 import React, {useState, useEffect} from 'react';
 import { db } from '../../firebase';
 import { EditQuantity } from './PantryComponents/EditQuantity';
-import { setDefaultEventParameters } from 'firebase/analytics';
+import { FlatList, ScrollView } from 'react-native-gesture-handler';
+import {List, Box, Heading, HStack, Center, AspectRatio, Skeleton, VStack} from 'native-base';
+
 
 const Pantry = ({navigation, route}) => {
   const uid = route.params.uid;
-  const [isVisible, setFormVisibility] = useState(false);
   const [pantryList, setPantryList] = useState([]);
+  const [listLoaded, setListLoaded] = useState(false);
+  // const [showAutocomplete, setShowAutocomplete] = useState(true);
 
   let collectionString = "users/" + uid + "/pantry";
   let pantryRef = db.collection(collectionString);
@@ -29,78 +32,112 @@ const Pantry = ({navigation, route}) => {
       let item = Object.values(tempDoc[i])[0];
       let qty = Object.values(tempDoc[i])[1];
       let unit = Object.keys(tempDoc[i])[1];
-      let newListEntry = [item, qty, unit];
+      let newListEntry = {"item": item, "qty": qty, "unit":unit};
       newPantryList.push(newListEntry);
     }
+    console.log("pantryList set");
     setPantryList(newPantryList);
+    setListLoaded(true);
   }
 
   useEffect(() => {
     getPantryList()
   }, []);
+  
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
+    // setShowAutocomplete(false);
   };
 
-    return (
-      <TouchableWithoutFeedback onPress={dismissKeyboard}>
-        <View style={styles.container}>
-          {/* <Button
-            title="Scan Receipt"
-            onPress={openScanner}
-          /> */}
-          <Pressable
-            style={styles.button}
-            onPress={() => setFormVisibility(!isVisible)}
-          >
-            <Text style={styles.text}>Add Items Manually</Text>
-          </Pressable>
-          {isVisible ? <AddManually style={styles.addManually} updateFunction={getPantryList}></AddManually>: null}
 
-          <View style={styles.listContainer}>
-              {pantryList.map((item) => (
-                <Text key={item}>{item[0]}: {item[1]} {item[2]} {"\n"} <EditQuantity item={item} updateFunction={getPantryList}></EditQuantity></Text>
-              ))}
-          </View>
+  const PantryListComp = ({ item }) => {
+    return(
+      <View style={styles.listItemCont}>
+        <Text key={item.item}  style={styles.text}>{item.item}: {item.qty} {item.unit} {"\n"}<EditQuantity item={item.item} updateFunction={getPantryList}  unit={item.unit}></EditQuantity></Text>
+      </View>
+    );
+
+  };
+  //Add to AddManually component : showAC={showAutocomplete} setShowAC={setShowAutocomplete}
+
+    return (
+      <TouchableWithoutFeedback onPress={dismissKeyboard} style={styles.outerCont}>
+        <View style={styles.container}>
+
+          <View style={styles.addItemsCont}>
+            <Text style={styles.header}>Add Items</Text>
+            <AddManually style={styles.addManually} updateFunction={getPantryList} ></AddManually>
+          </View >
+
+          {(listLoaded && pantryList.length > 0) ? (
+            <View style={styles.listCont}>
+              <FlatList contentContainerStyle={styles.list}
+                data={pantryList}
+                renderItem={PantryListComp}
+                keyExtractor={(item) => item.item}
+                ListHeaderComponent={() => <View style={{ height: 10 }} />}
+                ListFooterComponent={() => <View style={{ height: 10 }} />}
+                ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+              />
+            </View>
+          ) : (<View></View>)}
+
         </View>
       </TouchableWithoutFeedback>
 
     );
 };
-/*
-const openScanner = () =>
-    Alert.alert('Scan Receipt', 'implement later', [
-      {
-        text: 'Scan',
-        onPress: () => console.log('Scan Pressed'),
-        style: 'cancel',
-      },
-      {text: 'Cancel', onPress: () => console.log('Cancel Pressed')},
-    ]);
-
-*/
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    //justifyContent: 'center',
+  outerCont:{
+    zIndex: 0
   },
-  listContainer: {
-    flexDirection:'row',
-    flexWrap:'wrap',
-    marginTop: '10%',
+  listCont:{
+    // borderBottomColor: 'red',
+    // topBorderColor: 'red',
+    borderWidth: 2,
+    // flex: 1
+  },
+  list:{
+    paddingBottom: 400
+  },
+  addItemsCont: {
+    // borderColor: '#000000',
+    // borderWidth: '2px',
+    padding:'5%',
+    zIndex: 1
+  },
+  header: {
+    fontSize: '20px',
+    textAlign: 'center'
+  },
+  edit:{
+    zIndex: 1,
+    // borderColor: '#d00000',
+    // borderWidth: '2px',
   },
   button: {
     backgroundColor: '#CCCCCC',
     borderRadius: 8,
     padding: 10,
     width: '40%',
-    marginBottom: '10%'
+    marginBottom: '10%',
+    zIndex: 0
   },
   text: {
-    alignSelf: 'center',
+    height: 100,
+    zIndex: 0,
+    borderColor: '#ffffff',
+    borderWidth: '3px',
+    textAlign: 'center',
+    backgroundColor: '#adadad'
+  },
+  addManually:{
+    zIndex: 1
+  },
+  listItemCont: {
+    height: 100
   }
 
 });
