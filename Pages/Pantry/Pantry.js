@@ -3,8 +3,7 @@ import { AddManually } from './PantryComponents/AddManually';
 import React, {useState, useEffect} from 'react';
 import { db } from '../../firebase';
 import { EditQuantity } from './PantryComponents/EditQuantity';
-import { FlatList, ScrollView } from 'react-native-gesture-handler';
-import {List, Box, Heading, HStack, Center, AspectRatio, Skeleton, VStack} from 'native-base';
+import { FlatList} from 'react-native-gesture-handler';
 
 
 const Pantry = ({navigation, route}) => {
@@ -95,17 +94,12 @@ const styles = StyleSheet.create({
     zIndex: 0
   },
   listCont:{
-    // borderBottomColor: 'red',
-    // topBorderColor: 'red',
     borderWidth: 2,
-    // flex: 1
   },
   list:{
     paddingBottom: 400
   },
   addItemsCont: {
-    // borderColor: '#000000',
-    // borderWidth: '2px',
     padding:'5%',
     zIndex: 1,
     backgroundColor: '#cccccc'
@@ -116,8 +110,6 @@ const styles = StyleSheet.create({
   },
   edit:{
     zIndex: 1,
-    // borderColor: '#d00000',
-    // borderWidth: '2px',
   },
   button: {
     backgroundColor: '#CCCCCC',

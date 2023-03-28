@@ -89,9 +89,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row-reverse',
         alignItems: 'center',
         zIndex: 0,
-        // borderColor: '#000000',
-        // borderWidth: '2px',
-        // width: '80%'
     },
     input: {
         backgroundColor: 'white',

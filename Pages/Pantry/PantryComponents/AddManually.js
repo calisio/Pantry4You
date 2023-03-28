@@ -3,14 +3,10 @@ import React, {useState} from 'react';
 import { db } from '../../../firebase';
 import firebase from 'firebase/compat/app';
 import { getAuth } from "firebase/auth";
-import { SelectList } from 'react-native-dropdown-select-list';
 import { getFoodUnit } from '../../../utils/getFoodUnit';
 import { setFoodUnit } from '../../../utils/setFoodUnit';
 import { MyAutocomplete } from './Autocomplete';
 
-const dismissKeyboard = () => {
-    Keyboard.dismiss();
-}
 
 // https://reactnative.dev/docs/handling-text-input
 
@@ -256,16 +252,6 @@ const AddManually = (props) => {
     const [quantity, setQuantity] = useState('');
     const [selectedUnit, setSelectedUnit] = useState('');
 
-
-    //https://www.npmjs.com/package/react-native-dropdown-select-list
-    const units = [
-        {key:'1', value:'cup'},
-        {key:'2', value:'tbsp'},
-        {key:'3', value:'lb'},
-        {key:'4', value:'oz'},
-        {key:'5', value:'item'}
-    ]
-
     const auth = getAuth();
     const user = auth.currentUser.uid;
 
@@ -371,7 +357,6 @@ const AddManually = (props) => {
             })
         })
 
-        // console.log("cur pantry start-------------");
         for(let i=0; i < tempDoc.length; i++){
             curPantryList.push(tempDoc[i]);
         }
@@ -402,13 +387,6 @@ const AddManually = (props) => {
                         defaultValue={""}
                         id="quantity"
                     />
-                    {/* <SelectList
-                        setSelected={(val) => setSelectedUnit(val)}
-                        data={units}
-                        save="value"
-                        label="Units"
-                        style={styles.selectList}
-                    /> */}
                     <Text style={styles.unit}>{selectedUnit}</Text>
                 </View>
                 <Pressable

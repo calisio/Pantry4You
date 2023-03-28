@@ -1,7 +1,6 @@
 import { StyleSheet, Text, View, Keyboard, TouchableOpacity, SafeAreaView } from 'react-native';
 import React, {useCallback, useState} from 'react';
 import Autocomplete from 'react-native-autocomplete-input';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
 const MyAutocomplete = (props) => {
     const [query, setQuery] = useState('');
@@ -40,7 +39,6 @@ const MyAutocomplete = (props) => {
 
     return(
         <SafeAreaView style={styles.autocompleteContainer}>
-            {/* <TouchableWithoutFeedback style={styles.autocompleteContainer} > */}
                 <Autocomplete
                     value={query}
                     data={ possibleFoods }
@@ -59,7 +57,6 @@ const MyAutocomplete = (props) => {
                           ),
                     }}
                 />
-            {/* </TouchableWithoutFeedback> */}
         </SafeAreaView>
     );
 };
