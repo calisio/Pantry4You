@@ -28,15 +28,16 @@ const Account = ({navigation, route}) => {
         const fetchFriends = async () => {
             try {
                 const friendsDoc = await getDoc(doc(db, 'users', uid));
-                const friendsData = friendsDoc.data().friends;
-                console.log(friendsData)
-                const friendsArray = []
-                if (friendsData.length > 0) {
-                  friendsData.forEach(element => {
-                    console.log(element);
-                    friendsArray.push(element);
-                  });
-                  setFriends(friendsArray);
+                if (friendsDoc.data().friends) {
+                  const friendsData = friendsDoc.data().friends;
+                  const friendsArray = []
+                  if (friendsData.length > 0) {
+                    friendsData.forEach(element => {
+                      console.log(element);
+                      friendsArray.push(element);
+                    });
+                    setFriends(friendsArray);
+                  }
                 }
             } catch (error) {
                 console.error(error);
