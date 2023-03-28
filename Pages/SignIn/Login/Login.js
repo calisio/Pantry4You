@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { Button } from 'native-base';
 import firebase from 'firebase/app';
 
 
@@ -36,11 +37,11 @@ const Login = ({ navigation, route }) => {
           value={password}
           onChangeText={setPassword}
         />
-      <Button title="Login" onPress={() => handleSubmit()} />
-      <Button
-          title="Create Account"
-          onPress={() => navigation.navigate('CreateAccount')}
-        />
+        <Button color="#e57507" onPress={() => handleSubmit()}>Login</Button>
+        <Text />
+        <Button
+            onPress={() => navigation.navigate('CreateAccount')}
+            color="#e57507">Create Account</Button>
       </View>
     </TouchableWithoutFeedback>
   );

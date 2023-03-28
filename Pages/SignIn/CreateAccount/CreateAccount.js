@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Keyboard, Touchabl
 import firebase from 'firebase/app';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore, doc, setDoc, deleteDoc, collection } from 'firebase/firestore';
+import { Button } from 'native-base';
 import { auth } from '../../../App';
 
 
@@ -118,9 +119,7 @@ function CreateAccount({ navigation, route }) {
           onChangeText={text => setPassword(text)}
           secureTextEntry
         />
-        <TouchableOpacity onPress={handleCreateAccount} style={styles.button}>
-          <Text>Create Account</Text>
-        </TouchableOpacity>
+        <Button csize='xs'color="#e57507" onPress={handleCreateAccount}>Create Account</Button>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -149,11 +148,6 @@ const styles = StyleSheet.create({
   text: {
       fontSize: 15,
       marginBottom: 15,
-  },
-  button: {
-      backgroundColor: '#CCCCCC',
-      borderRadius: 8,
-      padding: 10,
   },
 });
 
