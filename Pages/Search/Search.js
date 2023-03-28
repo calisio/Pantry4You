@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { initializeApp } from "firebase/app";
+import { Button, Input } from 'native-base';
 import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCjsh6Mj0fxTwcd5rwbk11ow3UATgpwrw8",
@@ -54,42 +56,40 @@ const Search = ({navigation, route}) => {
       .catch(error => {
         console.error(error);
       });
+
   }
 
-  // function handleAddFriend(friendEmail) {
-  //   const userRef = doc(db, 'users', uid);
-  //   const friendRef = collection(db, 'users');
-  //   const q = query(friendRef, where('email', '==', friendEmail.toLowerCase()));
-  //   getDocs(q)
-  //     .then(querySnapshot => {
-  //       if (!querySnapshot.empty) {
-  //         const friendDoc = querySnapshot.docs[0];
-  //         const friendUID = friendDoc.id;
-  
-  //         // Retrieve the existing friends array, add the new friend UID, and update the document
-  //         getDoc(userRef)
-  //           .then((userDoc) => {
-  //             const userData = userDoc.data();
-  //             const friends = userData.friends || [];
-  //             const friendData = { friendUID: friendUID, friendEmail: friendEmail };
-  //             if (!friends.some(f => f.friendUID === friendUID)) {
-  //               friends.push(friendData);
-  //               updateDoc(userRef, { friends });
-  //             } else {
-  //               console.log('Friend is already added.');
-  //             }
-  //           });
-  //       } else {
-  //         console.log('No matching user found.');
-  //       }
-  //     })
-  //     .then(() => {
-  //       console.log('Friend added successfully.');
-  //     })
-  //     .catch(error => {
-  //       console.error(error);
-  //     });
-  // }
+  useEffect(() => {
+    console.log('inside use effect')
+    // check if you've already requested that friend
+    searchResults.forEach(user => {
+      console.log('insidef foe each usert')
+      let notificationsCollection = "users/" + user.uid + "/notifications";
+      const q = query(
+        collection(db, notificationsCollection),
+        where('requestType', '==', 'friend'),
+        where('userUID', '==', currentUserUID)
+      );
+      getDocs(q)
+        .then((querySnapshot) => {
+          if (querySnapshot.size != 0) {
+            querySnapshot.forEach((doc) => {
+              console.log("doc")
+              if (doc.exists) {
+                console.log('hello')
+                setRequestSent(true);
+              }
+            });
+          } else {
+            setRequestSent(false);
+          }
+        })
+        .catch((error) => {
+          console.error("Error getting documents: ", error);
+        });
+    });
+  }, [searchResults])
+
 
   function handleRequestFriend(friendEmail, friendUID) {
     console.log(requestSent)
@@ -167,15 +167,18 @@ const Search = ({navigation, route}) => {
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
     <View style={styles.container}>
       <Text style={styles.title}>Search for Friends</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter friend's email"
-        value={searchQuery}
-        onChangeText={text => setSearchQuery(text)}
-      />
-      <TouchableOpacity onPress={() => {handleSearch()}}>
-        <Text style={styles.searchButton}>Search</Text>
-      </TouchableOpacity>
+      <Input size='md' w="80%" py="0" InputRightElement={<Button size="lg" rounded="none" w="1/6" h="full" onPress={() => {handleSearch()}}>
+          <MaterialCommunityIcons name="magnify" color="white"/>
+          </Button>} placeholder="Enter friend's email" value={searchQuery} onChangeText={text => setSearchQuery(text)}/>
+      {/* <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter friend's email"
+          value={searchQuery}
+          onChangeText={text => setSearchQuery(text)}
+        />
+        <Button onPress={() => {handleSearch()}}><MaterialCommunityIcons name="magnify" color="white"/></Button>
+      </View> */}
       {searchResults.length > 0 ? (
         <View style={styles.resultsContainer}>
           {searchResults.map((user, index) => (
@@ -183,9 +186,9 @@ const Search = ({navigation, route}) => {
               <View style={styles.resultEmailContainer}>
                 <Text style={styles.resultEmail}>{user.email}</Text>
               </View>
-              <TouchableOpacity onPress={() => {requestSent ? handleRemoveRequest(user.email, user.uid) : handleRequestFriend(user.email, user.uid)}}>
-                <Text style={styles.resultButtonText}>{requestSent ? 'Request Sent' : 'Request'}</Text>
-              </TouchableOpacity>
+              <Button onPress={() => {requestSent ? handleRemoveRequest(user.email, user.uid) : handleRequestFriend(user.email, user.uid)}}>
+                {requestSent ? 'Request Sent' : 'Request'}
+              </Button>
             </View>
           ))}
         </View>
@@ -208,15 +211,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 24,
   },
-  input: {
-    width: '80%',
-    height: 40,
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    marginBottom: 16,
-  },
   resultsContainer: {
     marginTop: 24,
     width: '80%',
@@ -226,7 +220,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: 'white',
-    padding: 16,
+    padding: 7,
     borderRadius: 8,
     marginBottom: 16,
     shadowColor: '#000',
