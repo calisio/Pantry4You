@@ -253,10 +253,7 @@ const AddManually = (props) => {
     const [item, setItem] = useState('');
     const [quantity, setQuantity] = useState('');
     const [selectedUnit, setSelectedUnit] = useState('');
-    const [possibleFoods, setPossibleFoods] = useState([]);
 
-
-    
 
     //https://www.npmjs.com/package/react-native-dropdown-select-list
     const units = [
@@ -381,27 +378,9 @@ const AddManually = (props) => {
         return curPantryList;
     }
 
-
-
-    // const filterFoods = useCallback((query) => {
-    //     query = query.toLowerCase();
-    //     console.log("filter foods");
-    //     if(query){
-    //         console.log("if");
-    //         console.log(query);
-    //         setPossibleFoods(
-    //             allFoods.filter((food) => food.includes(query))
-    //         );
-    //     }
-    //     else{
-    //         console.log("else");
-    //         setPossibleFoods([]);
-    //     }
-    // }, []);
-
     return (
             <View  style={styles.outerCont}>
-                <View>
+                <View style={styles.autocompleteCont}>
                     <MyAutocomplete
                         updateItemFunction = {setItem}
                         foods={allFoods}
@@ -409,15 +388,6 @@ const AddManually = (props) => {
                     />
                 </View>
                 
-                
-                {/* <TextInput 
-                    value={item}
-                    style={styles.input}
-                    placeholder="Enter item here"
-                    onChangeText={newItem => setItem(newItem.toLowerCase())}
-                    defaultValue={""}
-                    id="item"
-                /> */}
                 <View style={styles.container}>
                     <TextInput
                         value={quantity}
@@ -487,7 +457,10 @@ const styles = StyleSheet.create({
     },
     autocomplete: {
         width: '90%',
-        zIndex: 1
+        zIndex: 100
+    },
+    autocompleteCont: {
+        zIndex: 100
     }
 });
 

@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         alignItems: 'center',
+        zIndex: 0
     },
     input: {
         width: '80%',
@@ -91,14 +92,16 @@ const styles = StyleSheet.create({
         borderColor: 'gray',
         borderRadius: 8,
         paddingHorizontal: '5%',
+        zIndex: 0
     },
     button: {
         backgroundColor: '#CCCCCC',
         borderRadius: 8,
         padding: 10,
+        zIndex: 0
     },
     text: {
-        alignSelf: 'center',
+        alignSelf: 'center'
     }
 
 });

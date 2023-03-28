@@ -1,13 +1,12 @@
-import { StyleSheet, Text, View, Button, Alert, TextInput, Keyboard, TouchableWithoutFeedback, Pressable } from 'react-native';
+import { StyleSheet, Text, View, Keyboard, TouchableWithoutFeedback} from 'react-native';
 import { AddManually } from './PantryComponents/AddManually';
 import React, {useState, useEffect} from 'react';
 import { db } from '../../firebase';
 import { EditQuantity } from './PantryComponents/EditQuantity';
-import { setDefaultEventParameters } from 'firebase/analytics';
+import zIndex from '@mui/material/styles/zIndex';
 
 const Pantry = ({navigation, route}) => {
   const uid = route.params.uid;
-  const [isVisible, setFormVisibility] = useState(false);
   const [pantryList, setPantryList] = useState([]);
 
   let collectionString = "users/" + uid + "/pantry";
@@ -44,63 +43,68 @@ const Pantry = ({navigation, route}) => {
   };
 
     return (
-      <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <TouchableWithoutFeedback onPress={dismissKeyboard} style={styles.outerCont}>
         <View style={styles.container}>
-          {/* <Button
-            title="Scan Receipt"
-            onPress={openScanner}
-          /> */}
-          <Pressable
-            style={styles.button}
-            onPress={() => setFormVisibility(!isVisible)}
-          >
-            <Text style={styles.text}>Add Items Manually</Text>
-          </Pressable>
-          {isVisible ? <AddManually style={styles.addManually} updateFunction={getPantryList}></AddManually>: null}
+
+          <View style={styles.addItemsCont}>
+            <Text style={styles.header}>Add Items</Text>
+            <AddManually style={styles.addManually} updateFunction={getPantryList}></AddManually>
+          </View>
 
           <View style={styles.listContainer}>
               {pantryList.map((item) => (
-                <Text key={item}>{item[0]}: {item[1]} {item[2]} {"\n"} <EditQuantity item={item} updateFunction={getPantryList}></EditQuantity></Text>
+                <Text key={item} style={styles.text}>{item[0]}: {item[1]} {item[2]} {"\n"} <EditQuantity item={item} updateFunction={getPantryList} style={styles.edit}></EditQuantity></Text>
               ))}
           </View>
+
         </View>
       </TouchableWithoutFeedback>
 
     );
 };
-/*
-const openScanner = () =>
-    Alert.alert('Scan Receipt', 'implement later', [
-      {
-        text: 'Scan',
-        onPress: () => console.log('Scan Pressed'),
-        style: 'cancel',
-      },
-      {text: 'Cancel', onPress: () => console.log('Cancel Pressed')},
-    ]);
-
-*/
 
 const styles = StyleSheet.create({
+  outerCont:{
+    zIndex: 0
+  },
+  addItemsCont: {
+    borderColor: '#000000',
+    borderWidth: '2px',
+    padding:'5%'
+  },
+  header: {
+    fontSize: '20px',
+    textAlign: 'center'
+  },
+  edit:{
+    zIndex: 0
+  },
   container: {
     flex: 1,
     alignItems: 'center',
     //justifyContent: 'center',
+    zIndex: 0
   },
   listContainer: {
     flexDirection:'row',
     flexWrap:'wrap',
     marginTop: '10%',
+    zIndex: 0
   },
   button: {
     backgroundColor: '#CCCCCC',
     borderRadius: 8,
     padding: 10,
     width: '40%',
-    marginBottom: '10%'
+    marginBottom: '10%',
+    zIndex: 0
   },
   text: {
     alignSelf: 'center',
+    zIndex: 0
+  },
+  addManually:{
+    zIndex: 1
   }
 
 });

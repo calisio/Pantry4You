@@ -53,7 +53,7 @@ const MyAutocomplete = (props) => {
                     flatListProps={{
                         keyboardShouldPersistTaps: 'always',
                         renderItem: ({item}) => (
-                            <TouchableOpacity onPress={() => handlePress(item)}>
+                            <TouchableOpacity onPress={() => handlePress(item)} >
                               <Text style={styles.itemText}>{item}</Text>
                             </TouchableOpacity>
                           ),
@@ -68,7 +68,8 @@ const styles = StyleSheet.create({
     itemText: {
       fontSize: 15,
       margin: 2,
-      zIndex: 1
+      zIndex: 1,
+      backgroundColor: '#c2c2c2'
     },
     saveView: {
         flex: 1,
