@@ -3,10 +3,15 @@ import { AddManually } from './PantryComponents/AddManually';
 import React, {useState, useEffect} from 'react';
 import { db } from '../../firebase';
 import { EditQuantity } from './PantryComponents/EditQuantity';
+import { FlatList, ScrollView } from 'react-native-gesture-handler';
+import {List, Box, Heading, HStack, Center, AspectRatio, Skeleton, VStack} from 'native-base';
+
 
 const Pantry = ({navigation, route}) => {
   const uid = route.params.uid;
   const [pantryList, setPantryList] = useState([]);
+  const [listLoaded, setListLoaded] = useState(false);
+  // const [showAutocomplete, setShowAutocomplete] = useState(true);
 
   let collectionString = "users/" + uid + "/pantry";
   let pantryRef = db.collection(collectionString);
@@ -27,19 +32,34 @@ const Pantry = ({navigation, route}) => {
       let item = Object.values(tempDoc[i])[0];
       let qty = Object.values(tempDoc[i])[1];
       let unit = Object.keys(tempDoc[i])[1];
-      let newListEntry = [item, qty, unit];
+      let newListEntry = {"item": item, "qty": qty, "unit":unit};
       newPantryList.push(newListEntry);
     }
+    console.log("pantryList set");
     setPantryList(newPantryList);
+    setListLoaded(true);
   }
 
   useEffect(() => {
     getPantryList()
   }, []);
+  
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
+    // setShowAutocomplete(false);
   };
+
+
+  const PantryListComp = ({ item }) => {
+    return(
+      <View style={styles.listItemCont}>
+        <Text key={item.item}  style={styles.text}>{item.item}: {item.qty} {item.unit} {"\n"}<EditQuantity item={item.item} updateFunction={getPantryList}  unit={item.unit}></EditQuantity></Text>
+      </View>
+    );
+
+  };
+  //Add to AddManually component : showAC={showAutocomplete} setShowAC={setShowAutocomplete}
 
     return (
       <TouchableWithoutFeedback onPress={dismissKeyboard} style={styles.outerCont}>
@@ -47,14 +67,21 @@ const Pantry = ({navigation, route}) => {
 
           <View style={styles.addItemsCont}>
             <Text style={styles.header}>Add Items</Text>
-            <AddManually style={styles.addManually} updateFunction={getPantryList}></AddManually>
-          </View>
+            <AddManually style={styles.addManually} updateFunction={getPantryList} ></AddManually>
+          </View >
 
-          <View style={styles.listContainer}>
-              {pantryList.map((item) => (
-                <Text key={item} style={styles.text}>{item[0]}: {item[1]} {item[2]} {"\n"} <EditQuantity item={item} updateFunction={getPantryList} style={styles.edit}></EditQuantity></Text>
-              ))}
-          </View>
+          {(listLoaded && pantryList.length > 0) ? (
+            <View style={styles.listCont}>
+              <FlatList contentContainerStyle={styles.list}
+                data={pantryList}
+                renderItem={PantryListComp}
+                keyExtractor={(item) => item.item}
+                ListHeaderComponent={() => <View style={{ height: 10 }} />}
+                ListFooterComponent={() => <View style={{ height: 10 }} />}
+                ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+              />
+            </View>
+          ) : (<View></View>)}
 
         </View>
       </TouchableWithoutFeedback>
@@ -66,29 +93,29 @@ const styles = StyleSheet.create({
   outerCont:{
     zIndex: 0
   },
+  listCont:{
+    // borderBottomColor: 'red',
+    // topBorderColor: 'red',
+    borderWidth: 2,
+    // flex: 1
+  },
+  list:{
+    paddingBottom: 400
+  },
   addItemsCont: {
-    borderColor: '#000000',
-    borderWidth: '2px',
-    padding:'5%'
+    // borderColor: '#000000',
+    // borderWidth: '2px',
+    padding:'5%',
+    zIndex: 1
   },
   header: {
     fontSize: '20px',
     textAlign: 'center'
   },
   edit:{
-    zIndex: 0
-  },
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    //justifyContent: 'center',
-    zIndex: 0
-  },
-  listContainer: {
-    flexDirection:'row',
-    flexWrap:'wrap',
-    marginTop: '10%',
-    zIndex: 0
+    zIndex: 1,
+    // borderColor: '#d00000',
+    // borderWidth: '2px',
   },
   button: {
     backgroundColor: '#CCCCCC',
@@ -99,11 +126,18 @@ const styles = StyleSheet.create({
     zIndex: 0
   },
   text: {
-    alignSelf: 'center',
-    zIndex: 0
+    height: 100,
+    zIndex: 0,
+    borderColor: '#ffffff',
+    borderWidth: '3px',
+    textAlign: 'center',
+    backgroundColor: '#adadad'
   },
   addManually:{
     zIndex: 1
+  },
+  listItemCont: {
+    height: 100
   }
 
 });

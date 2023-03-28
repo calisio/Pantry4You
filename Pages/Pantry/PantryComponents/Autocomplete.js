@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Keyboard, TouchableOpacity, SafeAreaView } from 'react-native';
 import React, {useCallback, useState} from 'react';
 import Autocomplete from 'react-native-autocomplete-input';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 
 const MyAutocomplete = (props) => {
     const [query, setQuery] = useState('');
@@ -16,6 +17,7 @@ const MyAutocomplete = (props) => {
             setPossibleFoods(
                 props.foods.filter((food) => food.includes(query))
             );
+            props.updateItemFunction(query);
         }
         else{
             console.log("else");
@@ -27,6 +29,7 @@ const MyAutocomplete = (props) => {
         console.log("press");
         setQuery(item);
         props.updateItemFunction(item);
+        props.updateUnitFunction(props.foodUnits[item]);
         setPossibleFoods([]);
         dismissKeyboard();
     }
@@ -36,8 +39,8 @@ const MyAutocomplete = (props) => {
     }
 
     return(
-        <SafeAreaView>
-            <View style={styles.autocompleteContainer}>
+        <SafeAreaView style={styles.autocompleteContainer}>
+            {/* <TouchableWithoutFeedback style={styles.autocompleteContainer} > */}
                 <Autocomplete
                     value={query}
                     data={ possibleFoods }
@@ -46,13 +49,17 @@ const MyAutocomplete = (props) => {
                     flatListProps={{
                         keyboardShouldPersistTaps: 'always',
                         renderItem: ({item}) => (
-                            <TouchableOpacity onPress={() => handlePress(item)} >
-                              <Text style={styles.itemText}>{item}</Text>
-                            </TouchableOpacity>
+                            // <View> 
+                                // /* {props.showAutocomplete && ( */}
+                                    <TouchableOpacity onPress={() => handlePress(item)} >
+                                        <Text style={styles.itemText}>{item}</Text>
+                                    </TouchableOpacity>
+                                // /* )} */}
+                            // /* </View> */
                           ),
                     }}
                 />
-            </View>
+            {/* </TouchableWithoutFeedback> */}
         </SafeAreaView>
     );
 };

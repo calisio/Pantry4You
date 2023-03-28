@@ -15,7 +15,7 @@ const dismissKeyboard = () => {
 // https://reactnative.dev/docs/handling-text-input
 
 const AddManually = (props) => {
-    console.log("rendered");
+    // console.log("rendered");
     const allFoodUnits = {
         "milk": "cup",
         "buttermilk": "cup",
@@ -340,8 +340,7 @@ const AddManually = (props) => {
                 props.updateFunction();
                 setItem('');
                 setQuantity('');
-                //TODO: how to reset dropdown?  this clears the var, but dropdown display doesn't change
-                //setSelectedUnit('');
+                setSelectedUnit('');
             }
             else{
                 console.log("units bad");
@@ -369,7 +368,7 @@ const AddManually = (props) => {
             })
         })
 
-        console.log("cur pantry start-------------");
+        // console.log("cur pantry start-------------");
         for(let i=0; i < tempDoc.length; i++){
             curPantryList.push(tempDoc[i]);
         }
@@ -379,11 +378,15 @@ const AddManually = (props) => {
 
     return (
             <View  style={styles.outerCont}>
-                <View style={styles.autocompleteCont}>
+                <View style={styles.autocompleteCont} >
                     <MyAutocomplete
                         updateItemFunction = {setItem}
                         foods={allFoods}
+                        foodUnits={allFoodUnits}
                         style={styles.autocomplete}
+                        updateUnitFunction = {setSelectedUnit}
+                        // showAutocomplete = {props.showAC}
+                        // setShowAutocomplete = {props.setShowAC}
                     />
                 </View>
                 
@@ -396,13 +399,14 @@ const AddManually = (props) => {
                         defaultValue={""}
                         id="quantity"
                     />
-                    <SelectList
+                    {/* <SelectList
                         setSelected={(val) => setSelectedUnit(val)}
                         data={units}
                         save="value"
                         label="Units"
                         style={styles.selectList}
-                    />
+                    /> */}
+                    <Text style={styles.unit}>{selectedUnit}</Text>
                 </View>
                 <Pressable
                     style={styles.button}
@@ -416,15 +420,21 @@ const AddManually = (props) => {
 };
 
 const styles = StyleSheet.create({
+    unit:{
+        marginLeft: '20%',
+        textAlign: 'auto'
+    },
     outerCont: {
-        zIndex: 0
+        zIndex: 0,
+        width: '90%'
     },
     container: {
       marginTop: '20%',
       flexDirection: 'row',
       flexWrap: 'wrap',
       alignItems: 'center',
-      zIndex: 0
+      zIndex: 0,
+      width: '90%'
     },
     input: {
         width: '50%',
