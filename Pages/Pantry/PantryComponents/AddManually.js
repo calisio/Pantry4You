@@ -456,7 +456,8 @@ const styles = StyleSheet.create({
         zIndex: 0
     },
     button: {
-        backgroundColor: '#CCCCCC',
+        marginTop: 10,
+        backgroundColor: '#e57507',
         borderRadius: 8,
         padding: 10,
         zIndex: 0

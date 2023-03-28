@@ -54,7 +54,7 @@ const Pantry = ({navigation, route}) => {
   const PantryListComp = ({ item }) => {
     return(
       <View style={styles.listItemCont}>
-        <Text key={item.item}  style={styles.text}>{item.item}: {item.qty} {item.unit} {"\n"}<EditQuantity item={item.item} updateFunction={getPantryList}  unit={item.unit}></EditQuantity></Text>
+        <Text key={item.item}  style={styles.text}>{item.item}: {item.qty} {item.unit} {"\n"}<EditQuantity item={item.item} updateFunction={getPantryList} qty={item.qty} unit={item.unit}></EditQuantity></Text>
       </View>
     );
 
@@ -79,6 +79,7 @@ const Pantry = ({navigation, route}) => {
                 ListHeaderComponent={() => <View style={{ height: 10 }} />}
                 ListFooterComponent={() => <View style={{ height: 10 }} />}
                 ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+                showsVerticalScrollIndicator={false}
               />
             </View>
           ) : (<View></View>)}
@@ -126,12 +127,13 @@ const styles = StyleSheet.create({
     zIndex: 0
   },
   text: {
-    height: 100,
+    height: 80,
     zIndex: 0,
     borderColor: '#ffffff',
     borderWidth: '3px',
     textAlign: 'center',
-    backgroundColor: '#adadad'
+    backgroundColor: '#adadad',
+    fontSize: 16
   },
   addManually:{
     zIndex: 1

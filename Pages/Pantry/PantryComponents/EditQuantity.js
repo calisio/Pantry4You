@@ -7,7 +7,7 @@ import { getFoodUnit } from "../../../utils/getFoodUnit";
 
 
 const EditQuantity = (props) => {
-    const [quantity, setQuantity] = useState('');
+    const [quantity, setQuantity] = useState(props.qty);
     console.log(props.item);
 
     const submitHandler = async() => {
@@ -65,13 +65,14 @@ const EditQuantity = (props) => {
                 onPress={submitHandler}
                 style={styles.button}
             >
-                <Text style={styles.text}>Change #</Text>
+                <Text style={styles.text}>Change Quantity</Text>
             </Pressable>
             <Text> {props.unit} </Text>
             <TextInput
                 clearButtonMode='always'
                 style={styles.input}
-                placeholder={quantity}
+                placeholder={""+ quantity}
+                textAlign= 'right'
                 onChangeText={newQuantity => setQuantity(newQuantity)}
                 defaultValue={""}
                 id="quantity"
@@ -93,7 +94,8 @@ const styles = StyleSheet.create({
         // width: '80%'
     },
     input: {
-        width: '17%',
+        backgroundColor: 'white',
+        width: '30%',
         borderWidth: 1,
         borderColor: 'gray',
         borderRadius: 8,
@@ -102,7 +104,7 @@ const styles = StyleSheet.create({
         marginLeft: 0
     },
     button: {
-        backgroundColor: '#CCCCCC',
+        backgroundColor: '#e57507',
         borderRadius: 8,
         padding: 5,
         zIndex: 0,
