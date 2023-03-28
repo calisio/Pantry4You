@@ -86,7 +86,6 @@ const Notifications = ({navigation, route}) => {
               deleteDoc(doc.ref)
                 .then(() => {
                   console.log("Notification document deleted");
-                  setRequestSent(false);
                 })
                 .catch((error) => {
                   console.error("Error deleting notification document: ", error);
@@ -109,7 +108,7 @@ const Notifications = ({navigation, route}) => {
           data={friendRequests}
           keyExtractor={(notification) => notification.notificationId}
           renderItem={({ item }) => (
-            <View style={styles.notification}>
+            <View style={styles.notification} key={item.notificationId}>
               <Text fontSize="xs">{item.requesterEmail} sent you a friend request</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Button.Group isAttached colorScheme="orange" mx={{

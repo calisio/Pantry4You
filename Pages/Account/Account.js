@@ -1,5 +1,6 @@
-import { StyleSheet, Text, View, Button, FlatList, Image, Linking, SafeAreaView, StatusBar } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Image, Linking, SafeAreaView, StatusBar } from 'react-native';
 import { getFirestore, collection, query, where, getDocs, getDoc, doc, updateDoc } from 'firebase/firestore';
+import { Button } from 'native-base';
 import { initializeApp } from "firebase/app";
 import React, {useState, useEffect} from 'react';
 
@@ -20,40 +21,27 @@ const Account = ({navigation, route}) => {
     const handleLogout = route.params.handleLogout;
     const uid = route.params.uid;
     const email = route.params.email;
-    const [followers, setFollowers] = useState([]);
-    const [following, setFollowing] = useState([]);
+    const [friends, setFriends] = useState([]);
       
-    useEffect(() => {
-        console.log('fetch followers');
-        const fetchFollowers = async () => {
-            try {
-                const q = query(collection(db, 'users'), where('friends', 'array-contains', uid));
-                const querySnapshot = await getDocs(q);
-                const matchingUsers = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                setFollowers(matchingUsers);
-                console.log(matchingUsers);
-            } catch (error) {
-                console.error(error);
-            }
-        };      
-        const fetchFollowing = async () => {
+    useEffect(() => {     
+        const fetchFriends = async () => {
             try {
                 const friendsDoc = await getDoc(doc(db, 'users', uid));
                 const friendsData = friendsDoc.data().friends;
-                if (friendsDoc.data().friends) {
-                    const followingData = await Promise.all(friendsData.map(async friend => {
-                        const friendDoc = await getDoc(doc(db, 'users', friend.friendUID));
-                        return friendDoc.data().email;
-                    }));
-                    setFollowing(followingData);
+                console.log(friendsData)
+                const friendsArray = []
+                if (friendsData.length > 0) {
+                  friendsData.forEach(element => {
+                    console.log(element.friendEmail);
+                    friendsArray.push(element.friendEmail);
+                  });
+                  setFriends(friendsArray);
                 }
-                console.log('Following useState:' + following);
             } catch (error) {
                 console.error(error);
             }
         };        
-        fetchFollowers();
-        fetchFollowing();
+        fetchFriends();
     },[navigation, route]);
   const [favorites, setFavorites] = useState([]);
 
@@ -94,7 +82,7 @@ const Account = ({navigation, route}) => {
     handleLogout();
   };
     
-    const handleUnfollow = async (friendUid, currentUserUid) => {
+    const handleUnfriend = async (friendUid, currentUserUid) => {
         try {
           const currentUserRef = doc(db, 'users', currentUserUid);
           const currentUserDoc = await getDoc(currentUserRef);
@@ -113,7 +101,7 @@ const Account = ({navigation, route}) => {
             // update the friends array in Firestore database
             await updateDoc(currentUserRef, { friends: currentUserData.friends });
             console.log('Friend removed successfully!');
-            setFollowing(following.filter(friend => friend !== friendUid));
+            setFriends(friends.filter(friend => friend !== friendUid));
           }
           else {
             console.log('no friend found')
@@ -125,33 +113,30 @@ const Account = ({navigation, route}) => {
 
   return (
     <View style={styles.container}>
-        <Button title="Log Out" onPress={() => handleSubmit()} />
+        <View style={styles.logoutContainer}>
+          <Button size='xs' onPress={() => handleSubmit()}>Log Out</Button>
+        </View>
         <Text style={styles.header}> Hello, {email} </Text>
-        <Text style={styles.subtitle}> Followers:</Text>
-        <View style={styles.list}>
-            {followers.length > 0 ? (
-            followers.map((follower) => (
-                <View key={follower.id} style={styles.listItem}>
-                <Text style={styles.listText}>{follower.name}</Text>
-                </View>
-            ))
-            ) : (
-            <Text style={styles.noItems}>You do not have any followers.</Text>
-            )}
-        </View>
-        <Text style={styles.subtitle}> Following:</Text>
-        <View style={styles.list}>
-            {following.length > 0 ? (
-            following.map((follow) => (
-                <View key={follow} style={styles.listItem}>
-                <Text style={styles.listText}>{follow}</Text>
-                <Button title="Unfollow" onPress={() => handleUnfollow(follow, uid)} style={styles.followButton} />
-                </View>
-            ))
-            ) : (
-            <Text style={styles.noItems}>You are not following anyone.</Text>
-            )}
-        </View>
+        <Text style={styles.subtitle}> Friends:</Text>
+        <FlatList
+          data={friends}
+          keyExtractor={(friend) => friend}
+          renderItem={({ item: friend }) => (
+            <View key={friend} style={styles.listItem}>
+              <Text style={styles.listText}>{friend}</Text>
+              <Button
+                onPress={() => handleUnfriend(friend, uid)}
+                style={styles.friendButton}
+                variant='outline'
+                size='xs'
+                color="#e57507"
+              >
+                Unfriend
+              </Button>
+            </View>
+          )}
+          ListEmptyComponent={<Text style={styles.noItems}>You are not friends with anyone.</Text>}
+        />
         <SafeAreaView style={styles.listContainer}>
             <FlatList
             data={favorites}
@@ -162,7 +147,7 @@ const Account = ({navigation, route}) => {
             ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
             />
         </SafeAreaView>
-        </View>
+    </View>
   );
 };
 
@@ -187,6 +172,11 @@ const styles = StyleSheet.create({
       flex: 1,
       marginTop: StatusBar.currentHeight || 0,
     },
+    logoutContainer: {
+      position: 'absolute',
+      top: 10 ,
+      right: 10,
+    },
     list: {
       marginVertical: 10,
     },
@@ -200,9 +190,6 @@ const styles = StyleSheet.create({
     },
     listText: {
       fontSize: 16,
-    },
-    followButton: {
-      paddingHorizontal: 10,
     },
     noItems: {
       color: '#ccc',
