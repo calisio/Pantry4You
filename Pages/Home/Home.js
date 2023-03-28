@@ -1,6 +1,6 @@
 import { FlatList, View, Image } from 'react-native';
 import GetRecipes from './GetRecipes';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Box, Heading, HStack, Center, AspectRatio, Skeleton, VStack, Pressable, Modal, Flex, Divider, Button, Text, Link } from 'native-base';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { addDoc, deleteDoc, doc, getDocs, query, where, collection, onSnapshot } from 'firebase/firestore';
@@ -21,6 +21,8 @@ const Home = ({ navigation, route }) => {
   const [favoriteRecipes, setFavoriteRecipes] = useState([]);
 
   const [favoriteRecipesIds, setFavoriteRecipesIds] = useState(new Set());
+  const lastFavoriteRecipes = useRef([]);
+
 
 const updateFavoriteRecipesIds = (recipeId, isFavorited) => {
   setFavoriteRecipesIds(prevState => {
@@ -34,33 +36,35 @@ const updateFavoriteRecipesIds = (recipeId, isFavorited) => {
   });
 };
 
-  const handleFavorite = async (recipe) => {
-    try {
-      // Check if the "favorites" subcollection exists
-      const favoritesRef = collection(db, `users/${uid}/favorites`);
-      const favoritesSnapshot = await getDocs(favoritesRef);
-      const existingDoc = favoritesSnapshot.docs.find(doc => doc.data().recipeId === recipe.recipeId);
-  
-      // If the recipe is not already in the "favorites" subcollection, add it
-      if (!existingDoc) {
-        // Add the recipe to the "favorites" subcollection
-        await addDoc(favoritesRef, recipe);
-        Alert.alert("Recipe added to favorites")
-        console.log('Recipe added to favorites');
-        fetchFavoriteRecipes();
-        setFavoriteRecipes([...favoriteRecipes, recipe]); // Update the state to include the new favorite
-      } else {
-        // If the recipe is already in the "favorites" subcollection, remove it
-        await deleteDoc(doc(db, `users/${uid}/favorites`, existingDoc.id));
-        Alert.alert("Recipe removed from favorites")
-        console.log('Recipe removed from favorites');
-        setFavoriteRecipes(favoriteRecipes.filter(fav => fav.recipeId !== recipe.recipeId)); // Update the state to exclude the removed favorite
-      }
-    } catch (error) {
-      console.log(error);
+const handleFavorite = async (recipe) => {
+  try {
+    // Check if the "favorites" subcollection exists
+    const favoritesRef = collection(db, `users/${uid}/favorites`);
+    const favoritesSnapshot = await getDocs(favoritesRef);
+    const existingDoc = favoritesSnapshot.docs.find(doc => doc.data().recipeId === recipe.recipeId);
+
+    // If the recipe is not already in the "favorites" subcollection, add it
+    if (!existingDoc) {
+      // Add the recipe to the "favorites" subcollection
+      await addDoc(favoritesRef, recipe);
+      Alert.alert("Recipe added to favorites")
+      console.log('Recipe added to favorites');
+      fetchFavoriteRecipes();
+      setFavoriteRecipes([...favoriteRecipes, recipe]); // Update the state to include the new favorite
+      updateFavoriteRecipesIds(recipe.recipeId, true); // Update the favoriteRecipesIds state
+    } else {
+      // If the recipe is already in the "favorites" subcollection, remove it
+      await deleteDoc(doc(db, `users/${uid}/favorites`, existingDoc.id));
+      Alert.alert("Recipe removed from favorites")
+      console.log('Recipe removed from favorites');
+      setFavoriteRecipes(favoriteRecipes.filter(fav => fav.recipeId !== recipe.recipeId)); // Update the state to exclude the removed favorite
+      updateFavoriteRecipesIds(recipe.recipeId, false); // Update the favoriteRecipesIds state
     }
-    
-  };
+  } catch (error) {
+    console.log(error);
+  }
+};
+
   
 
  // Create a new function to fetch favorite recipes
@@ -103,11 +107,17 @@ const updateFavoriteRecipesIds = (recipeId, isFavorited) => {
   //on load, get recipes
   useFocusEffect(
     React.useCallback(() => {
+      // Only fetch favorite recipes if the favoriteRecipes array has changed
+      if (lastFavoriteRecipes.current !== favoriteRecipes) {
+        fetchFavoriteRecipes();
+        lastFavoriteRecipes.current = favoriteRecipes;
+      }
+  
       fetchRecipes();
-      fetchFavoriteRecipes();
       return () => {};
-    }, [favoriteRecipes])
+    }, []) // Remove favoriteRecipes from the dependency array
   );
+  
 
   //on refresh, get recieps
   const handleRefresh = async () => {
