@@ -125,11 +125,15 @@ const Account = ({navigation, route}) => {
               px="3"
               py="1.5">
               <MaterialCommunityIcons
-                name='heart'
-                color="#f44336"
-                size={24}
-                onPress={() => handleFavorite(item)}
-              />
+  name='heart'
+  color="#f44336"
+  size={24}
+  onPress={async () => {
+    await handleFavorite(item);
+    fetchFavoriteRecipes();
+  }}
+/>
+
             </Center>
           </Box>
           <Heading>{item.title}</Heading>

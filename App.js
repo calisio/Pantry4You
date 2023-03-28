@@ -248,7 +248,7 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
     handleLogout: handleLogout,
     uid: uid,
     email: email,
-    updateFavoriteRecipesIds: updateFavoriteRecipesIds, // pass the function here
+     // pass the function here
   }}
 />
       </Tab.Navigator>
