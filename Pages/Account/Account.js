@@ -1,7 +1,12 @@
 import { StyleSheet, Text, View, Button, FlatList, Image, Linking, SafeAreaView, StatusBar } from 'react-native';
-import { getFirestore, collection, query, where, getDocs, getDoc, doc, updateDoc } from 'firebase/firestore';
+import { getFirestore, collection, query, where, getDocs, getDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { initializeApp } from "firebase/app";
 import React, {useState, useEffect} from 'react';
+import { Pressable, Box, AspectRatio, Center, Heading, VStack } from 'native-base';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Alert } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 const firebaseConfig = {
     apiKey: "AIzaSyCjsh6Mj0fxTwcd5rwbk11ow3UATgpwrw8",
@@ -16,12 +21,51 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);  
 
 const Account = ({navigation, route}) => {
-    console.log("account page rendered");
     const handleLogout = route.params.handleLogout;
     const uid = route.params.uid;
     const email = route.params.email;
     const [followers, setFollowers] = useState([]);
     const [following, setFollowing] = useState([]);
+    const [favoriteRecipes, setFavoriteRecipes] = useState([]);
+
+    // Create a new function to fetch favorite recipes
+    async function fetchFavoriteRecipes() {
+      try {
+        const favoritesRef = collection(db, `users/${uid}/favorites`);
+        const favoritesSnapshot = await getDocs(favoritesRef);
+        const favorites = favoritesSnapshot.docs.map(doc => doc.data());
+        setFavoriteRecipes(favorites);
+        return favorites;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    
+
+  const handleFavorite = async (recipe) => {
+    try {
+      const favoritesRef = collection(db, `users/${uid}/favorites`);
+      const favoritesSnapshot = await getDocs(favoritesRef);
+      const existingDoc = favoritesSnapshot.docs.find(doc => doc.data().recipeId === recipe.recipeId);
+
+      if (existingDoc) {
+        await deleteDoc(doc(db, `users/${uid}/favorites`, existingDoc.id));
+        Alert.alert("Recipe removed from favorites");
+        console.log('Recipe removed from favorites');
+        setFavoriteRecipes(favoriteRecipes.filter(fav => fav.recipeId !== recipe.recipeId));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchFavoriteRecipes();
+      return () => {};
+    }, [favoriteRecipes])
+  );
+  
       
     useEffect(() => {
         console.log('fetch followers');
@@ -55,39 +99,44 @@ const Account = ({navigation, route}) => {
         fetchFollowers();
         fetchFollowing();
     },[navigation, route]);
-  const [favorites, setFavorites] = useState([]);
+  
 
-  useEffect(() => {
-    const fetchFavorites = async () => {
-      try {
-        const favoritesRef = collection(db, `users/${uid}/favorites`);
-        const favoritesSnapshot = await getDocs(favoritesRef);
-        const favoritesList = [];
-        favoritesSnapshot.forEach((doc) => {
-          favoritesList.push(doc.data());
-        });
-        setFavorites(favoritesList);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchFavorites();
-  }, []);
-
-  const RecipeView = ({item}) => (
-    <View style={styles.recipeContainer}>
-      <Text style={styles.recipeTitle}>{item.title}</Text>
-      <Image
-        source={{ uri: item.imgUrl }}
-        style={styles.recipeImage}
-      />
-      <Text style={styles.recipeInstructions}
-        onPress={() => Linking.openURL(item.recipeUrl)}>
-        Instructions
-      </Text>
-    </View>
-  );
+  const RecipeView = ({ item }) => {
+    return (
+      <Pressable>
+        <Box
+          justifyContent='center'
+          alignItems='center'
+          maxW="80"
+          rounded="lg"
+          borderColor="coolGray.200"
+          borderWidth="1"
+        >
+          <Box>
+            <AspectRatio w="100%" ratio={16 / 9}>
+              <Image source={{
+                uri: item.imgUrl
+              }} alt="image" />
+            </AspectRatio>
+            <Center
+              position="absolute"
+              top="0"
+              right="0"
+              px="3"
+              py="1.5">
+              <MaterialCommunityIcons
+                name='heart'
+                color="#f44336"
+                size={24}
+                onPress={() => handleFavorite(item)}
+              />
+            </Center>
+          </Box>
+          <Heading>{item.title}</Heading>
+        </Box>
+      </Pressable>
+    );
+  };
 
   const handleSubmit = () => {
     console.log(handleLogout)
@@ -153,14 +202,25 @@ const Account = ({navigation, route}) => {
             )}
         </View>
         <SafeAreaView style={styles.listContainer}>
-            <FlatList
-            data={favorites}
-            renderItem={RecipeView}
-            keyExtractor={(item) => item.recipeId}
-            ListHeaderComponent={() => <View style={{ height: 10 }} />}
-            ListFooterComponent={() => <View style={{ height: 10 }} />}
-            ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
-            />
+        <VStack justifyContent="center" alignItems="center" h="full">
+    <Heading>Favorite Recipes</Heading>
+    {favoriteRecipes.length === 0 ? (
+      <Center>
+        <Text mt="4">No favorite recipes found.</Text>
+      </Center>
+    ) : (
+      <FlatList
+        data={favoriteRecipes}
+        renderItem={RecipeView}
+        keyExtractor={(item) => item.recipeId}
+        contentContainerStyle={{ padding: 10 }}
+        ListHeaderComponent={() => <View style={{ height: 10 }} />}
+        ListFooterComponent={() => <View style={{ height: 10 }} />}
+        ItemSeparatorComponent={() => <View style={{ height: 50 }} />}
+        showsVerticalScrollIndicator={false}
+      />
+    )}
+  </VStack>
         </SafeAreaView>
         </View>
   );

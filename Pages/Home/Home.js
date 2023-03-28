@@ -3,9 +3,11 @@ import GetRecipes from './GetRecipes';
 import React, { useState, useEffect } from 'react';
 import { Box, Heading, HStack, Center, AspectRatio, Skeleton, VStack, Pressable, Modal, Flex, Divider, Button, Text, Link } from 'native-base';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { addDoc, deleteDoc, doc, getDocs, query, where, collection } from 'firebase/firestore';
+import { addDoc, deleteDoc, doc, getDocs, query, where, collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { Alert } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 const Home = ({ navigation, route }) => {
   console.log("HOME RENDERED");
@@ -16,29 +18,73 @@ const Home = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [favoriteRecipes, setFavoriteRecipes] = useState([]);
 
+  const [favoriteRecipesIds, setFavoriteRecipesIds] = useState(new Set());
+
+const updateFavoriteRecipesIds = (recipeId, isFavorited) => {
+  setFavoriteRecipesIds(prevState => {
+    const newSet = new Set(prevState);
+    if (isFavorited) {
+      newSet.add(recipeId);
+    } else {
+      newSet.delete(recipeId);
+    }
+    return newSet;
+  });
+};
 
   const handleFavorite = async (recipe) => {
     try {
       // Check if the "favorites" subcollection exists
       const favoritesRef = collection(db, `users/${uid}/favorites`);
       const favoritesSnapshot = await getDocs(favoritesRef);
-      const recipeExists = favoritesSnapshot.docs.some(doc => String(doc.data().recipeId) === recipe.recipeId);
-
+      const existingDoc = favoritesSnapshot.docs.find(doc => doc.data().recipeId === recipe.recipeId);
+  
       // If the recipe is not already in the "favorites" subcollection, add it
-      if (!recipeExists) {
-
+      if (!existingDoc) {
         // Add the recipe to the "favorites" subcollection
         await addDoc(favoritesRef, recipe);
+        Alert.alert("Recipe added to favorites")
         console.log('Recipe added to favorites');
+        fetchFavoriteRecipes();
+        setFavoriteRecipes([...favoriteRecipes, recipe]); // Update the state to include the new favorite
       } else {
-        console.log('Recipe already in favorites');
-        Alert.alert('Error', 'This recipe is already in your favorites.');
+        // If the recipe is already in the "favorites" subcollection, remove it
+        await deleteDoc(doc(db, `users/${uid}/favorites`, existingDoc.id));
+        Alert.alert("Recipe removed from favorites")
+        console.log('Recipe removed from favorites');
+        setFavoriteRecipes(favoriteRecipes.filter(fav => fav.recipeId !== recipe.recipeId)); // Update the state to exclude the removed favorite
       }
     } catch (error) {
       console.log(error);
     }
+    
   };
+  
+
+ // Create a new function to fetch favorite recipes
+ const fetchFavoriteRecipes = async () => {
+  try {
+    const favoritesCollection = collection(db, "favorites");
+    const q = query(favoritesCollection, where("userId", "==", uid));
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const favorites = [];
+      querySnapshot.forEach((doc) => {
+        favorites.push({ ...doc.data(), id: doc.id });
+      });
+      setFavoriteRecipes(favorites);
+    });
+
+    // Clean up the listener when the component is unmounted
+    return () => unsubscribe();
+  } catch (error) {
+    console.error("Error fetching favorite recipes: ", error);
+  }
+};
+
+
 
 
   //function used to get recipes
@@ -55,9 +101,13 @@ const Home = ({ navigation, route }) => {
 
 
   //on load, get recipes
-  useEffect(() => {
-    fetchRecipes();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchRecipes();
+      fetchFavoriteRecipes();
+      return () => {};
+    }, [favoriteRecipes])
+  );
 
   //on refresh, get recieps
   const handleRefresh = async () => {
@@ -65,59 +115,67 @@ const Home = ({ navigation, route }) => {
     setIsRefreshing(true);
     //setIsLoading(true);
     await fetchRecipes();
+    fetchFavoriteRecipes();
     //setIsLoading(false);
     setIsRefreshing(false);
   };
 
-  const RecipeView = ({ item }) => (
-    <Pressable onPress={() => handlePress(item)} >
-      <Box
-        justifyContent='center'
-        alignItems='center'
-        maxW="80"
-        rounded="lg"
-        borderColor="coolGray.200"
-        borderWidth="1"
-      >
-        <Box>
-          <AspectRatio w="100%" ratio={16 / 9}>
-            <Image source={{
-              uri: item.imgUrl
-            }} alt="image" />
-          </AspectRatio>
-          {item.missedCount > 0 && (
-            <Center bg="rgba(255, 255, 255, 0.4)"
-              _text={{
-                color: "red.600",
-                fontWeight: "700",
-                fontSize: "xs"
-              }}
+  const RecipeView = ({ item }) => {
+    // Check if the current recipe (item) is in the user's favorite recipes
+    const isFavorite = favoriteRecipesIds.has(item.recipeId);
+  
+    return (
+      <Pressable onPress={() => handlePress(item)}>
+        <Box
+          justifyContent='center'
+          alignItems='center'
+          maxW="80"
+          rounded="lg"
+          borderColor="coolGray.200"
+          borderWidth="1"
+        >
+          <Box>
+            <AspectRatio w="100%" ratio={16 / 9}>
+              <Image source={{
+                uri: item.imgUrl
+              }} alt="image" />
+            </AspectRatio>
+            {item.missedCount > 0 && (
+              <Center bg="rgba(255, 255, 255, 0.4)"
+                _text={{
+                  color: "red.600",
+                  fontWeight: "700",
+                  fontSize: "xs"
+                }}
+                position="absolute"
+                bottom="0"
+                right="0"
+                px="3"
+                py="1.5">
+                {item.missedCount} missing
+              </Center>
+            )}
+            {/* Show filled heart if the recipe is in the user's favorites, otherwise show heart outline */}
+            <Center
               position="absolute"
-              bottom="0"
+              top="0"
               right="0"
               px="3"
               py="1.5">
-              {item.missedCount} missing
+              <MaterialCommunityIcons
+                name={isFavorite ? 'heart' : 'heart-outline'}
+                color="#f44336"
+                size={24}
+                onPress={() => handleFavorite(item)}
+              />
             </Center>
-          )}
-          <Center
-            position="absolute"
-            top="0"
-            right="0"
-            px="3"
-            py="1.5">
-            <MaterialCommunityIcons
-              name="heart-outline"
-              color="#f44336"
-              size={24}
-              onPress={() => handleFavorite(item)}
-            />
-          </Center>
+          </Box>
+          <Heading>{item.title}</Heading>
         </Box>
-        <Heading>{item.title}</Heading>
-      </Box>
-    </Pressable >
-  );
+      </Pressable >
+    );
+  };
+  
 
 
   return (

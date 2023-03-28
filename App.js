@@ -236,24 +236,21 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
           }}
         />
         <Tab.Screen
-          name="Account"
-          component={Account}
-          // {...(props) => <Account {...props} handleLogout={handleLogout} />}
-          options={{
-            tabBarLabel: 'Account',
-            //tabBarIcon: ({ color, size }) => (
-            //  <MaterialCommunityIcons name="account-circle" color={theme.palette.primary.main} size={size} />
-            //),
-            tabBarIcon: ({ theme, size, focused }) => (
-              <MaterialCommunityIcons name={focused ? 'account-circle' : 'account-circle-outline'} color="#e57507" size={size} />
-            ),
-          }}
-          initialParams={{
-            handleLogout: handleLogout,
-            uid:uid,
-            email:email,
-          }}
-        />
+  name="Account"
+  component={Account}
+  options={{
+    tabBarLabel: 'Account',
+    tabBarIcon: ({ theme, size, focused }) => (
+      <MaterialCommunityIcons name={focused ? 'account-circle' : 'account-circle-outline'} color="#e57507" size={size} />
+    ),
+  }}
+  initialParams={{
+    handleLogout: handleLogout,
+    uid: uid,
+    email: email,
+    updateFavoriteRecipesIds: updateFavoriteRecipesIds, // pass the function here
+  }}
+/>
       </Tab.Navigator>
     );
   }
