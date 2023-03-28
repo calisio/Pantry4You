@@ -1,13 +1,6 @@
-import { StyleSheet, Text, View, Button, Alert, TextInput, Keyboard, TouchableWithoutFeedback, TouchableOpacity, Pressable, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, Keyboard, TouchableOpacity, SafeAreaView } from 'react-native';
 import React, {useCallback, useState} from 'react';
-import { db } from '../../../firebase';
-import firebase from 'firebase/compat/app';
-import { getAuth } from "firebase/auth";
-import { SelectList } from 'react-native-dropdown-select-list';
-import { getFoodUnit } from '../../../utils/getFoodUnit';
-import { setFoodUnit } from '../../../utils/setFoodUnit';
 import Autocomplete from 'react-native-autocomplete-input';
-import zIndex from '@mui/material/styles/zIndex';
 
 const MyAutocomplete = (props) => {
     const [query, setQuery] = useState('');

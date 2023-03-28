@@ -3,7 +3,6 @@ import { AddManually } from './PantryComponents/AddManually';
 import React, {useState, useEffect} from 'react';
 import { db } from '../../firebase';
 import { EditQuantity } from './PantryComponents/EditQuantity';
-import zIndex from '@mui/material/styles/zIndex';
 
 const Pantry = ({navigation, route}) => {
   const uid = route.params.uid;

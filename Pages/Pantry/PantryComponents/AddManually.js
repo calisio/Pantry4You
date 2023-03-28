@@ -1,12 +1,11 @@
-import { StyleSheet, Text, View, Button, Alert, TextInput, Keyboard, TouchableWithoutFeedback, Pressable, SafeAreaView } from 'react-native';
-import React, {useCallback, useState} from 'react';
+import { StyleSheet, Text, View, Alert, TextInput, Keyboard, Pressable } from 'react-native';
+import React, {useState} from 'react';
 import { db } from '../../../firebase';
 import firebase from 'firebase/compat/app';
 import { getAuth } from "firebase/auth";
 import { SelectList } from 'react-native-dropdown-select-list';
 import { getFoodUnit } from '../../../utils/getFoodUnit';
 import { setFoodUnit } from '../../../utils/setFoodUnit';
-// import Autocomplete from 'react-native-autocomplete-input';
 import { MyAutocomplete } from './Autocomplete';
 
 const dismissKeyboard = () => {
