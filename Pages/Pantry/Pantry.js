@@ -78,7 +78,7 @@ const Pantry = ({navigation, route}) => {
                 keyExtractor={(item) => item.item}
                 ListHeaderComponent={() => <View style={{ height: 10 }} />}
                 ListFooterComponent={() => <View style={{ height: 10 }} />}
-                ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+                ItemSeparatorComponent={() => <View style={{ height: 0 }} />}
                 showsVerticalScrollIndicator={false}
               />
             </View>
@@ -107,7 +107,8 @@ const styles = StyleSheet.create({
     // borderColor: '#000000',
     // borderWidth: '2px',
     padding:'5%',
-    zIndex: 1
+    zIndex: 1,
+    backgroundColor: '#cccccc'
   },
   header: {
     fontSize: '20px',
@@ -132,7 +133,7 @@ const styles = StyleSheet.create({
     borderColor: '#ffffff',
     borderWidth: '3px',
     textAlign: 'center',
-    backgroundColor: '#adadad',
+    backgroundColor: '#e57507',
     fontSize: 16
   },
   addManually:{

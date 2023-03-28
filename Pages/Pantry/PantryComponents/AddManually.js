@@ -443,7 +443,8 @@ const styles = StyleSheet.create({
         borderColor: 'gray',
         borderRadius: 8,
         paddingHorizontal: '10%',
-        zIndex: 0
+        zIndex: 0,
+        backgroundColor: 'white'
     },
     selectList: {
         marginLeft: '10%',
