@@ -3,6 +3,8 @@ import { getFirestore, collection, query, where, getDocs, getDoc, doc, updateDoc
 import { Button } from 'native-base';
 import { initializeApp } from "firebase/app";
 import React, {useState, useEffect} from 'react';
+import { db } from '../../firebase';
+
 
 const firebaseConfig = {
     apiKey: "AIzaSyCjsh6Mj0fxTwcd5rwbk11ow3UATgpwrw8",
@@ -14,7 +16,6 @@ const firebaseConfig = {
     measurementId: "G-MV5KGDBTTJ"
   };
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);  
 
 const Account = ({navigation, route}) => {
     console.log("account page rendered");
@@ -32,8 +33,8 @@ const Account = ({navigation, route}) => {
                 const friendsArray = []
                 if (friendsData.length > 0) {
                   friendsData.forEach(element => {
-                    console.log(element.friendEmail);
-                    friendsArray.push(element.friendEmail);
+                    console.log(element);
+                    friendsArray.push(element);
                   });
                   setFriends(friendsArray);
                 }
@@ -82,34 +83,49 @@ const Account = ({navigation, route}) => {
     handleLogout();
   };
     
-    const handleUnfriend = async (friendUid, currentUserUid) => {
-        try {
-          const currentUserRef = doc(db, 'users', currentUserUid);
-          const currentUserDoc = await getDoc(currentUserRef);
-          const currentUserData = currentUserDoc.data();
-      
-          const friendsArray = currentUserData.friends;
-          console.log('friend wanted to be removed: ' + friendUid)
-          // find the index of the friend to be removed
-          const index = friendsArray.findIndex(friend => friend.friendEmail === friendUid);
-          console.log('index of friend:' + index)
-      
-          if (index != -1) {
-            // remove the friend from the array
-            currentUserData.friends.splice(index, 1);
-                
-            // update the friends array in Firestore database
-            await updateDoc(currentUserRef, { friends: currentUserData.friends });
-            console.log('Friend removed successfully!');
-            setFriends(friends.filter(friend => friend !== friendUid));
+  const handleUnfriend = async (friendObject, currentUserUid) => {
+    try {
+      const currentUserRef = doc(db, 'users', currentUserUid);
+      const currentUserDoc = await getDoc(currentUserRef);
+      const currentUserData = currentUserDoc.data();
+  
+      const friendsArray = currentUserData.friends;
+  
+      // Find the index of the friend to be removed
+      const index = friendsArray.findIndex(friend => friend.friendEmail === friendObject.friendEmail);
+  
+      if (index !== -1) {
+        // // Remove the friend from the array
+        currentUserData.friends.splice(index, 1);
+  
+        // Update the friends array in Firestore database
+        await updateDoc(currentUserRef, { friends: currentUserData.friends });
+  
+        console.log('Friend removed successfully!');
+        setFriends(friends.filter(friend => friend !== friendObject.friendUid));
+  
+        // Retrieve the friend's data
+        const friendRef = doc(db, 'users', friendObject.friendUID);
+        const friendDoc = await getDoc(friendRef);
+        const friendData = friendDoc.data();
+
+        if (friendData) {
+          // Remove the current user from the friend's friends array
+          const friendIndex = friendData.friends.findIndex(friend => friend.friendEmail === currentUserData.email);
+          if (friendIndex !== -1) {
+            friendData.friends.splice(friendIndex, 1);
+            await updateDoc(friendRef, { friends: friendData.friends });
           }
-          else {
-            console.log('no friend found')
-          }
-        } catch (error) {
-          console.error('Error removing friend:', error);
         }
+      } else {
+        console.log('No friend found');
       }
+    } catch (error) {
+      console.error('Error removing friend:', error);
+    }
+  }
+  
+  
 
   return (
     <View style={styles.container}>
@@ -119,21 +135,21 @@ const Account = ({navigation, route}) => {
         <Text style={styles.header}> Hello, {email} </Text>
         <Text style={styles.subtitle}> Friends:</Text>
         <FlatList
-          data={friends}
-          keyExtractor={(friend) => friend}
-          renderItem={({ item: friend }) => (
-            <View key={friend} style={styles.listItem}>
-              <Text style={styles.listText}>{friend}</Text>
-              <Button
-                onPress={() => handleUnfriend(friend, uid)}
-                style={styles.friendButton}
-                variant='outline'
-                size='xs'
-                color="#e57507"
-              >
-                Unfriend
-              </Button>
-            </View>
+        data={friends}
+        keyExtractor={(friend) => friend.friendEmail}
+        renderItem={({ item: friend }) => (
+          <View key={friend.friendEmail} style={styles.listItem}>
+            <Text style={styles.listText}>{friend.friendEmail}</Text>
+            <Button
+              onPress={() => handleUnfriend(friend, uid)}
+              style={styles.friendButton}
+              variant='outline'
+              size='xs'
+              color="#e57507"
+            >
+              Unfriend
+            </Button>
+          </View>
           )}
           ListEmptyComponent={<Text style={styles.noItems}>You are not friends with anyone.</Text>}
         />
