@@ -70,7 +70,7 @@ const Home = ({ navigation, route }) => {
   };
 
   const RecipeView = ({ item }) => (
-    <Pressable onPress={() => handlePress(item)} >
+    < Pressable onPress={() => handlePress(item)} >
       <Box
         justifyContent='center'
         alignItems='center'
