@@ -24,8 +24,8 @@ const Home = ({ navigation, route }) => {
   const [favoriteRecipesIds, setFavoriteRecipesIds] = useState(new Set());
   const lastFavoriteRecipes = useRef([]);
 
-  const [latitude, setLatitude] = useState(null);
-  const [longitude, setLongitude] = useState(null);
+  // const [latitude, setLatitude] = useState(null);
+  // const [longitude, setLongitude] = useState(null);
 
 
 const updateFavoriteRecipesIds = (recipeId, isFavorited) => {
@@ -122,24 +122,25 @@ const handleFavorite = async (recipe) => {
     }, []) // Remove favoriteRecipes from the dependency array
   );
 
-  useEffect(() => {
-    console.log("use effect");
-    (async () => {
-      let {status} = await Location.requestForegroundPermissionsAsync();
-      // console.log("status: ",status);
+  // useEffect(() => {
+  //   //https://www.youtube.com/watch?v=2q-wgobQ-zQ&ab_channel=TechHarvestingwithNaseel
+  //   console.log("use effect");
+  //   (async () => {
+  //     let {status} = await Location.requestForegroundPermissionsAsync();
+  //     // console.log("status: ",status);
 
-      if(status == 'granted'){
-        console.log("location permission granted");
-        const loc = await Location.getCurrentPositionAsync();
-        setLatitude(loc.coords.latitude);
-        setLongitude(loc.coords.longitude);
-        console.log("location: \n",loc.coords);
-      }
-      else{
-        console.log("location permission not granted");
-      }
-    })();
-  }, []);
+  //     if(status == 'granted'){
+  //       console.log("location permission granted");
+  //       const loc = await Location.getCurrentPositionAsync();
+  //       setLatitude(loc.coords.latitude);
+  //       setLongitude(loc.coords.longitude);
+  //       console.log("location: \n",loc.coords);
+  //     }
+  //     else{
+  //       console.log("location permission not granted");
+  //     }
+  //   })();
+  // }, []);
   
 
   //on refresh, get recieps

@@ -23,6 +23,9 @@ import firebase from 'firebase/app';
 import {Alert} from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { NativeBaseProvider, extendTheme } from "native-base";
+// import * as Location from "expo-location"
+import { setLocation } from "./utils/setLocation";
+
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -83,6 +86,8 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
   //const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [uid, setUid] = useState('');
   const [email, setEmail] = useState('');
+  // const [latitude, setLatitude] = useState(null);
+  // const [longitude, setLongitude] = useState(null);
 
   //callbacks for child components
   function handleUidChange(uid, email, password){
@@ -108,6 +113,25 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
           .catch(error => console.log('Error signing in:', error));
       }
     });
+
+    // (async () => {
+    //   let {status} = await Location.requestForegroundPermissionsAsync()
+    //   .catch((error) => {
+    //     console.log("Error getting location");
+    //   });
+    //   // console.log("status: ",status);
+
+    //   if(status == 'granted'){
+    //     console.log("location permission granted");
+    //     const loc = await Location.getCurrentPositionAsync();
+    //     setLatitude(loc.coords.latitude);
+    //     setLongitude(loc.coords.longitude);
+    //     console.log("location: \n",loc.coords);
+    //   }
+    //   else{
+    //     console.log("location permission not granted");
+    //   }
+    // })();
   });
 
   //login handler
@@ -121,6 +145,9 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
       setEmail(email);
       setIsAuthenticated(true);
       console.log("user signed in manually");
+      setLocation()
+      .then(() => console.log("location set in handleLogin"))
+      .catch(error => console.log("error setting location in handleLogin: \n", error));
       //Store user credentials in storage for reload
       AsyncStorage.setItem('userCredentials', JSON.stringify({ email, password }))
       .then(() => console.log('User credentials stored'))
