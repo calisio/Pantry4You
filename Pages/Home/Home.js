@@ -7,6 +7,7 @@ import { addDoc, deleteDoc, doc, getDocs, query, where, collection, onSnapshot }
 import { db } from '../../firebase';
 import { Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import * as Location from "expo-location"
 
 
 const Home = ({ navigation, route }) => {
@@ -22,6 +23,9 @@ const Home = ({ navigation, route }) => {
 
   const [favoriteRecipesIds, setFavoriteRecipesIds] = useState(new Set());
   const lastFavoriteRecipes = useRef([]);
+
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
 
 
 const updateFavoriteRecipesIds = (recipeId, isFavorited) => {
@@ -104,6 +108,7 @@ const handleFavorite = async (recipe) => {
   }
 
 
+
   //on load, get recipes
   useFocusEffect(
     React.useCallback(() => {
@@ -112,11 +117,29 @@ const handleFavorite = async (recipe) => {
         fetchFavoriteRecipes();
         lastFavoriteRecipes.current = favoriteRecipes;
       }
-  
       fetchRecipes();
       return () => {};
     }, []) // Remove favoriteRecipes from the dependency array
   );
+
+  useEffect(() => {
+    console.log("use effect");
+    (async () => {
+      let {status} = await Location.requestForegroundPermissionsAsync();
+      // console.log("status: ",status);
+
+      if(status == 'granted'){
+        console.log("location permission granted");
+        const loc = await Location.getCurrentPositionAsync();
+        setLatitude(loc.coords.latitude);
+        setLongitude(loc.coords.longitude);
+        console.log("location: \n",loc.coords);
+      }
+      else{
+        console.log("location permission not granted");
+      }
+    })();
+  }, []);
   
 
   //on refresh, get recieps
