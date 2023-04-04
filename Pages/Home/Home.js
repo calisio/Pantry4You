@@ -24,69 +24,69 @@ const Home = ({ navigation, route }) => {
   const lastFavoriteRecipes = useRef([]);
 
 
-const updateFavoriteRecipesIds = (recipeId, isFavorited) => {
-  setFavoriteRecipesIds(prevState => {
-    const newSet = new Set(prevState);
-    if (isFavorited) {
-      newSet.add(recipeId);
-    } else {
-      newSet.delete(recipeId);
-    }
-    return newSet;
-  });
-};
-
-const handleFavorite = async (recipe) => {
-  try {
-    // Check if the "favorites" subcollection exists
-    const favoritesRef = collection(db, `users/${uid}/favorites`);
-    const favoritesSnapshot = await getDocs(favoritesRef);
-    const existingDoc = favoritesSnapshot.docs.find(doc => doc.data().recipeId === recipe.recipeId);
-
-    // If the recipe is not already in the "favorites" subcollection, add it
-    if (!existingDoc) {
-      // Add the recipe to the "favorites" subcollection
-      await addDoc(favoritesRef, recipe);
-      Alert.alert("Recipe added to favorites")
-      console.log('Recipe added to favorites');
-      fetchFavoriteRecipes();
-      setFavoriteRecipes([...favoriteRecipes, recipe]); // Update the state to include the new favorite
-      updateFavoriteRecipesIds(recipe.recipeId, true); // Update the favoriteRecipesIds state
-    } else {
-      // If the recipe is already in the "favorites" subcollection, remove it
-      await deleteDoc(doc(db, `users/${uid}/favorites`, existingDoc.id));
-      Alert.alert("Recipe removed from favorites")
-      console.log('Recipe removed from favorites');
-      setFavoriteRecipes(favoriteRecipes.filter(fav => fav.recipeId !== recipe.recipeId)); // Update the state to exclude the removed favorite
-      updateFavoriteRecipesIds(recipe.recipeId, false); // Update the favoriteRecipesIds state
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-  
-
- // Create a new function to fetch favorite recipes
- const fetchFavoriteRecipes = async () => {
-  try {
-    const favoritesCollection = collection(db, "favorites");
-    const q = query(favoritesCollection, where("userId", "==", uid));
-
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const favorites = [];
-      querySnapshot.forEach((doc) => {
-        favorites.push({ ...doc.data(), id: doc.id });
-      });
-      setFavoriteRecipes(favorites);
+  const updateFavoriteRecipesIds = (recipeId, isFavorited) => {
+    setFavoriteRecipesIds(prevState => {
+      const newSet = new Set(prevState);
+      if (isFavorited) {
+        newSet.add(recipeId);
+      } else {
+        newSet.delete(recipeId);
+      }
+      return newSet;
     });
+  };
 
-    // Clean up the listener when the component is unmounted
-    return () => unsubscribe();
-  } catch (error) {
-    console.error("Error fetching favorite recipes: ", error);
-  }
-};
+  const handleFavorite = async (recipe) => {
+    try {
+      // Check if the "favorites" subcollection exists
+      const favoritesRef = collection(db, `users/${uid}/favorites`);
+      const favoritesSnapshot = await getDocs(favoritesRef);
+      const existingDoc = favoritesSnapshot.docs.find(doc => doc.data().recipeId === recipe.recipeId);
+
+      // If the recipe is not already in the "favorites" subcollection, add it
+      if (!existingDoc) {
+        // Add the recipe to the "favorites" subcollection
+        await addDoc(favoritesRef, recipe);
+        Alert.alert("Recipe added to favorites")
+        console.log('Recipe added to favorites');
+        fetchFavoriteRecipes();
+        setFavoriteRecipes([...favoriteRecipes, recipe]); // Update the state to include the new favorite
+        updateFavoriteRecipesIds(recipe.recipeId, true); // Update the favoriteRecipesIds state
+      } else {
+        // If the recipe is already in the "favorites" subcollection, remove it
+        await deleteDoc(doc(db, `users/${uid}/favorites`, existingDoc.id));
+        Alert.alert("Recipe removed from favorites")
+        console.log('Recipe removed from favorites');
+        setFavoriteRecipes(favoriteRecipes.filter(fav => fav.recipeId !== recipe.recipeId)); // Update the state to exclude the removed favorite
+        updateFavoriteRecipesIds(recipe.recipeId, false); // Update the favoriteRecipesIds state
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+
+  // Create a new function to fetch favorite recipes
+  const fetchFavoriteRecipes = async () => {
+    try {
+      const favoritesCollection = collection(db, "favorites");
+      const q = query(favoritesCollection, where("userId", "==", uid));
+
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const favorites = [];
+        querySnapshot.forEach((doc) => {
+          favorites.push({ ...doc.data(), id: doc.id });
+        });
+        setFavoriteRecipes(favorites);
+      });
+
+      // Clean up the listener when the component is unmounted
+      return () => unsubscribe();
+    } catch (error) {
+      console.error("Error fetching favorite recipes: ", error);
+    }
+  };
 
 
 
@@ -112,12 +112,11 @@ const handleFavorite = async (recipe) => {
         fetchFavoriteRecipes();
         lastFavoriteRecipes.current = favoriteRecipes;
       }
-  
       fetchRecipes();
-      return () => {};
+      return () => { };
     }, []) // Remove favoriteRecipes from the dependency array
   );
-  
+
 
   //on refresh, get recieps
   const handleRefresh = async () => {
@@ -133,7 +132,7 @@ const handleFavorite = async (recipe) => {
   const RecipeView = ({ item }) => {
     // Check if the current recipe (item) is in the user's favorite recipes
     const isFavorite = favoriteRecipesIds.has(item.recipeId);
-  
+
     return (
       <Pressable onPress={() => handlePress(item)}>
         <Box
@@ -185,7 +184,7 @@ const handleFavorite = async (recipe) => {
       </Pressable >
     );
   };
-  
+
 
 
   return (
