@@ -131,7 +131,6 @@ const handleFavorite = async (recipe) => {
   };
 
   const RecipeView = ({ item }) => {
-    // Check if the current recipe (item) is in the user's favorite recipes
     const isFavorite = favoriteRecipesIds.has(item.recipeId);
   
     return (
@@ -143,6 +142,9 @@ const handleFavorite = async (recipe) => {
           rounded="lg"
           borderColor="coolGray.200"
           borderWidth="1"
+          backgroundColor="white"
+          shadow={2}
+          p={2}
         >
           <Box>
             <AspectRatio w="100%" ratio={16 / 9}>
@@ -151,21 +153,20 @@ const handleFavorite = async (recipe) => {
               }} alt="image" />
             </AspectRatio>
             {item.missedCount > 0 && (
-              <Center bg="rgba(255, 255, 255, 0.4)"
+              <Center bg="rgba(255, 255, 255, 1)"
                 _text={{
                   color: "red.600",
                   fontWeight: "700",
                   fontSize: "xs"
                 }}
                 position="absolute"
-                bottom="0"
-                right="0"
+                bottom="1"
+                right="1"
                 px="3"
                 py="1.5">
                 {item.missedCount} missing
               </Center>
             )}
-            {/* Show filled heart if the recipe is in the user's favorites, otherwise show heart outline */}
             <Center
               position="absolute"
               top="0"
@@ -173,9 +174,16 @@ const handleFavorite = async (recipe) => {
               px="3"
               py="1.5">
               <MaterialCommunityIcons
-                name={isFavorite ? 'heart' : 'heart-outline'}
+                name="heart"
+                color={isFavorite ? "#f44336" : "white"}
+                size={35}
+                onPress={() => handleFavorite(item)}
+                style={{ position: 'absolute' }}
+              />
+              <MaterialCommunityIcons
+                name="heart-outline"
                 color="#f44336"
-                size={24}
+                size={35}
                 onPress={() => handleFavorite(item)}
               />
             </Center>
@@ -185,6 +193,7 @@ const handleFavorite = async (recipe) => {
       </Pressable >
     );
   };
+  
   
 
 

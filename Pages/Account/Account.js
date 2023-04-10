@@ -92,6 +92,8 @@ const Account = ({ navigation, route }) => {
 
 
   const RecipeView = ({ item }) => {
+    const isFavorite = favoriteRecipes.some(fav => fav.recipeId === item.recipeId);
+  
     return (
       <Pressable>
         <Box
@@ -115,15 +117,24 @@ const Account = ({ navigation, route }) => {
               px="3"
               py="1.5">
               <MaterialCommunityIcons
-                name='heart'
+                name="heart"
+                color={isFavorite ? "#f44336" : "white"}
+                size={35}
+                onPress={async () => {
+                  await handleFavorite(item);
+                  fetchFavoriteRecipes();
+                }}
+                style={{ position: 'absolute' }}
+              />
+              <MaterialCommunityIcons
+                name="heart-outline"
                 color="#f44336"
-                size={24}
+                size={35}
                 onPress={async () => {
                   await handleFavorite(item);
                   fetchFavoriteRecipes();
                 }}
               />
-
             </Center>
           </Box>
           <Heading>{item.title}</Heading>
@@ -131,6 +142,7 @@ const Account = ({ navigation, route }) => {
       </Pressable>
     );
   };
+  
 
   const handleSubmit = () => {
     console.log(handleLogout)
