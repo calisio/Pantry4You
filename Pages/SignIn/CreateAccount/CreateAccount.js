@@ -11,8 +11,16 @@ import { setLocation } from '../../../utils/setLocation';
 function CreateAccount({ navigation, route }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+
 
   const onUidChange = route.params.onUidChange;
+
+  const handlePhoneNumberChange = (value) => {
+    // Remove all non-digit characters from the input
+    const cleanedPhoneNumber = value.replace(/\D/g, '');
+    setPhoneNumber(cleanedPhoneNumber);
+  };
 
   async function handleCreateAccount() {
     try {
@@ -25,7 +33,8 @@ function CreateAccount({ navigation, route }) {
       console.log(emailLower);
       await setDoc(userRef, {
         email: emailLower,
-        password: password
+        password: password,
+        phoneNumber: phoneNumber,
       });
       setLocation()
       .then(() => console.log("location set in create account"))
@@ -123,6 +132,15 @@ function CreateAccount({ navigation, route }) {
           onChangeText={text => setPassword(text)}
           secureTextEntry
         />
+        <Text style={styles.text}> Please enter a phone number that can recieve SMS texts. A verification code will be sent upon sign up. </Text>
+          <TextInput
+            style={styles.input}
+            keyboardType='phone-pad'
+            maxLength={10}
+            onChangeText={handlePhoneNumberChange}
+            value={phoneNumber}
+            placeholder='Phone Number'
+          />
         <Button csize='xs'color="#e57507" onPress={handleCreateAccount}>Create Account</Button>
       </View>
     </TouchableWithoutFeedback>
@@ -133,7 +151,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingVertical: 75,
   },
   title: {
       fontSize: 24,

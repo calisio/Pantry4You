@@ -22,10 +22,13 @@ const firebaseConfig = {
 const Search = ({navigation, route}) => {
   const currentUserUID = route.params.uid;
   const currentUserEmail = route.params.email;
+  const currentUserPhoneNumber = route.params.phoneNumber;
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [requestSent, setRequestSent] = useState(false);
   const [isHandlingRequest, setIsHandlingRequest] = useState(false);
+
+  console.log(route.params)
 
   function handleSearch() {
     console.log(searchQuery)
@@ -44,10 +47,10 @@ const Search = ({navigation, route}) => {
             const userData = doc.data();
             matchingUsers.push({
               uid: doc.id,
-              email: userData.email
+              email: userData.email,
+              phoneNumber: userData.phoneNumber
             });
           });
-          console.log(matchingUsers);
           setSearchResults(matchingUsers);
         } else {
           setSearchResults([]);
@@ -63,7 +66,6 @@ const Search = ({navigation, route}) => {
     console.log('inside use effect')
     // check if you've already requested that friend
     searchResults.forEach(user => {
-      console.log('insidef foe each usert')
       let notificationsCollection = "users/" + user.uid + "/notifications";
       const q = query(
         collection(db, notificationsCollection),
@@ -76,7 +78,6 @@ const Search = ({navigation, route}) => {
             querySnapshot.forEach((doc) => {
               console.log("doc")
               if (doc.exists) {
-                console.log('hello')
                 setRequestSent(true);
               }
             });
@@ -101,7 +102,8 @@ const Search = ({navigation, route}) => {
     friendRequestsRef.add({
       requestType: 'friend',
       userUID: currentUserUID,
-      userEmail: currentUserEmail
+      userEmail: currentUserEmail,
+      userPhoneNumber: currentUserPhoneNumber
     }).then(function() {
       console.log("Frank food updated");
       setRequestSent(true);
@@ -136,26 +138,6 @@ const Search = ({navigation, route}) => {
       .catch((error) => {
         console.error("Error getting documents: ", error);
       });
-
-    // // Retrieve the existing friend requests object, remove the friend request, and update the document
-    // getDoc(userRef)
-    //   .then((userDoc) => {
-    //     const userData = userDoc.data();
-    //     const friendRequests = userData.friendRequests || {};
-    //     if (friendRequests[friendEmail]) {
-    //       delete friendRequests[friendEmail];
-    //       updateDoc(userRef, { friendRequests });
-    //       setRequestSent(false);
-    //     } else {
-    //       console.log('No matching friend request found.');
-    //     }
-    //   })
-    //   .then(() => {
-    //     console.log('Friend request removed successfully.');
-    //   })
-    //   .catch(error => {
-    //     console.error(error);
-    //   });
   }
   
 
@@ -170,15 +152,6 @@ const Search = ({navigation, route}) => {
       <Input size='md' w="80%" py="0" InputRightElement={<Button size="lg" rounded="none" w="1/6" h="full" onPress={() => {handleSearch()}}>
           <MaterialCommunityIcons name="magnify" color="white"/>
           </Button>} placeholder="Enter friend's email" value={searchQuery} onChangeText={text => setSearchQuery(text)}/>
-      {/* <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter friend's email"
-          value={searchQuery}
-          onChangeText={text => setSearchQuery(text)}
-        />
-        <Button onPress={() => {handleSearch()}}><MaterialCommunityIcons name="magnify" color="white"/></Button>
-      </View> */}
       {searchResults.length > 0 ? (
         <View style={styles.resultsContainer}>
           {searchResults.map((user, index) => (

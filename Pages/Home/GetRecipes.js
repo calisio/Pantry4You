@@ -1,7 +1,7 @@
 import { db } from '../../firebase';
-let convert = require('convert-units')
+// let convert = require('convert-units')
 
-const GetRecipes = async function(uid, recipeCount) {
+const GetRecipes = async function(uid) {
   //get list of current ingredients
   const userDoc = await db.collection('users').doc(uid).get();
   let collectionString = "users/" + uid + "/pantry";
@@ -9,29 +9,16 @@ const GetRecipes = async function(uid, recipeCount) {
   let pantryList = [];
   let friendsList = [];
   let tempDoc;
-  const unitCleaned = {
-    'cups': 'cup',
-    'lbs': 'lb',
-    'teaspoons': 'tsp',
-    'teaspoon': 'tsp',
-    'tablespoons': 'Tbs',
-    'tablespoon': 'Tbs',
-  }
-
-  function cleanUnit(unit) {
-    if (unit in unitCleaned) {
-      return unitCleaned[unit];
-    }
-    return unit;
-  }
 
   //Create list of friend UIDs
   if (userDoc.data().hasOwnProperty('friends')) {
     const friends = userDoc.data().friends;
     friendsList = friends.map(friend => ({
       uid: friend.friendUID,
-      email: friend.friendEmail
+      email: friend.friendEmail,
+      phoneNumber: friend.friendPhoneNumber
     }));
+    console.log(friends)
   }
 
   //Add friend's pantry to list
@@ -43,6 +30,7 @@ const GetRecipes = async function(uid, recipeCount) {
       amount: doc.data()
     }));
     friendsList[i].pantry = friendPantryList;
+    //console.log(friendPantryList);
   }
 
   //get pantry items from db
@@ -54,21 +42,21 @@ const GetRecipes = async function(uid, recipeCount) {
 
   //create list of pantry item names
   for (let i = 0; i < tempDoc.length; i++) {
-    pantryList.push(tempDoc[i]);
+    let item = Object.values(tempDoc[i])[0];
+    pantryList.push(item);
   }
 
   //create query with list of ingredients
   async function fetchRecipes(ingredients) {
-    let ingredientNames = ingredients.map(ingredient => ingredient.id)
     let recipeList = [];
     let recipeIdString = ""
     let query = ""
-    for (let i = 0; i < ingredientNames.length; i++) {
+    for (let i = 0; i < ingredients.length; i++) {
       if (i == 0) {
-        query += ingredientNames[i];
+        query += ingredients[i];
       }
       else {
-        query += (",+" + ingredientNames[i]);
+        query += (",+" + ingredients[i]);
       }
     }
 
@@ -79,7 +67,7 @@ const GetRecipes = async function(uid, recipeCount) {
       random = true
     }
     else {
-      apiUrl = 'https://api.spoonacular.com/recipes/findByIngredients?ingredients=' + query + '&number=' + recipeCount + '&ranking=2'
+      apiUrl = 'https://api.spoonacular.com/recipes/findByIngredients?ingredients=' + query + '&number=5&ranking=2'
     }
 
     //Get get is recipes and ingredeints (NOT INCLUDING URLS)
@@ -93,7 +81,6 @@ const GetRecipes = async function(uid, recipeCount) {
       });
       console.log("API CALL: GETTING RECIPES FOR: ", uid)
       const data = await recipes.json();
-
 
       let iterLength = 0
       if (random) {
@@ -121,8 +108,7 @@ const GetRecipes = async function(uid, recipeCount) {
             imgUrl: data['recipes'][i]['image'],
             recipeId: data['recipes'][i]['id'],
             missedCount: data['recipes'][i]['extendedIngredients'].length,
-            //missed: data['recipes'][i]['extendedIngredients'].map(ingredient => ingredient.name),
-            missed: data['recipes'][i]['extendedIngredients'],
+            missed: data['recipes'][i]['extendedIngredients'].map(ingredient => ingredient.name),
             used: [],
             recipeUrl: data['recipes'][i]['sourceUrl']
           }
@@ -133,58 +119,35 @@ const GetRecipes = async function(uid, recipeCount) {
             imgUrl: data[i]['image'],
             recipeId: data[i]['id'],
             missedCount: data[i]['missedIngredientCount'],
-            //missed: data[i]['missedIngredients'].map(ingredient => ingredient.name),
-            missed: data[i]['missedIngredients'],
+            missed: data[i]['missedIngredients'].map(ingredient => ingredient.name),
             used: data[i]['usedIngredients'],
             recipeUrl: ""
           }
         }
 
-        //see if you have enouugh of used ingredients
-        for (let j = 0; j < tempRecipe.used.length; ++j) {
-          const myIngredient = ingredients.find(ingredient => ingredient.id === tempRecipe.used[j].name);
-          if (myIngredient) {
-            const myIngredientUnit = Object.keys(myIngredient).filter(key => key != "id")[0];
-            const recipeIngredientConverted = convert(tempRecipe.used[j].amount).from(cleanUnit(tempRecipe.used[j].unit)).to(cleanUnit(myIngredientUnit))
-            if (!recipeIngredientConverted || recipeIngredientConverted > myIngredient[myIngredientUnit]) {
-              let diff = recipeIngredientConverted - myIngredient[myIngredientUnit];
-              let tempMissed = {
-                name: myIngredient.id,
-                unit: myIngredientUnit,
-                amount: diff
-              }
-              //add to missed list
-              tempRecipe.missed.push(tempMissed)
-              tempRecipe.missedCount++;
-              //remove from used list
-              tempRecipe.used.splice(j, 1);
-            }
-          }
-        }
         //get friends with missing ingredients, for each ingredient
         for (let j = 0; j < tempRecipe.missed.length; ++j) {
           let friendsWithIngredient = []
           for (let k = 0; k < friendsList.length; ++k) {
             const friendPantryIds = friendsList[k]['pantry'].map(ingredient => ingredient.id);
-            if (friendPantryIds.includes(tempRecipe.missed[j].name)) {
-              const matchedIngredient = friendsList[k]['pantry'].find(ingredient => ingredient.id === tempRecipe.missed[j].name);
-              const matchedIngredientUnit = Object.keys(matchedIngredient.amount)[0]
+            console.log(tempRecipe.missed[j]);
+            if (friendPantryIds.includes(tempRecipe.missed[j])) {
               let tempFriendObj = {
                 uid: friendsList[k]['uid'],
                 email: friendsList[k]['email'],
-                amount: convert(matchedIngredient.amount[matchedIngredientUnit]).from(cleanUnit(matchedIngredientUnit)).to(cleanUnit(tempRecipe.missed[j].unit)),
-                unit: tempRecipe.missed[j].unit
+                amount: friendsList[k]['pantry'].amount,
+                phoneNumber: friendsList[k]['phoneNumber'],
               }
+              console.log(tempFriendObj)
               friendsWithIngredient.push(tempFriendObj)
             }
           }
           missed.push({
-            ingredient: tempRecipe.missed[j],
+            name: String(tempRecipe.missed[j]),
             friendsWithIngredient: friendsWithIngredient
           });
         }
         tempRecipe.missed = missed
-
         recipeList.push(tempRecipe)
       }
     } catch (error) {
