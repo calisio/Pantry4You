@@ -285,12 +285,19 @@ const AddManually = (props) => {
     const submitHandler = async() => {
         let reg = /^\d+$/;
         if(!reg.test(quantity)){
-            Alert.alert("Please enter a numeric quantity");
+            Alert.alert("Please enter a numeric quantity greater than 0");
             return;
         }
         if(item != '' && quantity != '' && selectedUnit != ''){
             let quantityInt = parseInt(quantity);
 
+            if(quantityInt <= 0){
+                Alert.alert("Please enter a numeric quantity greater than 0");
+                dismissKeyboard();
+                setQuantity('');
+                // setSelectedUnit('');
+                return;
+            }
             let foodUnit = await getFoodUnit(item);
 
             if(foodUnit == null){
@@ -334,9 +341,7 @@ const AddManually = (props) => {
                 let alertString = item + " added!";
                 Alert.alert(alertString);
                 dismissKeyboard();
-                setItem('');
                 setQuantity('');
-                setSelectedUnit('');
                 
             }
             else{
