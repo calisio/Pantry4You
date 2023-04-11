@@ -132,7 +132,7 @@ function CreateAccount({ navigation, route }) {
           onChangeText={text => setPassword(text)}
           secureTextEntry
         />
-        <Text style={styles.text}> Please enter a phone number that can recieve SMS texts. A verification code will be sent upon sign up. </Text>
+        <Text style={styles.text}> Please enter a phone number that can recieve SMS texts.</Text>
           <TextInput
             style={styles.input}
             keyboardType='phone-pad'
