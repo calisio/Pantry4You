@@ -1,4 +1,4 @@
-import { FlatList, View, Image } from 'react-native';
+import { FlatList, View, Image, PanResponder } from 'react-native';
 import GetRecipes from './GetRecipes';
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, Heading, HStack, Center, AspectRatio, Skeleton, VStack, Pressable, Modal, Flex, Divider, Button, Text, Link } from 'native-base';
@@ -19,6 +19,7 @@ const Home = ({ navigation, route }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [favoriteRecipes, setFavoriteRecipes] = useState([]);
+  const [recipeCount, setRecipeCount] = useState(10);
 
   const [favoriteRecipesIds, setFavoriteRecipesIds] = useState(new Set());
   const lastFavoriteRecipes = useRef([]);
@@ -93,7 +94,7 @@ const Home = ({ navigation, route }) => {
 
   //function used to get recipes
   async function fetchRecipes() {
-    let recipesObjs = await GetRecipes(uid);
+    let recipesObjs = await GetRecipes(uid, recipeCount);
     setRecipeList(recipesObjs);
     setIsLoading(false);
   }
@@ -102,6 +103,16 @@ const Home = ({ navigation, route }) => {
     setSelectedRecipe(recipeObj);
     setShowModal(true);
   }
+
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onPanResponderMove: (evt, gestureState) => {
+      const { dy } = gestureState;
+      const step = 1;
+      const newValue = recipeCount + (dy > 0 ? step : -step);
+      setRecipeCount(Math.max(0, Math.min(newValue, 100)));
+    },
+  });
 
 
   //on load, get recipes
@@ -203,6 +214,12 @@ const Home = ({ navigation, route }) => {
         </Center>
       ) : (
         <Center>
+          <View {...panResponder.panHandlers}>
+            <Flex direction="row" alignItems="center">
+              <Text fontSize="lg"># Recipes: {recipeCount}</Text>
+              <Image source={require('../../assets/drag.png')} style={{ width: 24, height: 24, marginRight: 5, marginLeft: 5 }} />
+            </Flex>
+          </View>
           <FlatList
             data={recipeList}
             renderItem={RecipeView}
@@ -232,7 +249,7 @@ const Home = ({ navigation, route }) => {
                           </Center>
                           <View>
                             {selectedRecipe.used.map((item, index) => (
-                              <Text key={index} fontSize="md">{'\u2022'} {item.name}</Text>
+                              <Text key={index} fontSize="md">{'\u2022'} {item.name} ({item.amount} {item.unit})</Text>
                             ))}
                           </View>
                         </Box>
@@ -248,10 +265,14 @@ const Home = ({ navigation, route }) => {
                           <View>
                             {selectedRecipe.missed.map((item, index) => (
                               <React.Fragment key={index}>
-                                <Text fontSize="md">{'\u2022'} {item.name}</Text>
-                                {item.friendsWithIngredient.map((friend, i) => (
-                                  <Text key={i} fontSize="sm" ml={4}>{friend.email}</Text>
-                                ))}
+                                <Text fontSize="md">{'\u2022'} {item.ingredient.name} ({item.ingredient.amount} {item.ingredient.unit})</Text>
+                                {item.friendsWithIngredient.map((friend, i) => {
+                                  const color = friend.amount >= item.ingredient.amount ? 'green.500' : 'black.500';
+                                  return (
+                                    <Text key={i} fontSize="sm" ml={4} color={color}>{friend.email} ({friend.amount} {friend.unit})</Text>
+                                  )
+                                }
+                                )}
                               </React.Fragment>
                             ))}
                           </View>
