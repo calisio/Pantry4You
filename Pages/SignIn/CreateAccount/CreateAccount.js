@@ -5,6 +5,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore, doc, setDoc, deleteDoc, collection } from 'firebase/firestore';
 import { Button } from 'native-base';
 import { auth } from '../../../App';
+import { setLocation } from '../../../utils/setLocation';
 
 
 function CreateAccount({ navigation, route }) {
@@ -26,6 +27,9 @@ function CreateAccount({ navigation, route }) {
         email: emailLower,
         password: password
       });
+      setLocation()
+      .then(() => console.log("location set in create account"))
+      .catch(error => console.log("error setting location in create account: \n", error));
 
       //create empty pantry subcollection for user
       // const pantryRef = collection(userRef, 'pantry');

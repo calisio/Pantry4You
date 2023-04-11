@@ -7,6 +7,7 @@ import { addDoc, deleteDoc, doc, getDocs, query, where, collection, onSnapshot }
 import { db } from '../../firebase';
 import { Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import * as Location from "expo-location"
 
 
 const Home = ({ navigation, route }) => {
@@ -23,6 +24,9 @@ const Home = ({ navigation, route }) => {
 
   const [favoriteRecipesIds, setFavoriteRecipesIds] = useState(new Set());
   const lastFavoriteRecipes = useRef([]);
+
+  // const [latitude, setLatitude] = useState(null);
+  // const [longitude, setLongitude] = useState(null);
 
 
   const updateFavoriteRecipesIds = (recipeId, isFavorited) => {
@@ -112,14 +116,43 @@ const Home = ({ navigation, route }) => {
   });
 
 
+
   //on load, get recipes
   useFocusEffect(
     React.useCallback(() => {
+<<<<<<< HEAD
       fetchFavoriteRecipes();
+=======
+      // Only fetch favorite recipes if the favoriteRecipes array has changed
+      if (lastFavoriteRecipes.current !== favoriteRecipes) {
+        fetchFavoriteRecipes();
+        lastFavoriteRecipes.current = favoriteRecipes;
+      }
+>>>>>>> location
       fetchRecipes();
       return () => {};
     }, [])
   );
+
+  // useEffect(() => {
+  //   //https://www.youtube.com/watch?v=2q-wgobQ-zQ&ab_channel=TechHarvestingwithNaseel
+  //   console.log("use effect");
+  //   (async () => {
+  //     let {status} = await Location.requestForegroundPermissionsAsync();
+  //     // console.log("status: ",status);
+
+  //     if(status == 'granted'){
+  //       console.log("location permission granted");
+  //       const loc = await Location.getCurrentPositionAsync();
+  //       setLatitude(loc.coords.latitude);
+  //       setLongitude(loc.coords.longitude);
+  //       console.log("location: \n",loc.coords);
+  //     }
+  //     else{
+  //       console.log("location permission not granted");
+  //     }
+  //   })();
+  // }, []);
   
 
 
