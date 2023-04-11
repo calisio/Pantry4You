@@ -71,23 +71,20 @@ const Home = ({ navigation, route }) => {
   // Create a new function to fetch favorite recipes
   const fetchFavoriteRecipes = async () => {
     try {
-      const favoritesCollection = collection(db, "favorites");
-      const q = query(favoritesCollection, where("userId", "==", uid));
-
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const favorites = [];
-        querySnapshot.forEach((doc) => {
-          favorites.push({ ...doc.data(), id: doc.id });
-        });
-        setFavoriteRecipes(favorites);
-      });
-
-      // Clean up the listener when the component is unmounted
-      return () => unsubscribe();
+      const favoritesRef = collection(db, `users/${uid}/favorites`);
+      const favoritesSnapshot = await getDocs(favoritesRef);
+      const favorites = favoritesSnapshot.docs.map(doc => doc.data().recipeId);
+      // Clear previous favorite recipes ids
+      setFavoriteRecipesIds(new Set());
+      // Add fetched favorite recipes ids
+      favorites.forEach(recipeId => updateFavoriteRecipesIds(recipeId, true));
     } catch (error) {
       console.error("Error fetching favorite recipes: ", error);
     }
   };
+  
+  
+  
 
 
 
@@ -118,15 +115,12 @@ const Home = ({ navigation, route }) => {
   //on load, get recipes
   useFocusEffect(
     React.useCallback(() => {
-      // Only fetch favorite recipes if the favoriteRecipes array has changed
-      if (lastFavoriteRecipes.current !== favoriteRecipes) {
-        fetchFavoriteRecipes();
-        lastFavoriteRecipes.current = favoriteRecipes;
-      }
+      fetchFavoriteRecipes();
       fetchRecipes();
-      return () => { };
-    }, []) // Remove favoriteRecipes from the dependency array
+      return () => {};
+    }, [])
   );
+  
 
 
   //on refresh, get recieps
