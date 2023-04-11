@@ -1,4 +1,5 @@
 import { db } from '../../firebase';
+let convert = require('convert-units')
 
 const GetRecipes = async function(uid) {
   //get list of current ingredients
@@ -24,8 +25,12 @@ const GetRecipes = async function(uid) {
   for (let i = 0; i < friendsList.length; ++i) {
     let friendRef = db.collection('users').doc(friendsList[i]['uid']).collection('pantry');
     let friendPantryColl = await friendRef.get();
-    const friendPantryList = friendPantryColl.docs.map(doc => doc.id);
+    const friendPantryList = friendPantryColl.docs.map(doc => ({
+      id: doc.id,
+      amount: doc.data()
+    }));
     friendsList[i].pantry = friendPantryList;
+    //console.log(friendPantryList);
   }
 
   //get pantry items from db
@@ -124,10 +129,13 @@ const GetRecipes = async function(uid) {
         for (let j = 0; j < tempRecipe.missed.length; ++j) {
           let friendsWithIngredient = []
           for (let k = 0; k < friendsList.length; ++k) {
-            if (friendsList[k]['pantry'].includes(tempRecipe.missed[j])) {
+            const friendPantryIds = friendsList[k]['pantry'].map(ingredient => ingredient.id);
+            console.log(tempRecipe.missed[j]);
+            if (friendPantryIds.includes(tempRecipe.missed[j])) {
               let tempFriendObj = {
                 uid: friendsList[k]['uid'],
                 email: friendsList[k]['email'],
+                amount: friendsList[k]['pantry'].amount
                 phoneNumber: friendsList[k]['phoneNumber'],
               }
               console.log(tempFriendObj)
