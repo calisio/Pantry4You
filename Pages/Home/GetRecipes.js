@@ -140,24 +140,29 @@ const GetRecipes = async function(uid, recipeCount) {
           }
         }
 
-        //see if you have enouugh of used ingredients
+        //see if you have enough of used ingredients
         for (let j = 0; j < tempRecipe.used.length; ++j) {
           const myIngredient = ingredients.find(ingredient => ingredient.id === tempRecipe.used[j].name);
           if (myIngredient) {
             const myIngredientUnit = Object.keys(myIngredient).filter(key => key != "id")[0];
-            const recipeIngredientConverted = convert(tempRecipe.used[j].amount).from(cleanUnit(tempRecipe.used[j].unit)).to(cleanUnit(myIngredientUnit))
-            if (!recipeIngredientConverted || recipeIngredientConverted > myIngredient[myIngredientUnit]) {
-              let diff = recipeIngredientConverted - myIngredient[myIngredientUnit];
-              let tempMissed = {
-                name: myIngredient.id,
-                unit: myIngredientUnit,
-                amount: diff
+            try {
+              const recipeIngredientConverted = convert(tempRecipe.used[j].amount).from(cleanUnit(tempRecipe.used[j].unit)).to(cleanUnit(myIngredientUnit))
+              if (!recipeIngredientConverted || recipeIngredientConverted > myIngredient[myIngredientUnit]) {
+                let diff = recipeIngredientConverted - myIngredient[myIngredientUnit];
+                let tempMissed = {
+                  name: myIngredient.id,
+                  unit: myIngredientUnit,
+                  amount: diff
+                }
+                //add to missed list
+                tempRecipe.missed.push(tempMissed)
+                tempRecipe.missedCount++;
+                //remove from used list
+                tempRecipe.used.splice(j, 1);
               }
-              //add to missed list
-              tempRecipe.missed.push(tempMissed)
-              tempRecipe.missedCount++;
-              //remove from used list
-              tempRecipe.used.splice(j, 1);
+            }
+            catch (error) {
+              console.error("Conversion Failure From: " + tempRecipe.used[j].unit + " to " + myIngredientUnit);
             }
           }
         }
@@ -169,11 +174,22 @@ const GetRecipes = async function(uid, recipeCount) {
             if (friendPantryIds.includes(tempRecipe.missed[j].name)) {
               const matchedIngredient = friendsList[k]['pantry'].find(ingredient => ingredient.id === tempRecipe.missed[j].name);
               const matchedIngredientUnit = Object.keys(matchedIngredient.amount)[0]
-              let tempFriendObj = {
-                uid: friendsList[k]['uid'],
-                email: friendsList[k]['email'],
-                amount: convert(matchedIngredient.amount[matchedIngredientUnit]).from(cleanUnit(matchedIngredientUnit)).to(cleanUnit(tempRecipe.missed[j].unit)),
-                unit: tempRecipe.missed[j].unit
+              try {
+                let tempFriendObj = {
+                  uid: friendsList[k]['uid'],
+                  email: friendsList[k]['email'],
+                  amount: convert(matchedIngredient.amount[matchedIngredientUnit]).from(cleanUnit(matchedIngredientUnit)).to(cleanUnit(tempRecipe.missed[j].unit)),
+                  unit: tempRecipe.missed[j].unit
+                }
+              }
+              catch (error) {
+                console.error("Conversion Failure in Friend Pantry. Abort");
+                let tempFriendObj = {
+                  uid: friendsList[k]['uid'],
+                  email: friendsList[k]['email'],
+                  amount: matchedIngredient.amount[matchedIngredientUnit],
+                  unit: tempRecipe.missed[j].unit
+                }
               }
               friendsWithIngredient.push(tempFriendObj)
             }
