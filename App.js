@@ -120,7 +120,7 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
           .catch(error => console.log('Error signing in:', error));
       }
     });
-  }, []);
+  });
 
   // call getPhoneNumber every time uid or phoneNumber changes
   useEffect(() => {

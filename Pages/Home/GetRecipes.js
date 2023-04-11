@@ -1,5 +1,5 @@
 import { db } from '../../firebase';
-let convert = require('convert-units')
+// let convert = require('convert-units')
 
 const GetRecipes = async function(uid) {
   //get list of current ingredients
@@ -135,7 +135,7 @@ const GetRecipes = async function(uid) {
               let tempFriendObj = {
                 uid: friendsList[k]['uid'],
                 email: friendsList[k]['email'],
-                amount: friendsList[k]['pantry'].amount
+                amount: friendsList[k]['pantry'].amount,
                 phoneNumber: friendsList[k]['phoneNumber'],
               }
               console.log(tempFriendObj)
