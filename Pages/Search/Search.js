@@ -139,12 +139,6 @@ const Search = ({navigation, route}) => {
         }
       );
 
-      // console.log(test1.data());
-
-      
-
-      
-
       let distance = await getDistance(userLat, userLong, friendLat, friendLong);
       distance = distance.toFixed(5);
 
