@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Keyboard, TouchableWithoutFeedback, Alert } from 'react-native';
 import { initializeApp } from "firebase/app";
 import { Button, Input } from 'native-base';
 import { getFirestore, collection, query, where, getDocs, doc, updateDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { getDistance } from '../../utils/getDistance';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCjsh6Mj0fxTwcd5rwbk11ow3UATgpwrw8",
@@ -104,9 +105,47 @@ const Search = ({navigation, route}) => {
       userUID: currentUserUID,
       userEmail: currentUserEmail,
       userPhoneNumber: currentUserPhoneNumber
-    }).then(function() {
+    }).then(async function() {
       console.log("Frank food updated");
       setRequestSent(true);
+
+
+      let userLat;
+      let userLong;
+      let friendLat;
+      let friendLong;
+
+      await db.collection('users').doc(currentUserUID).get()
+      .then((doc) => {
+          if(doc.exists){
+            userLat = doc.data()['latitude'];
+            userLong = doc.data()['longitude'];
+            // console.log("long  " + doc);
+          }
+          else{
+            console.log(" lat/long DNE");
+          }
+        }
+      );
+
+      await db.collection('users').doc(friendUID).get()
+      .then((doc) => {
+          if(doc.exists){
+            friendLat = doc.data()['latitude'];
+            friendLong = doc.data()['longitude'];
+            // console.log("long  " + doc);
+          }
+          else{
+            console.log(" lat/long DNE");
+          }
+        }
+      );
+
+      let distance = await getDistance(userLat, userLong, friendLat, friendLong);
+      distance = distance.toFixed(5);
+
+      let alertString = friendEmail + " is approximately " + distance + " km away from you";
+      Alert.alert(alertString);
     });
   }
   
