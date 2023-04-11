@@ -120,15 +120,7 @@ const Home = ({ navigation, route }) => {
   //on load, get recipes
   useFocusEffect(
     React.useCallback(() => {
-<<<<<<< HEAD
       fetchFavoriteRecipes();
-=======
-      // Only fetch favorite recipes if the favoriteRecipes array has changed
-      if (lastFavoriteRecipes.current !== favoriteRecipes) {
-        fetchFavoriteRecipes();
-        lastFavoriteRecipes.current = favoriteRecipes;
-      }
->>>>>>> location
       fetchRecipes();
       return () => {};
     }, [])

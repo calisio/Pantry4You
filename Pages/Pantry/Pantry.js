@@ -112,21 +112,24 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   button: {
-    backgroundColor: '#CCCCCC',
+    backgroundColor: '#999797',
     borderRadius: 8,
     padding: 10,
-    width: '40%',
+    width: '30%',
     marginBottom: '10%',
     zIndex: 0
   },
   text: {
-    height: 80,
+    height: 90,
+    width: '90%',
+    alignSelf: 'center',
+    alignContent: 'center',
     zIndex: 0,
     borderColor: '#ffffff',
     borderWidth: '3px',
     textAlign: 'center',
-    backgroundColor: '#e57507',
-    fontSize: 16
+    backgroundColor: '#fca853',
+    fontSize: 20
   },
   addManually:{
     zIndex: 1

@@ -31,7 +31,9 @@ const EditQuantity = (props) => {
                 .catch((error) => {
                     console.log("error deleting ", editedItem);
                     console.log(error);
-                })
+                });
+                let alertString = props.item + " deleted";
+                Alert.alert(alertString);
             }
             else{
                 let editedItem = props.item;
@@ -50,11 +52,12 @@ const EditQuantity = (props) => {
                     setQuantity('');
                     props.updateFunction();
                 });
-
+                let alertString = "quantity of " + props.item + " updated";
+                Alert.alert(alertString);
             }
         }
         else{
-            Alert.alert("Please enter a numeric value");
+            Alert.alert("Please enter a positive numeric value");
         }
     }
 
@@ -105,7 +108,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         padding: 5,
         zIndex: 0,
-        width: '50%',
+        width: '20%',
         marginHorizontal: '2%'
     },
     text: {

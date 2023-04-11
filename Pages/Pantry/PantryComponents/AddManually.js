@@ -278,6 +278,10 @@ const AddManually = (props) => {
       }
 
 
+    const dismissKeyboard = () => {
+        Keyboard.dismiss();
+    }
+
     const submitHandler = async() => {
         let reg = /^\d+$/;
         if(!reg.test(quantity)){
@@ -327,9 +331,13 @@ const AddManually = (props) => {
                 }
 
                 props.updateFunction();
+                let alertString = item + " added!";
+                Alert.alert(alertString);
+                dismissKeyboard();
                 setItem('');
                 setQuantity('');
                 setSelectedUnit('');
+                
             }
             else{
                 console.log("units bad");
