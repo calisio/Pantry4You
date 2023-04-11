@@ -14,7 +14,8 @@ const GetRecipes = async function(uid) {
     const friends = userDoc.data().friends;
     friendsList = friends.map(friend => ({
       uid: friend.friendUID,
-      email: friend.friendEmail
+      email: friend.friendEmail,
+      phoneNumber: friend.friendPhoneNumber
     }));
   }
 

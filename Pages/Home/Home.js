@@ -7,6 +7,7 @@ import { addDoc, deleteDoc, doc, getDocs, query, where, collection, onSnapshot }
 import { db } from '../../firebase';
 import { Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import Communications from 'react-native-communications';
 
 
 const Home = ({ navigation, route }) => {
@@ -194,7 +195,12 @@ const handleFavorite = async (recipe) => {
     );
   };
   
-  
+
+  //send a text to request an item
+  function sendText (phoneNumber, itemName) {
+    console.log(phoneNumber)
+    // Communications.text(phoneNumber, 'Hi! I was wondering if I could borrow ' + itemName + ' from you for a recipe I am making?')
+  }
 
 
   return (
@@ -260,7 +266,10 @@ const handleFavorite = async (recipe) => {
                               <React.Fragment key={index}>
                                 <Text fontSize="md">{'\u2022'} {item.name}</Text>
                                 {item.friendsWithIngredient.map((friend, i) => (
+                                  <>
                                   <Text key={i} fontSize="sm" ml={4}>{friend.email}</Text>
+                                  <Button onPress={() => {sendText(friend.phoneNumber, item.name)}}>Request</Button>
+                                  </>
                                 ))}
                               </React.Fragment>
                             ))}

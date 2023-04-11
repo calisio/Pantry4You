@@ -12,6 +12,7 @@ const Notifications = ({navigation, route}) => {
   const [friendRequests, setFriendRequests] = useState([]);
   const currentUserUID = route.params.uid;
   const currentUserEmail = route.params.email;
+  const currentUserPhoneNumber = route.params.phoneNumber;
 
   useEffect(() => {
     const q = query(collection(db, `users/${currentUserUID}/notifications`), where("requestType", "==", "friend"));
@@ -55,50 +56,53 @@ const Notifications = ({navigation, route}) => {
     // Update friends array for the current user
     const currentUserRef = db.collection('users').doc(currentUserUID);
   
-    const currentUserData = { friendUID: currentUserUID, friendEmail: currentUserEmail }
-    const friendData = { friendUID: userRequestFrom.requesterUID, friendEmail: userRequestFrom.requesterEmail }
+    console.log(route.params)
+    console.log(userRequestFrom)
+
+    // const currentUserData = { friendUID: currentUserUID, friendEmail: currentUserEmail, friendPhoneNumber: currentUserPhoneNumber}
+    // const friendData = { friendUID: userRequestFrom.requesterUID, friendEmail: userRequestFrom.requesterEmail, friendPhoneNumber: userRequestFrom.requesterPhoneNumber }
     
-    // Update friends array for the current user
-    const currentUserUpdate = currentUserRef.update({
-      friends: arrayUnion(friendData)
-    });
+    // // Update friends array for the current user
+    // const currentUserUpdate = currentUserRef.update({
+    //   friends: arrayUnion(friendData)
+    // });
     
-    // Update friends array for the friend user
-    const friendUserRef = db.collection('users').doc(userRequestFrom.requesterUID);
-    const friendUserUpdate = friendUserRef.update({
-      friends: arrayUnion(currentUserData)
-    });
+    // // Update friends array for the friend user
+    // const friendUserRef = db.collection('users').doc(userRequestFrom.requesterUID);
+    // const friendUserUpdate = friendUserRef.update({
+    //   friends: arrayUnion(currentUserData)
+    // });
   
-    Promise.all([currentUserUpdate, friendUserUpdate])
-      .then(() => {
-        console.log("Both friend arrays updated successfully");
-        // remove from notifications
-        let notificationsCollection = "users/" + currentUserUID + "/notifications";
-        const q = query(
-          collection(db, notificationsCollection),
-          where('requestType', '==', 'friend'),
-          where('userUID', '==', userRequestFrom.requesterUID)
-        );
+    // Promise.all([currentUserUpdate, friendUserUpdate])
+    //   .then(() => {
+    //     console.log("Both friend arrays updated successfully");
+    //     // remove from notifications
+    //     let notificationsCollection = "users/" + currentUserUID + "/notifications";
+    //     const q = query(
+    //       collection(db, notificationsCollection),
+    //       where('requestType', '==', 'friend'),
+    //       where('userUID', '==', userRequestFrom.requesterUID)
+    //     );
   
-        getDocs(q)
-          .then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-              deleteDoc(doc.ref)
-                .then(() => {
-                  console.log("Notification document deleted");
-                })
-                .catch((error) => {
-                  console.error("Error deleting notification document: ", error);
-                });
-            });
-          })
-          .catch((error) => {
-            console.error("Error getting notification documents: ", error);
-          });
-      })
-      .catch((error) => {
-        console.error("Error updating friend arrays: ", error);
-      });
+    //     getDocs(q)
+    //       .then((querySnapshot) => {
+    //         querySnapshot.forEach((doc) => {
+    //           deleteDoc(doc.ref)
+    //             .then(() => {
+    //               console.log("Notification document deleted");
+    //             })
+    //             .catch((error) => {
+    //               console.error("Error deleting notification document: ", error);
+    //             });
+    //         });
+    //       })
+    //       .catch((error) => {
+    //         console.error("Error getting notification documents: ", error);
+    //       });
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error updating friend arrays: ", error);
+    //   });
   }  
 
   return (

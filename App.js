@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import {getAuth, onAuthStateChanged} from 'firebase/auth';
+import {getAuth, onAuthStateChanged, RecaptchaVerifier } from 'firebase/auth';
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 import { StyleSheet, Text, View } from 'react-native';
@@ -72,7 +72,16 @@ const theme = extendTheme({
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth();
+export const auth = getAuth(app);
+window.recaptchaVerifier = new RecaptchaVerifier('sign-in-button', {
+  'size': 'invisible',
+  'callback': (response) => {
+    // reCAPTCHA solved, allow signInWithPhoneNumber.
+    onSignInSubmit();
+  }
+}, auth);
+export const appVerifier = window.recaptchaVerifier;
+
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -151,6 +160,13 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
       // An error happened.
     });
   }
+
+  // attach phoneNumber to pass to children
+  // useEffect(() => {
+  //   const currentUserRef = db.collection('users').doc(currentUserUID);
+  //   console.log(currentUserRef)
+  // }, [uid])
+  
 
   if(!isAuthenticated){
     return (

@@ -44,10 +44,10 @@ const Search = ({navigation, route}) => {
             const userData = doc.data();
             matchingUsers.push({
               uid: doc.id,
-              email: userData.email
+              email: userData.email,
+              phoneNumber: userData.phoneNumber
             });
           });
-          console.log(matchingUsers);
           setSearchResults(matchingUsers);
         } else {
           setSearchResults([]);
