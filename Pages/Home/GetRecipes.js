@@ -17,6 +17,7 @@ const GetRecipes = async function(uid) {
       email: friend.friendEmail,
       phoneNumber: friend.friendPhoneNumber
     }));
+    console.log(friends)
   }
 
   //Add friend's pantry to list
@@ -127,7 +128,9 @@ const GetRecipes = async function(uid) {
               let tempFriendObj = {
                 uid: friendsList[k]['uid'],
                 email: friendsList[k]['email'],
+                phoneNumber: friendsList[k]['phoneNumber'],
               }
+              console.log(tempFriendObj)
               friendsWithIngredient.push(tempFriendObj)
             }
           }

@@ -23,6 +23,8 @@ import firebase from 'firebase/app';
 import {Alert} from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { NativeBaseProvider, extendTheme } from "native-base";
+import { db } from './firebase';
+
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -73,14 +75,14 @@ const theme = extendTheme({
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-window.recaptchaVerifier = new RecaptchaVerifier('sign-in-button', {
-  'size': 'invisible',
-  'callback': (response) => {
-    // reCAPTCHA solved, allow signInWithPhoneNumber.
-    onSignInSubmit();
-  }
-}, auth);
-export const appVerifier = window.recaptchaVerifier;
+// window.recaptchaVerifier = new RecaptchaVerifier('sign-in-button', {
+//   'size': 'invisible',
+//   'callback': (response) => {
+//     // reCAPTCHA solved, allow signInWithPhoneNumber.
+//     onSignInSubmit();
+//   }
+// }, auth);
+// export const appVerifier = window.recaptchaVerifier;
 
 
 const Stack = createStackNavigator();
@@ -92,6 +94,7 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
   //const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [uid, setUid] = useState('');
   const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   //callbacks for child components
   function handleUidChange(uid, email, password){
@@ -112,12 +115,20 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
             console.log('User signed in automatically');
             setUid(userCredential.user.uid);
             setEmail(email);
-            setIsAuthenticated(true);
+            setIsAuthenticated(true)
           })
           .catch(error => console.log('Error signing in:', error));
       }
     });
-  });
+  }, []);
+
+  // call getPhoneNumber every time uid or phoneNumber changes
+  useEffect(() => {
+    if (uid) {
+      console.log('getting phone number');
+      getPhoneNumber(uid);
+    }
+  }, [uid]);
 
   //login handler
   const handleLogin = (email, password) => {
@@ -125,6 +136,7 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
     .then((userCredential) => {
       // Signed in 
       const user = userCredential.user;
+      console.log(userCredential)
       const { email } = user;
       setUid(user.uid);
       setEmail(email);
@@ -148,6 +160,7 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
       ]);
     });
   };
+  
 
   const handleLogout = () => {
     signOut(auth).then(() => {
@@ -162,11 +175,20 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
   }
 
   // attach phoneNumber to pass to children
-  // useEffect(() => {
-  //   const currentUserRef = db.collection('users').doc(currentUserUID);
-  //   console.log(currentUserRef)
-  // }, [uid])
-  
+  function getPhoneNumber(uid) {
+    console.log('called')
+    const currentUserRef = db.collection('users').doc(uid);
+    currentUserRef.get().then((doc) => {
+      if (doc.exists) {
+        const phoneNumb = doc.data().phoneNumber;
+        setPhoneNumber(phoneNumb)
+      } else {
+        console.log('User document not found');
+      }
+    }).catch((error) => {
+      console.log('Error getting user document:', error);
+    });
+  }
 
   if(!isAuthenticated){
     return (
@@ -232,7 +254,7 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
         <Tab.Screen
           name="Search"
           component={Search}
-          initialParams={{uid:uid, email:email}}
+          initialParams={{uid:uid, email:email, phoneNumber: phoneNumber}}
           options={{
             tabBarLabel: 'Search',
             tabBarIcon: ({ theme, size, focused }) => (
@@ -243,7 +265,7 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
         <Tab.Screen
           name="Notifications"
           component={Notifications}
-          initialParams={{uid:uid, email:email}}
+          initialParams={{uid:uid, email:email, phoneNumber: phoneNumber}}
           options={{
             tabBarLabel: 'Notifications',
             tabBarIcon: ({ theme, size, focused }) => (

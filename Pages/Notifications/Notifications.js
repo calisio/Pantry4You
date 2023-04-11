@@ -10,9 +10,9 @@ import { db } from '../../firebase';
 const Notifications = ({navigation, route}) => {
   const [notifications, setNotifications] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
+  const [queryMyPhoneNumber, setQueryMyPhoneNumber] = useState('');
   const currentUserUID = route.params.uid;
   const currentUserEmail = route.params.email;
-  const currentUserPhoneNumber = route.params.phoneNumber;
 
   useEffect(() => {
     const q = query(collection(db, `users/${currentUserUID}/notifications`), where("requestType", "==", "friend"));
@@ -28,8 +28,8 @@ const Notifications = ({navigation, route}) => {
           requestType: notificationData.requestType,
           requesterEmail: notificationData.userEmail,
           requesterUID: notificationData.userUID,
+          requesterPhoneNumber: notificationData.userPhoneNumber,
         };
-
         if (notificationData.requestType === "friend") {
           console.log('here')
           updatedFriendRequests.push(notification);
@@ -52,58 +52,100 @@ const Notifications = ({navigation, route}) => {
     // adding it to your own friend list
     const userRef = doc(db, 'users', currentUserUID);
     const friendRef = collection(db, 'users');
+    const userRequestPhoneNumber = userRequestFrom.requesterPhoneNumber;
   
     // Update friends array for the current user
     const currentUserRef = db.collection('users').doc(currentUserUID);
   
-    console.log(route.params)
-    console.log(userRequestFrom)
+    // get the curr user phone number in this query
+    currentUserRef.get()
+      .then((doc) => {
+        if (doc.exists) {
+          const qMyPhoneNumber = doc.data().phoneNumber;
+          setQueryMyPhoneNumber(qMyPhoneNumber);
+  
+          const currentUserData = { friendUID: currentUserUID, friendEmail: currentUserEmail, friendPhoneNumber: qMyPhoneNumber};
+          const friendData = { friendUID: userRequestFrom.requesterUID, friendEmail: userRequestFrom.requesterEmail, friendPhoneNumber: userRequestPhoneNumber };
+  
+          // Update friends array for the current user
+          const currentUserUpdate = currentUserRef.update({
+            friends: arrayUnion(friendData)
+          });
+  
+          // Update friends array for the friend user
+          const friendUserRef = db.collection('users').doc(userRequestFrom.requesterUID);
+          const friendUserUpdate = friendUserRef.update({
+            friends: arrayUnion(currentUserData)
+          });
+  
+          Promise.all([currentUserUpdate, friendUserUpdate])
+            .then(() => {
+              console.log("Both friend arrays updated successfully");
+              // remove from notifications
+              let notificationsCollection = "users/" + currentUserUID + "/notifications";
+              const q = query(
+                collection(db, notificationsCollection),
+                where('requestType', '==', 'friend'),
+                where('userUID', '==', userRequestFrom.requesterUID)
+              );
+  
+              getDocs(q)
+                .then((querySnapshot) => {
+                  querySnapshot.forEach((doc) => {
+                    deleteDoc(doc.ref)
+                      .then(() => {
+                        console.log("Notification document deleted");
+                      })
+                      .catch((error) => {
+                        console.error("Error deleting notification document: ", error);
+                      });
+                  });
+                })
+                .catch((error) => {
+                  console.error("Error getting notification documents: ", error);
+                });
+            })
+            .catch((error) => {
+              console.error("Error updating friend arrays: ", error);
+            });
+        } else {
+          console.log('User document not found');
+        }
+      })
+      .catch((error) => {
+        console.log('Error getting user document:', error);
+      });
+  }
+  
 
-    // const currentUserData = { friendUID: currentUserUID, friendEmail: currentUserEmail, friendPhoneNumber: currentUserPhoneNumber}
-    // const friendData = { friendUID: userRequestFrom.requesterUID, friendEmail: userRequestFrom.requesterEmail, friendPhoneNumber: userRequestFrom.requesterPhoneNumber }
-    
-    // // Update friends array for the current user
-    // const currentUserUpdate = currentUserRef.update({
-    //   friends: arrayUnion(friendData)
-    // });
-    
-    // // Update friends array for the friend user
-    // const friendUserRef = db.collection('users').doc(userRequestFrom.requesterUID);
-    // const friendUserUpdate = friendUserRef.update({
-    //   friends: arrayUnion(currentUserData)
-    // });
   
-    // Promise.all([currentUserUpdate, friendUserUpdate])
-    //   .then(() => {
-    //     console.log("Both friend arrays updated successfully");
-    //     // remove from notifications
-    //     let notificationsCollection = "users/" + currentUserUID + "/notifications";
-    //     const q = query(
-    //       collection(db, notificationsCollection),
-    //       where('requestType', '==', 'friend'),
-    //       where('userUID', '==', userRequestFrom.requesterUID)
-    //     );
-  
-    //     getDocs(q)
-    //       .then((querySnapshot) => {
-    //         querySnapshot.forEach((doc) => {
-    //           deleteDoc(doc.ref)
-    //             .then(() => {
-    //               console.log("Notification document deleted");
-    //             })
-    //             .catch((error) => {
-    //               console.error("Error deleting notification document: ", error);
-    //             });
-    //         });
-    //       })
-    //       .catch((error) => {
-    //         console.error("Error getting notification documents: ", error);
-    //       });
-    //   })
-    //   .catch((error) => {
-    //     console.error("Error updating friend arrays: ", error);
-    //   });
-  }  
+  function handleRejectFriendRequest(item) {
+    // const userRef = doc(db, 'users', uid);
+    // const friendUID = friendRequests[friendEmail];
+
+    let notificationsCollection = "users/" + currentUserUID + "/notifications";
+    const q = query(
+      collection(db, notificationsCollection),
+      where('requestType', '==', 'friend'),
+      where('userUID', '==', item.requesterUID)
+    );
+
+    getDocs(q)
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          deleteDoc(doc.ref)
+            .then(() => {
+              console.log("Document deleted");
+            })
+            .catch((error) => {
+              console.error("Error deleting document: ", error);
+            });
+        });
+      })
+      .catch((error) => {
+        console.error("Error getting documents: ", error);
+      });
+  }
 
   return (
     <View style={styles.container}>
@@ -127,20 +169,6 @@ const Notifications = ({navigation, route}) => {
           )}
         />
       )}  
-      {/* this should be used to update the requested items */}
-      {/* {notifications.length > 0 && (
-        <FlatList
-          data={notifications}
-          keyExtractor={(notification) => notification.notificationId}
-          renderItem={({ item }) => (
-            <View style={styles.notification}>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.message}>{item.body}</Text>
-            </View>
-          )}
-        />
-      )} */}
-  
       {friendRequests.length === 0 && notifications.length === 0 && (
         <Text style={styles.noNotifications}>No notifications yet</Text>
       )}

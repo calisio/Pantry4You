@@ -197,9 +197,8 @@ const handleFavorite = async (recipe) => {
   
 
   //send a text to request an item
-  function sendText (phoneNumber, itemName) {
-    console.log(phoneNumber)
-    // Communications.text(phoneNumber, 'Hi! I was wondering if I could borrow ' + itemName + ' from you for a recipe I am making?')
+  function sendText (friend, itemName) {
+    Communications.text(friend.phoneNumber, 'Hi! I was wondering if I could borrow ' + itemName + ' from you for a recipe I am making?')
   }
 
 
@@ -268,7 +267,7 @@ const handleFavorite = async (recipe) => {
                                 {item.friendsWithIngredient.map((friend, i) => (
                                   <>
                                   <Text key={i} fontSize="sm" ml={4}>{friend.email}</Text>
-                                  <Button onPress={() => {sendText(friend.phoneNumber, item.name)}}>Request</Button>
+                                  <Button onPress={() => {sendText(friend, item.name)}}>Request</Button>
                                   </>
                                 ))}
                               </React.Fragment>
