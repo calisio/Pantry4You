@@ -3,6 +3,7 @@ import React, {useState} from 'react';
 import { db } from '../../../firebase';
 import { getAuth } from "firebase/auth";
 import { getFoodUnit } from "../../../utils/getFoodUnit";
+import { Button, Input, VStack} from 'native-base';
 
 
 
@@ -61,25 +62,57 @@ const EditQuantity = (props) => {
         }
     }
 
+    const decrementQuantity = () => {
+        if (quantity > 0) {
+          setQuantity(quantity - 1);
+        }
+      }
+    
+      const incrementQuantity = () => {
+        setQuantity(quantity + 1);
+      }
+
+      const handleChangeText = (text) => {
+        // You can add validation or custom logic here if needed
+        setQuantity(parseInt(text));
+      }
+
     return(
-        <View style={styles.container}>
-            <Pressable
-                title="Submit"
-                onPress={submitHandler}
-                style={styles.button}
-            >
-                <Text style={styles.text}>Change Quantity</Text>
-            </Pressable>
-            <Text> {props.unit} </Text>
-            <TextInput
-                clearButtonMode='always'
-                style={styles.input}
-                placeholder={""+ quantity}
-                textAlign= 'right'
-                onChangeText={newQuantity => setQuantity(newQuantity)}
-                defaultValue={""}
-                id="quantity"
-            />
+        // <View style={styles.container}>
+        //     {/* <Text> {props.unit} </Text>
+        //     <Input
+        //         placeholder={""+ quantity}
+        //         onChangeText={(newQuantity) => setQuantity(newQuantity)}
+        //         defaultValue={"" + quantity}
+        //         id="quantity"
+        //         InputLeftElement= {<Button size='xs' rounded='none' w="1/6" h="full" onPress={()=> setQuantity(quantity-1)}>Minus </Button>}
+        //         InputRightElement={<Button size='xs' rounded='none' w="1/6" h="full" onPress={()=> setQuantity(quantity-1)}> Plus </Button>}
+        //     />
+        //     <Button title="Submit" onClick={() => submitHandler()}> </Button> */}
+        //     <Input w="100%" py="0" InputLeftAddon= {<Button size='xs' rounded='none' w="1/6" h="full" onPress={()=> setQuantity(quantity-1)}>Minus</Button>}
+        //     InputRightAddon={<Button size='xs' rounded='none' w="1/6" h="full" onPress={()=> setQuantity(quantity-1)}>Plus</Button>}
+        //     placeholder={""+ quantity}/>
+        // </View>
+        <View style={styles.container} alignItems="center">
+        <Input
+            w="50%"
+            py={0}
+            InputLeftAddon={
+            <Button size='xs' roundedLeft='none' onPress={decrementQuantity}>
+                Minus
+            </Button>
+            }
+            InputRightAddon={
+            <Button size='xs' roundedRight='none' onPress={incrementQuantity}>
+                Plus
+            </Button>
+            }
+            placeholder={`Quantity: ${quantity}`}
+            value={quantity.toString()}
+            keyboardType="numeric"
+            textAlign="center"
+            onChangeText={handleChangeText}
+        />
         </View>
     );
 };
