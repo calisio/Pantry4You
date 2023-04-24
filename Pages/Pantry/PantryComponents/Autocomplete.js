@@ -68,7 +68,8 @@ const styles = StyleSheet.create({
       fontSize: 15,
       margin: 2,
       zIndex: 1,
-      backgroundColor: '#c2c2c2'
+      backgroundColor: '#c2c2c2',
+      paddingVertical: 10,
     },
     saveView: {
         flex: 1,
