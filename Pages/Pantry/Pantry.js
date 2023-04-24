@@ -53,7 +53,10 @@ const Pantry = ({navigation, route}) => {
   const PantryListComp = ({ item }) => {
     return(
       <View style={styles.listItemCont}>
-        <Text key={item.item}  style={styles.text}>{item.item}: {item.qty} {item.unit} {"\n"}<EditQuantity item={item.item} updateFunction={getPantryList} qty={item.qty} unit={item.unit}></EditQuantity></Text>
+          <Text key={item.item} style={styles.textItem}>{item.item}: </Text>
+          <View style={styles.editQuantity}>
+          <EditQuantity item={item.item} updateFunction={getPantryList} qty={item.qty} unit={item.unit}></EditQuantity>
+          </View>
       </View>
     );
 
@@ -61,14 +64,12 @@ const Pantry = ({navigation, route}) => {
   //Add to AddManually component : showAC={showAutocomplete} setShowAC={setShowAutocomplete}
 
     return (
-      <TouchableWithoutFeedback onPress={dismissKeyboard} style={styles.outerCont}>
         <View style={styles.container}>
-
+          <TouchableWithoutFeedback onPress={dismissKeyboard} style={styles.outerCont}>
           <View style={styles.addItemsCont}>
-            <Text style={styles.header}>Add Items</Text>
             <AddManually style={styles.addManually} updateFunction={getPantryList} ></AddManually>
           </View >
-
+          </TouchableWithoutFeedback>
           {(listLoaded && pantryList.length > 0) ? (
             <View style={styles.listCont}>
               <FlatList contentContainerStyle={styles.list}
@@ -77,15 +78,13 @@ const Pantry = ({navigation, route}) => {
                 keyExtractor={(item) => item.item}
                 ListHeaderComponent={() => <View style={{ height: 10 }} />}
                 ListFooterComponent={() => <View style={{ height: 10 }} />}
-                ItemSeparatorComponent={() => <View style={{ height: 0 }} />}
+                ItemSeparatorComponent={() => <View style={{ height: 5 }} />}
                 showsVerticalScrollIndicator={false}
               />
             </View>
           ) : (<View></View>)}
 
         </View>
-      </TouchableWithoutFeedback>
-
     );
 };
 
@@ -95,14 +94,21 @@ const styles = StyleSheet.create({
   },
   listCont:{
     borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 500,
   },
   list:{
-    paddingBottom: 400
+    paddingBottom: 400,
+  },
+  container: {
+    alignContent: 'center',
   },
   addItemsCont: {
-    padding:'5%',
-    zIndex: 1,
-    backgroundColor: '#cccccc'
+    padding:'3%',
+    zIndex: 30,
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
     fontSize: '20px',
@@ -111,33 +117,29 @@ const styles = StyleSheet.create({
   edit:{
     zIndex: 1,
   },
-  button: {
-    backgroundColor: '#999797',
-    borderRadius: 8,
-    padding: 10,
-    width: '30%',
-    marginBottom: '10%',
-    zIndex: 0
-  },
-  text: {
-    height: 90,
-    width: '90%',
-    alignSelf: 'center',
-    alignContent: 'center',
-    zIndex: 0,
-    borderColor: '#ffffff',
-    borderWidth: '3px',
-    textAlign: 'center',
-    backgroundColor: '#fca853',
-    fontSize: 20
+  textItem: {
+    marginRight: 5,
+    flex:1, 
+    textAlign:'center',
   },
   addManually:{
     zIndex: 1
   },
   listItemCont: {
-    height: 100
+    width: 345,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    paddingTop: 20,
+    paddingBottom: 20,
+    borderColor: '#ffffff',
+    borderWidth: '3px',
+  },
+  editQuantity: {
+    alignItems: 'center',
+    flex:3,
   }
-
 });
 
 export {Pantry};

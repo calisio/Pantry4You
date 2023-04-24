@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, Keyboard, TouchableOpacity, SafeAreaView } from 'react-native';
 import React, {useCallback, useState} from 'react';
 import Autocomplete from 'react-native-autocomplete-input';
+import { Input } from 'native-base';
 
 const MyAutocomplete = (props) => {
     const [query, setQuery] = useState('');
@@ -44,6 +45,7 @@ const MyAutocomplete = (props) => {
                     data={ possibleFoods }
                     onChangeText={filterFoods}
                     placeholder="Enter food here"
+                    style={styles.addItemsInput}
                     flatListProps={{
                         keyboardShouldPersistTaps: 'always',
                         renderItem: ({item}) => (
@@ -74,15 +76,9 @@ const styles = StyleSheet.create({
     autocompleteContainer: {
         // Hack required to make the autocomplete
         // work on Andrdoid
-        flex: 1,
-        left: 0,
-        position: 'absolute',
-        right: 0,
-        top: 0,
-        zIndex: 1,
         padding: 5,
         backgroundColor: '#ffffff',
-    }
+    },
     });
 
 export { MyAutocomplete };

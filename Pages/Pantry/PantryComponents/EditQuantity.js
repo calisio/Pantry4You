@@ -1,16 +1,22 @@
 import { Alert, TextInput, View, Text, StyleSheet, Pressable} from "react-native";
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { db } from '../../../firebase';
 import { getAuth } from "firebase/auth";
 import { getFoodUnit } from "../../../utils/getFoodUnit";
 import { Button, Input, VStack} from 'native-base';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 
 const EditQuantity = (props) => {
     const [quantity, setQuantity] = useState(props.qty);
-    console.log(props.item);
+    const unit = props.unit;
+    console.log(props);
 
+    useEffect(() => {
+      setQuantity(props.qty);
+    }, [props])
+    
     const submitHandler = async() => {
         let reg = /^\d+$/;
         console.log("------------------", reg.test(quantity), "------------");
@@ -50,7 +56,7 @@ const EditQuantity = (props) => {
                 }, {merge: true})
                 .then(console.log("edited quantity"))
                 .then(() => {
-                    setQuantity('');
+                    setQuantity(quantity);
                     props.updateFunction();
                 });
                 let alertString = "quantity of " + props.item + " updated";
@@ -62,57 +68,71 @@ const EditQuantity = (props) => {
         }
     }
 
-    const decrementQuantity = () => {
-        if (quantity > 0) {
-          setQuantity(quantity - 1);
-        }
-      }
+    const decreaseQuantity = () => {
+        let value = parseInt(quantity);
+        value = value - 1;
+        const stringValue = value.toString();
+        setQuantity(stringValue);
+      };
     
-      const incrementQuantity = () => {
-        setQuantity(quantity + 1);
-      }
+      const increaseQuantity = () => {
+        let value = parseInt(quantity);
+        value = value + 1;
+        const stringValue = value.toString();
+        setQuantity(stringValue);
+      };
+    
+      const handleInputChange = (newQuantity) => {
+        console.log(quantity);
+        setQuantity(newQuantity);
+        console.log(quantity);
+      };
 
-      const handleChangeText = (text) => {
-        // You can add validation or custom logic here if needed
-        setQuantity(parseInt(text));
-      }
+      const deleteItem = async () => {
+        try {
+          console.log('hello');
+          const auth = getAuth();
+          const user = auth.currentUser.uid;
+          let editedItem = props.item;
+          await db
+            .collection('users')
+            .doc(user)
+            .collection('pantry')
+            .doc(editedItem)
+            .delete();
+          console.log(editedItem, ' deleted');
+          props.updateFunction();
+          let alertString = props.item + ' deleted';
+          Alert.alert(alertString);
+        } catch (error) {
+          console.log('error deleting ', editedItem);
+          console.log(error);
+        }
+      };
+      
 
     return(
-        // <View style={styles.container}>
-        //     {/* <Text> {props.unit} </Text>
-        //     <Input
-        //         placeholder={""+ quantity}
-        //         onChangeText={(newQuantity) => setQuantity(newQuantity)}
-        //         defaultValue={"" + quantity}
-        //         id="quantity"
-        //         InputLeftElement= {<Button size='xs' rounded='none' w="1/6" h="full" onPress={()=> setQuantity(quantity-1)}>Minus </Button>}
-        //         InputRightElement={<Button size='xs' rounded='none' w="1/6" h="full" onPress={()=> setQuantity(quantity-1)}> Plus </Button>}
-        //     />
-        //     <Button title="Submit" onClick={() => submitHandler()}> </Button> */}
-        //     <Input w="100%" py="0" InputLeftAddon= {<Button size='xs' rounded='none' w="1/6" h="full" onPress={()=> setQuantity(quantity-1)}>Minus</Button>}
-        //     InputRightAddon={<Button size='xs' rounded='none' w="1/6" h="full" onPress={()=> setQuantity(quantity-1)}>Plus</Button>}
-        //     placeholder={""+ quantity}/>
-        // </View>
-        <View style={styles.container} alignItems="center">
-        <Input
-            w="50%"
-            py={0}
-            InputLeftAddon={
-            <Button size='xs' roundedLeft='none' onPress={decrementQuantity}>
-                Minus
-            </Button>
-            }
-            InputRightAddon={
-            <Button size='xs' roundedRight='none' onPress={incrementQuantity}>
-                Plus
-            </Button>
-            }
-            placeholder={`Quantity: ${quantity}`}
-            value={quantity.toString()}
-            keyboardType="numeric"
-            textAlign="center"
-            onChangeText={handleChangeText}
-        />
+        <View style={styles.quantityRow}>
+                <Button size='xs' h={10} borderRadius={30} onPress={decreaseQuantity} variant="subtle">
+                    <MaterialCommunityIcons name="minus" color="black"/>
+                </Button>
+                <Input
+                w={12}
+                h={12}
+                style={styles.quantityInput}
+                value={quantity}
+                placeholder={"" + quantity}
+                defaultValue={"" + quantity}
+                id="quantity"
+                rounded='none'
+                keyboardType="numeric"
+            />
+            <Button size='xs' h={10} borderRadius={30} onPress={increaseQuantity} variant="subtle">
+                <MaterialCommunityIcons name="plus" color="black"/>
+            </Button> 
+            <Text style={styles.unit}>{unit}</Text>
+            <Button size='xs' h={10} style={{ marginRight: 5 }} onPress={submitHandler}> <MaterialCommunityIcons name="check" color="white"/> </Button>
+            <Button size='xs' h={10} onPress={deleteItem}> <MaterialCommunityIcons name="trash-can-outline" color="white"/> </Button>
         </View>
     );
 };
@@ -121,10 +141,8 @@ const EditQuantity = (props) => {
 
 const styles = StyleSheet.create({
     container: {
-        marginTop:'5%',
-        flexDirection: 'row-reverse',
         alignItems: 'center',
-        zIndex: 0,
+        width: '100%',
     },
     input: {
         backgroundColor: 'white',
@@ -133,23 +151,27 @@ const styles = StyleSheet.create({
         borderColor: 'gray',
         borderRadius: 8,
         paddingHorizontal: '5%',
-        zIndex: 0,
         marginLeft: 0
-    },
-    button: {
-        backgroundColor: '#CCCCCC',
-        borderRadius: 8,
-        padding: 5,
-        zIndex: 0,
-        width: '50%',
-        marginHorizontal: '2%'
     },
     text: {
         alignSelf: 'center',
         textAlign: 'center',
         textAlignVertical: 'center'
+    },
+    quantityRow: {
+        flexDirection: 'row',
+        position: 'relative',
+        bottom: 0,
+        alignItems: 'center',
+    },
+    quantityInput: {
+        textAlign:"center",
+        backgroundColor: 'white'
+    },
+    unit: {
+        flex:1,
+        textAlign: 'center'
     }
-
 });
 
 

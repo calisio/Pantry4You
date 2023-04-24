@@ -1,11 +1,13 @@
 import { StyleSheet, Text, View, Alert, TextInput, Keyboard, Pressable } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { db } from '../../../firebase';
 import firebase from 'firebase/compat/app';
 import { getAuth } from "firebase/auth";
 import { getFoodUnit } from '../../../utils/getFoodUnit';
 import { setFoodUnit } from '../../../utils/setFoodUnit';
 import { MyAutocomplete } from './Autocomplete';
+import { Input , Button} from 'native-base';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 // https://reactnative.dev/docs/handling-text-input
@@ -249,7 +251,7 @@ const AddManually = (props) => {
     const allFoods = Object.keys(allFoodUnits);
 
     const [item, setItem] = useState('');
-    const [quantity, setQuantity] = useState('');
+    const [quantity, setQuantity] = useState('0');
     const [selectedUnit, setSelectedUnit] = useState('');
 
     const auth = getAuth();
@@ -294,8 +296,7 @@ const AddManually = (props) => {
             if(quantityInt <= 0){
                 Alert.alert("Please enter a numeric quantity greater than 0");
                 dismissKeyboard();
-                setQuantity('');
-                // setSelectedUnit('');
+                setQuantity('0');
                 return;
             }
             let foodUnit = await getFoodUnit(item);
@@ -341,8 +342,7 @@ const AddManually = (props) => {
                 let alertString = item + " added!";
                 Alert.alert(alertString);
                 dismissKeyboard();
-                setQuantity('');
-                
+                setQuantity('0');
             }
             else{
                 console.log("units bad");
@@ -377,68 +377,129 @@ const AddManually = (props) => {
         return curPantryList;
     }
 
+    const decreaseQuantity = () => {
+        let value = parseInt(quantity);
+        value = value - 1;
+        const stringValue = value.toString();
+        setQuantity(stringValue);
+      };
+    
+      const increaseQuantity = () => {
+        let value = parseInt(quantity);
+        value = value + 1;
+        const stringValue = value.toString();
+        setQuantity(stringValue);
+      };
+    
+      const handleInputChange = (newQuantity) => {
+        console.log(quantity);
+        setQuantity(newQuantity);
+        console.log(quantity);
+      };
+
     return (
             <View  style={styles.outerCont}>
-                <View style={styles.autocompleteCont} >
-                    <MyAutocomplete
-                        updateItemFunction = {setItem}
-                        foods={allFoods}
-                        foodUnits={allFoodUnits}
-                        style={styles.autocomplete}
-                        updateUnitFunction = {setSelectedUnit}
-                        // showAutocomplete = {props.showAC}
-                        // setShowAutocomplete = {props.setShowAC}
-                    />
+                <View style={styles.rowAddItems}>
+                    <Text style={styles.addItemText}> Add Item: </Text>
+                    <View style={styles.autocompleteCont} >
+                        <MyAutocomplete
+                            updateItemFunction = {setItem}
+                            foods={allFoods}
+                            foodUnits={allFoodUnits}
+                            style={styles.autocomplete}
+                            updateUnitFunction = {setSelectedUnit}
+                            // showAutocomplete = {props.showAC}
+                            // setShowAutocomplete = {props.setShowAC}
+                        />
+                    </View>
                 </View>
-                
-                <View style={styles.container}>
-                    <TextInput
-                        value={quantity}
-                        style={styles.input}
-                        placeholder="Quantity"
-                        onChangeText={newQuantity => setQuantity(newQuantity)}
-                        defaultValue={""}
-                        id="quantity"
-                    />
-                    <Text style={styles.unit}>{selectedUnit}</Text>
+                <View style={styles.row}>
+                    <View style={styles.amountAndUnit}>
+                        <View style={styles.quantityRow}>
+                            <Button size='xs' roundedRight='none' h={12} variant="subtle" onPress={() => decreaseQuantity()}>
+                                <MaterialCommunityIcons name="minus" color="black"/>
+                            </Button>
+                            <Input
+                                w={12}
+                                h={12}
+                                style={styles.quantityInput}
+                                value={quantity.toString()}
+                                placeholder='0'
+                                defaultValue='0'
+                                onChangeText={handleInputChange}
+                                id="quantity"
+                                rounded='none'
+                                keyboardType="numeric"
+                            />
+                            <Button size='xs' h={12} roundedLeft='none' variant="subtle" onPress={() => increaseQuantity()}>
+                                <MaterialCommunityIcons name="plus" color="black"/>
+                            </Button> 
+                        </View>
+                        <Text style={styles.unit}>{selectedUnit}</Text>
+                    </View>
+                    <View style={styles.buttonContainer}>          
+                        <Button
+                            style={styles.button}
+                            onPress={submitHandler}
+                        > Add Item </Button>
+                    </View>
                 </View>
-                <Pressable
-                    style={styles.button}
-                    title="Add Item"
-                    onPress={submitHandler}
-                >
-                    <Text style={styles.text}>Add Item</Text>
-                </Pressable>
             </View>
     );
 };
 
 const styles = StyleSheet.create({
+    rowAddItems: {
+        flexDirection: 'row',
+        padding: 4,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderColor:'white',
+        borderRadius:8,
+        borderWidth:3,
+        zIndex:5,
+    },
+    addItemText: {
+        flex: 2,
+        position: 'relative',
+        zIndex: 1,
+    },
+    autocompleteCont: {
+        flex: 6,
+        position: 'relative',
+        zIndex: 999,
+    },
     unit:{
-        marginLeft: '20%',
-        textAlign: 'auto'
+        textAlign: 'center',
+        paddingLeft: 10,
+        position: 'relative',
+        zIndex: 1,
     },
     outerCont: {
-        zIndex: 0,
-        width: '90%'
+        width: '100%',
+        alignItems: 'center',
     },
-    container: {
-      marginTop: '20%',
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      alignItems: 'center',
-      zIndex: 0,
-      width: '90%'
+    row: {
+        flexDirection: "row",
+        padding: 4,
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '80%',
+        position: 'relative',
+        zIndex: 1,
     },
-    input: {
-        width: '50%',
-        height: 20,
-        borderWidth: 1,
-        borderColor: 'gray',
-        borderRadius: 8,
-        paddingHorizontal: '10%',
-        zIndex: 0,
-        backgroundColor: 'white'
+    quantityRow: {
+        flexDirection: "row",
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        zIndex: 1,
+    },
+    quantityInput: {
+        textAlign:"center",
+        backgroundColor:'white',
+        position: 'relative',
+        zIndex: 1,
     },
     selectList: {
         marginLeft: '10%',
@@ -448,24 +509,39 @@ const styles = StyleSheet.create({
         borderColor: 'gray',
         borderRadius: 8,
         paddingHorizontal: '10%',
-        zIndex: 0
+        position: 'relative',
+        zIndex: 1,
+    },
+    buttonContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex:2,
+        position: 'relative',
+        zIndex: 1,
     },
     button: {
-        marginTop: 10,
-        backgroundColor: '#e57507',
-        borderRadius: 8,
-        padding: 10,
-        zIndex: 0
+        position: 'relative',
+        zIndex: 1,
     },
     text: {
-        alignSelf: 'center'
+        alignSelf: 'center',
+        position: 'relative',
+        zIndex: 1,
     },
     autocomplete: {
-        width: '90%',
-        zIndex: 100
+        width: '30%',
     },
-    autocompleteCont: {
-        zIndex: 100
+    amountAndUnit: {
+        flexDirection: 'row',
+        flex:3,
+        padding: 6,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderColor: 'white',
+        borderWidth: 3,
+        borderRadius: 8,
+        position: 'relative',
+        zIndex: 1,
     }
 });
 
