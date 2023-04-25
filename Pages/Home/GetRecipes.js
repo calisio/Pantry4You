@@ -79,7 +79,7 @@ const GetRecipes = async function(uid, recipeCount, query) {
     let random = false
     if (query) {
       console.log('query: ' + query);
-      query = "pasta with sauce"
+      //query = "pasta with sauce"
       apiUrl = 'https://api.spoonacular.com/recipes/complexSearch?query=' + query + '&number=' + recipeCount + '&fillIngredients=true&addRecipeInformation=true'
     }
     else if (ingredientsString == "") {

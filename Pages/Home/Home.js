@@ -92,6 +92,9 @@ const Home = ({ navigation, route }) => {
 
   //function used to get recipes
   async function fetchRecipes() {
+    console.log("IN FETCH");
+    console.log(recipeQuery);
+    console.log("check");
     let recipesObjs = await GetRecipes(uid, recipeCount, recipeQuery);
     setRecipeList(recipesObjs);
     setIsLoading(false);
