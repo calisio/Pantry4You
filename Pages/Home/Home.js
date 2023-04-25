@@ -96,6 +96,7 @@ const Home = ({ navigation, route }) => {
     console.log(recipeQuery);
     console.log("check");
     let recipesObjs = await GetRecipes(uid, recipeCount, recipeQuery);
+    setRecipeQuery("");
     setRecipeList(recipesObjs);
     setIsLoading(false);
   }
