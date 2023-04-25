@@ -1,7 +1,7 @@
 import { FlatList, View, Image, PanResponder } from 'react-native';
 import GetRecipes from './GetRecipes';
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, Heading, HStack, Center, AspectRatio, Skeleton, VStack, Pressable, Modal, Flex, Divider, Button, Text, Link } from 'native-base';
+import { Box, Heading, HStack, Center, AspectRatio, Skeleton, VStack, Pressable, Modal, Flex, Divider, Button, Text, Link, Input } from 'native-base';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { addDoc, deleteDoc, doc, getDocs, query, where, collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
@@ -9,6 +9,7 @@ import { Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import * as Location from "expo-location"
 import Communications from 'react-native-communications';
+import { TextInput } from 'react-native-gesture-handler';
 
 
 const Home = ({ navigation, route }) => {
@@ -22,6 +23,7 @@ const Home = ({ navigation, route }) => {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [favoriteRecipes, setFavoriteRecipes] = useState([]);
   const [recipeCount, setRecipeCount] = useState(10);
+  const [recipeQuery, setRecipeQuery] = useState("");
 
   const [favoriteRecipesIds, setFavoriteRecipesIds] = useState(new Set());
   const lastFavoriteRecipes = useRef([]);
@@ -90,7 +92,7 @@ const Home = ({ navigation, route }) => {
 
   //function used to get recipes
   async function fetchRecipes() {
-    let recipesObjs = await GetRecipes(uid, recipeCount);
+    let recipesObjs = await GetRecipes(uid, recipeCount, recipeQuery);
     setRecipeList(recipesObjs);
     setIsLoading(false);
   }
@@ -219,6 +221,13 @@ const Home = ({ navigation, route }) => {
             <Flex direction="row" alignItems="center">
               <Text fontSize="lg"># Recipes: {recipeCount}</Text>
               <Image source={require('../../assets/drag.png')} style={{ width: 24, height: 24, marginRight: 5, marginLeft: 5 }} />
+            </Flex>
+          </View>
+          <View>
+          <Flex direction="row" alignItems="center">
+              <Input size='lg' w="95%" py="0" InputRightElement={<Button size="lg" rounded="none" w="1/6" h="full" onPress={() => {fetchRecipes()}}>
+                <MaterialCommunityIcons name="magnify" color="white"/>
+              </Button>} placeholder="Search for recipes by keyword" value={recipeQuery} onChangeText={text => setRecipeQuery(text)}/>
             </Flex>
           </View>
           <FlatList
