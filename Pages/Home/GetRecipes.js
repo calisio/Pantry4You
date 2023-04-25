@@ -30,7 +30,8 @@ const GetRecipes = async function(uid, recipeCount) {
     const friends = userDoc.data().friends;
     friendsList = friends.map(friend => ({
       uid: friend.friendUID,
-      email: friend.friendEmail
+      email: friend.friendEmail,
+      phoneNumber: friend.friendPhoneNumber
     }));
   }
 
@@ -180,7 +181,8 @@ const GetRecipes = async function(uid, recipeCount) {
                   uid: friendsList[k]['uid'],
                   email: friendsList[k]['email'],
                   amount: convert(matchedIngredient.amount[matchedIngredientUnit]).from(cleanUnit(matchedIngredientUnit)).to(cleanUnit(tempRecipe.missed[j].unit)),
-                  unit: tempRecipe.missed[j].unit
+                  unit: tempRecipe.missed[j].unit,
+                  phoneNumber: friendsList[k]['phoneNumber'],
                 }
               }
               catch (error) {
@@ -189,7 +191,8 @@ const GetRecipes = async function(uid, recipeCount) {
                   uid: friendsList[k]['uid'],
                   email: friendsList[k]['email'],
                   amount: matchedIngredient.amount[matchedIngredientUnit],
-                  unit: tempRecipe.missed[j].unit
+                  unit: tempRecipe.missed[j].unit,
+                  phoneNumber: friendsList[k]['phoneNumber'],
                 }
               }
               friendsWithIngredient.push(tempFriendObj)

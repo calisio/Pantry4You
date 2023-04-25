@@ -294,7 +294,7 @@ const Home = ({ navigation, route }) => {
                                   return (
                                     <>
                                       <Text key={i} fontSize="sm" ml={4} color={color}>{friend.email} ({friend.amount} {friend.unit})</Text>
-                                      <Button onPress={() => { sendText(friend, item.name) }}>Request</Button>
+                                      <Button onPress={() => { sendText(friend, item.ingredient.name) }}>Request</Button>
                                     </>
                                   )
                                 }
