@@ -1,4 +1,4 @@
-import { FlatList, View, Image, PanResponder } from 'react-native';
+import { FlatList, View, Image, PanResponder, Keyboard } from 'react-native';
 import GetRecipes from './GetRecipes';
 import React, { useState, useEffect, useRef } from 'react';
 import { Box, Heading, HStack, Center, AspectRatio, Skeleton, VStack, Pressable, Modal, Flex, Divider, Button, Text, Link, Input } from 'native-base';
@@ -134,6 +134,11 @@ const Home = ({ navigation, route }) => {
     setIsRefreshing(false);
   };
 
+  const handleSubmitQuery = async () => {
+    dismissKeyboard();
+    fetchRecipes();
+  }
+
   const RecipeView = ({ item }) => {
     const isFavorite = favoriteRecipesIds.has(item.recipeId);
 
@@ -199,6 +204,10 @@ const Home = ({ navigation, route }) => {
   };
 
 
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  }
+
   //send a text to request an item
   function sendText(friend, itemName) {
     Communications.text(friend.phoneNumber, 'Hi! I was wondering if I could borrow ' + itemName + ' from you for a recipe I am making?')
@@ -229,7 +238,7 @@ const Home = ({ navigation, route }) => {
           </View>
           <View>
           <Flex direction="row" alignItems="center">
-              <Input size='lg' w="95%" py="0" InputRightElement={<Button size="lg" rounded="none" w="1/6" h="full" onPress={() => {fetchRecipes()}}>
+              <Input size='lg' w="95%" py="0" InputRightElement={<Button size="lg" rounded="none" w="1/6" h="full" onPress={() => {handleSubmitQuery()}}>
                 <MaterialCommunityIcons name="magnify" color="white"/>
               </Button>} placeholder="Search for recipes by keyword" value={recipeQuery} onChangeText={text => setRecipeQuery(text)}/>
             </Flex>
