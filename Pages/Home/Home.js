@@ -237,8 +237,8 @@ const Home = ({ navigation, route }) => {
             </Flex>
           </View>
           <View>
-          <Flex direction="row" alignItems="center">
-              <Input size='lg' w="95%" py="0" InputRightElement={<Button size="lg" rounded="none" w="1/6" h="full" onPress={() => {handleSubmitQuery()}}>
+          <Flex direction="row" alignItems="center" paddingY='3' >
+              <Input size='lg' w="90%" py="0" marginRight='2' marginLeft='5' InputRightElement={<Button size="lg" rounded="none" w="1/6" h="full" onPress={() => {handleSubmitQuery()}}>
                 <MaterialCommunityIcons name="magnify" color="white"/>
               </Button>} placeholder="Search for recipes by keyword" value={recipeQuery} onChangeText={text => setRecipeQuery(text)}/>
             </Flex>
