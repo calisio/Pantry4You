@@ -1,7 +1,7 @@
 import { db } from '../../firebase';
 let convert = require('convert-units')
 
-const GetRecipes = async function(uid, recipeCount) {
+const GetRecipes = async function(uid, recipeCount, query) {
   //get list of current ingredients
   const userDoc = await db.collection('users').doc(uid).get();
   let collectionString = "users/" + uid + "/pantry";
@@ -12,10 +12,13 @@ const GetRecipes = async function(uid, recipeCount) {
   const unitCleaned = {
     'cups': 'cup',
     'lbs': 'lb',
+    'pounds': 'lb',
+    'pound': 'lb',
     'teaspoons': 'tsp',
     'teaspoon': 'tsp',
     'tablespoons': 'Tbs',
     'tablespoon': 'Tbs',
+    'ounces': 'oz'
   }
 
   function cleanUnit(unit) {
@@ -62,27 +65,33 @@ const GetRecipes = async function(uid, recipeCount) {
     let ingredientNames = ingredients.map(ingredient => ingredient.id)
     let recipeList = [];
     let recipeIdString = ""
-    let query = ""
+    let ingredientsString = ""
     for (let i = 0; i < ingredientNames.length; i++) {
       if (i == 0) {
-        query += ingredientNames[i];
+        ingredientsString += ingredientNames[i];
       }
       else {
-        query += (",+" + ingredientNames[i]);
+        ingredientsString += (",+" + ingredientNames[i]);
       }
     }
 
     let apiUrl = ''
     let random = false
-    if (query == "") {
+    if (query) {
+      console.log('query: ' + query);
+      query = "pasta with sauce"
+      apiUrl = 'https://api.spoonacular.com/recipes/complexSearch?query=' + query + '&number=' + recipeCount + '&fillIngredients=true&addRecipeInformation=true'
+    }
+    else if (ingredientsString == "") {
       apiUrl = 'https://api.spoonacular.com/recipes/random?number=5'
       random = true
     }
     else {
-      apiUrl = 'https://api.spoonacular.com/recipes/findByIngredients?ingredients=' + query + '&number=' + recipeCount + '&ranking=2'
+      apiUrl = 'https://api.spoonacular.com/recipes/findByIngredients?ingredients=' + ingredientsString + '&number=' + recipeCount + '&ranking=2'
     }
 
     //Get get is recipes and ingredeints (NOT INCLUDING URLS)
+    console.log(apiUrl)
     try {
       const recipes = await fetch(apiUrl, {
         method: 'GET',
@@ -93,23 +102,30 @@ const GetRecipes = async function(uid, recipeCount) {
       });
       console.log("API CALL: GETTING RECIPES FOR: ", uid)
       const data = await recipes.json();
-
-
+      let cleanedData = {}
+      console.log(data.length)
       let iterLength = 0
       if (random) {
         iterLength = data.recipes.length
       }
       else {
-        iterLength = data.length
+        if (data.length) {
+          iterLength = data.length
+          cleanedData = data
+        }
+        else {
+          iterLength = data.results.length
+          cleanedData = data.results
+        }
       }
-
+      //console.log(cleanedData)
       for (let i = 0; i < iterLength; i++) {
         if (!random) {
           if (i == 0) {
-            recipeIdString += data[i]['id'];
+            recipeIdString += cleanedData[i]['id'];
           }
           else {
-            recipeIdString += ("," + data[i]['id']);
+            recipeIdString += ("," + cleanedData[i]['id']);
           }
         }
 
@@ -129,13 +145,13 @@ const GetRecipes = async function(uid, recipeCount) {
         }
         else {
           tempRecipe = {
-            title: data[i]['title'],
-            imgUrl: data[i]['image'],
-            recipeId: data[i]['id'],
-            missedCount: data[i]['missedIngredientCount'],
+            title: cleanedData[i]['title'],
+            imgUrl: cleanedData[i]['image'],
+            recipeId: cleanedData[i]['id'],
+            missedCount: cleanedData[i]['missedIngredientCount'],
             //missed: data[i]['missedIngredients'].map(ingredient => ingredient.name),
-            missed: data[i]['missedIngredients'],
-            used: data[i]['usedIngredients'],
+            missed: cleanedData[i]['missedIngredients'],
+            used: cleanedData[i]['usedIngredients'],
             recipeUrl: ""
           }
         }

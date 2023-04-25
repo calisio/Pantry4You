@@ -119,28 +119,6 @@ const Home = ({ navigation, route }) => {
     }, [])
   );
 
-  // useEffect(() => {
-  //   //https://www.youtube.com/watch?v=2q-wgobQ-zQ&ab_channel=TechHarvestingwithNaseel
-  //   console.log("use effect");
-  //   (async () => {
-  //     let {status} = await Location.requestForegroundPermissionsAsync();
-  //     // console.log("status: ",status);
-
-  //     if(status == 'granted'){
-  //       console.log("location permission granted");
-  //       const loc = await Location.getCurrentPositionAsync();
-  //       setLatitude(loc.coords.latitude);
-  //       setLongitude(loc.coords.longitude);
-  //       console.log("location: \n",loc.coords);
-  //     }
-  //     else{
-  //       console.log("location permission not granted");
-  //     }
-  //   })();
-  // }, []);
-
-
-
   //on refresh, get recieps
   const handleRefresh = async () => {
     console.log("REFRESH");
