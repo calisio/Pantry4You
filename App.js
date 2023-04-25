@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import {getAuth, onAuthStateChanged, RecaptchaVerifier } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, RecaptchaVerifier } from 'firebase/auth';
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
 import { StyleSheet, Text, View } from 'react-native';
@@ -8,24 +8,27 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Login} from './Pages/SignIn/Login/Login';
-import {CreateAccount} from './Pages/SignIn/CreateAccount/CreateAccount';
-import {Account} from './Pages/Account/Account';
+import { Login } from './Pages/SignIn/Login/Login';
+import { CreateAccount } from './Pages/SignIn/CreateAccount/CreateAccount';
+import { Account } from './Pages/Account/Account';
 import { Home } from './Pages/Home/Home';
 import { Pantry } from './Pages/Pantry/Pantry';
 import { Search } from './Pages/Search/Search';
 import { Notifications } from './Pages/Notifications/Notifications';
-import {Add} from './Pages/Add/Add';
-import React, {useState, useEffect} from 'react';
-import {signInWithEmailAndPassword, signOut} from 'firebase/auth';
+import { Add } from './Pages/Add/Add';
+import React, { useState, useEffect } from 'react';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firebase from 'firebase/app';
-import {Alert} from 'react-native';
+import { Alert } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { NativeBaseProvider, extendTheme } from "native-base";
 // import * as Location from "expo-location"
 import { setLocation } from "./utils/setLocation";
 import { db } from './firebase';
+
+console.disableYellowBox = true;
+console.error = () => { };
 
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -33,7 +36,7 @@ import { db } from './firebase';
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
- const firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyCjsh6Mj0fxTwcd5rwbk11ow3UATgpwrw8",
   authDomain: "pantry4you-bf048.firebaseapp.com",
   projectId: "pantry4you-bf048",
@@ -90,7 +93,7 @@ export const auth = getAuth(app);
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function Pages({isAuthenticated, setIsAuthenticated}) {
+function Pages({ isAuthenticated, setIsAuthenticated }) {
   console.log("PAGES RENDERED");
   const theme = useTheme();
   //const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -99,7 +102,7 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
   const [phoneNumber, setPhoneNumber] = useState('');
 
   //callbacks for child components
-  function handleUidChange(uid, email, password){
+  function handleUidChange(uid, email, password) {
     setUid(uid);
     setEmail(email);
     AsyncStorage.setItem('userCredentials', JSON.stringify({ email, password }));
@@ -154,37 +157,37 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
   //login handler
   const handleLogin = (email, password) => {
     signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      // Signed in 
-      const user = userCredential.user;
-      console.log(userCredential)
-      const { email } = user;
-      setUid(user.uid);
-      setEmail(email);
-      setIsAuthenticated(true);
-      console.log("user signed in manually");
-      setLocation()
-      .then(() => console.log("location set in handleLogin"))
-      .catch(error => console.log("error setting location in handleLogin: \n", error));
-      //Store user credentials in storage for reload
-      AsyncStorage.setItem('userCredentials', JSON.stringify({ email, password }))
-      .then(() => console.log('User credentials stored'))
-      .catch(error => console.log('Error storing credentials:', error));
-    })
-    .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      Alert.alert('Invalid Login', 'The username or password you have entered is incorrect. Please try again.', [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        {text: 'OK', onPress: () => console.log('OK Pressed')},
-      ]);
-    });
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        console.log(userCredential)
+        const { email } = user;
+        setUid(user.uid);
+        setEmail(email);
+        setIsAuthenticated(true);
+        console.log("user signed in manually");
+        setLocation()
+          .then(() => console.log("location set in handleLogin"))
+          .catch(error => console.log("error setting location in handleLogin: \n", error));
+        //Store user credentials in storage for reload
+        AsyncStorage.setItem('userCredentials', JSON.stringify({ email, password }))
+          .then(() => console.log('User credentials stored'))
+          .catch(error => console.log('Error storing credentials:', error));
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        Alert.alert('Invalid Login', 'The username or password you have entered is incorrect. Please try again.', [
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Cancel Pressed'),
+            style: 'cancel',
+          },
+          { text: 'OK', onPress: () => console.log('OK Pressed') },
+        ]);
+      });
   };
-  
+
 
   const handleLogout = () => {
     signOut(auth).then(() => {
@@ -214,29 +217,29 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
     });
   }
 
-  if(!isAuthenticated){
+  if (!isAuthenticated) {
     return (
-      
+
       //<View>
-        <Stack.Navigator initialRouteName="Login">
-          <Stack.Screen
-            name="Login"
-            component={Login}
-            options={{ title: 'Login' }}
-            initialParams={{handleLogin: handleLogin}}
-          />
-          <Stack.Screen 
-            name="CreateAccount" 
-            component={CreateAccount} 
-            options={{ title: 'Create Account' }} 
-            initialParams={{onUidChange: handleUidChange}}
-            />
-        </Stack.Navigator>
+      <Stack.Navigator initialRouteName="Login">
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{ title: 'Login' }}
+          initialParams={{ handleLogin: handleLogin }}
+        />
+        <Stack.Screen
+          name="CreateAccount"
+          component={CreateAccount}
+          options={{ title: 'Create Account' }}
+          initialParams={{ onUidChange: handleUidChange }}
+        />
+      </Stack.Navigator>
       //</View>
-      
+
     )
   }
-  else{
+  else {
     return (
       <Tab.Navigator
         activeTintColor="red"
@@ -244,19 +247,19 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
         <Tab.Screen
           name="Home"
           component={Home}
-          initialParams={{uid:uid}}
+          initialParams={{ uid: uid }}
           options={{
             tabBarLabel: 'Home',
             tabBarIcon: ({ color, size, focused }) => (
               <MaterialCommunityIcons name={focused ? 'home' : 'home-outline'} color="#e57507" size={size} />
             ),
           }}
-          uid = {uid}
+          uid={uid}
         />
         <Tab.Screen
           name="Pantry"
           component={Pantry}
-          initialParams={{uid:uid}}
+          initialParams={{ uid: uid }}
           options={{
             tabBarLabel: 'Pantry',
             tabBarIcon: ({ color, size, focused }) => (
@@ -278,7 +281,7 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
         <Tab.Screen
           name="Search"
           component={Search}
-          initialParams={{uid:uid, email:email, phoneNumber: phoneNumber}}
+          initialParams={{ uid: uid, email: email, phoneNumber: phoneNumber }}
           options={{
             tabBarLabel: 'Search',
             tabBarIcon: ({ theme, size, focused }) => (
@@ -289,7 +292,7 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
         <Tab.Screen
           name="Notifications"
           component={Notifications}
-          initialParams={{uid:uid, email:email, phoneNumber: phoneNumber}}
+          initialParams={{ uid: uid, email: email, phoneNumber: phoneNumber }}
           options={{
             tabBarLabel: 'Notifications',
             tabBarIcon: ({ theme, size, focused }) => (
@@ -324,8 +327,8 @@ export default function App() {
   return (
     <NativeBaseProvider theme={theme}>
       <NavigationContainer>
-        <Pages 
-          isAuthenticated={isAuthenticated} 
+        <Pages
+          isAuthenticated={isAuthenticated}
           setIsAuthenticated={setIsAuthenticated}
         />
       </NavigationContainer>

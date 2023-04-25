@@ -1,7 +1,7 @@
-import { FlatList, View, Image, PanResponder } from 'react-native';
+import { FlatList, View, Image, PanResponder, Keyboard } from 'react-native';
 import GetRecipes from './GetRecipes';
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, Heading, HStack, Center, AspectRatio, Skeleton, VStack, Pressable, Modal, Flex, Divider, Button, Text, Link } from 'native-base';
+import { Box, Heading, HStack, Center, AspectRatio, Skeleton, VStack, Pressable, Modal, Flex, Divider, Button, Text, Link, Input } from 'native-base';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { addDoc, deleteDoc, doc, getDocs, query, where, collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
@@ -9,6 +9,7 @@ import { Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import * as Location from "expo-location"
 import Communications from 'react-native-communications';
+import { TextInput } from 'react-native-gesture-handler';
 
 
 const Home = ({ navigation, route }) => {
@@ -22,6 +23,7 @@ const Home = ({ navigation, route }) => {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [favoriteRecipes, setFavoriteRecipes] = useState([]);
   const [recipeCount, setRecipeCount] = useState(10);
+  const [recipeQuery, setRecipeQuery] = useState("");
 
   const [favoriteRecipesIds, setFavoriteRecipesIds] = useState(new Set());
   const lastFavoriteRecipes = useRef([]);
@@ -90,7 +92,12 @@ const Home = ({ navigation, route }) => {
 
   //function used to get recipes
   async function fetchRecipes() {
-    let recipesObjs = await GetRecipes(uid, recipeCount);
+    console.log("IN FETCH");
+    console.log(recipeQuery);
+    console.log("check");
+    setIsLoading(true)
+    let recipesObjs = await GetRecipes(uid, recipeCount, recipeQuery);
+    setRecipeQuery("");
     setRecipeList(recipesObjs);
     setIsLoading(false);
   }
@@ -119,36 +126,21 @@ const Home = ({ navigation, route }) => {
     }, [])
   );
 
-  // useEffect(() => {
-  //   //https://www.youtube.com/watch?v=2q-wgobQ-zQ&ab_channel=TechHarvestingwithNaseel
-  //   console.log("use effect");
-  //   (async () => {
-  //     let {status} = await Location.requestForegroundPermissionsAsync();
-  //     // console.log("status: ",status);
-
-  //     if(status == 'granted'){
-  //       console.log("location permission granted");
-  //       const loc = await Location.getCurrentPositionAsync();
-  //       setLatitude(loc.coords.latitude);
-  //       setLongitude(loc.coords.longitude);
-  //       console.log("location: \n",loc.coords);
-  //     }
-  //     else{
-  //       console.log("location permission not granted");
-  //     }
-  //   })();
-  // }, []);
-
-
-
   //on refresh, get recieps
   const handleRefresh = async () => {
     console.log("REFRESH");
     setIsRefreshing(true);
+    setIsLoading(true)
     await fetchRecipes();
     fetchFavoriteRecipes();
+    setIsLoading(false)
     setIsRefreshing(false);
   };
+
+  const handleSubmitQuery = async () => {
+    dismissKeyboard();
+    fetchRecipes();
+  }
 
   const RecipeView = ({ item }) => {
     const isFavorite = favoriteRecipesIds.has(item.recipeId);
@@ -215,6 +207,10 @@ const Home = ({ navigation, route }) => {
   };
 
 
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  }
+
   //send a text to request an item
   function sendText(friend, itemName) {
     Communications.text(friend.phoneNumber, 'Hi! I was wondering if I could borrow ' + itemName + ' from you for a recipe I am making?')
@@ -241,6 +237,13 @@ const Home = ({ navigation, route }) => {
             <Flex direction="row" alignItems="center">
               <Text fontSize="lg"># Recipes: {recipeCount}</Text>
               <Image source={require('../../assets/drag.png')} style={{ width: 24, height: 24, marginRight: 5, marginLeft: 5 }} />
+            </Flex>
+          </View>
+          <View>
+            <Flex direction="row" alignItems="center" paddingY='3' >
+              <Input size='lg' w="90%" py="0" marginRight='2' marginLeft='5' InputRightElement={<Button size="lg" rounded="none" w="1/6" h="full" onPress={() => { handleSubmitQuery() }}>
+                <MaterialCommunityIcons name="magnify" color="white" />
+              </Button>} placeholder="Search for recipes by keyword" value={recipeQuery} onChangeText={text => setRecipeQuery(text)} />
             </Flex>
           </View>
           <FlatList

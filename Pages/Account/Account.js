@@ -66,25 +66,27 @@ const Account = ({ navigation, route }) => {
     }, [activeTab])
   );
 
-  useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        const friendsDoc = await getDoc(doc(db, 'users', uid));
-        if (friendsDoc.data().friends) {
-          const friendsData = friendsDoc.data().friends;
-          const friendsArray = []
-          if (friendsData.length > 0) {
-            friendsData.forEach(element => {
-              console.log(element);
-              friendsArray.push(element);
-            });
-            setFriends(friendsArray);
-          }
+
+  const fetchFriends = async () => {
+    try {
+      const friendsDoc = await getDoc(doc(db, 'users', uid));
+      if (friendsDoc.data().friends) {
+        const friendsData = friendsDoc.data().friends;
+        const friendsArray = []
+        if (friendsData.length > 0) {
+          friendsData.forEach(element => {
+            console.log(element);
+            friendsArray.push(element);
+          });
+          setFriends(friendsArray);
         }
-      } catch (error) {
-        console.error(error);
       }
-    };
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
     fetchFriends();
   }, [navigation, route]);
 
@@ -178,6 +180,10 @@ const Account = ({ navigation, route }) => {
           if (friendIndex !== -1) {
             friendData.friends.splice(friendIndex, 1);
             await updateDoc(friendRef, { friends: friendData.friends });
+            // console.log(friendData.email);
+            let alertString = friendData.email + " removed";
+            Alert.alert(alertString);
+            fetchFriends();
           }
         }
       } else {
