@@ -25,9 +25,8 @@ const Account = ({ navigation, route }) => {
   const uid = route.params.uid;
   const email = route.params.email;
   const [friends, setFriends] = useState([]);
-  const [followers, setFollowers] = useState([]);
-  const [following, setFollowing] = useState([]);
   const [favoriteRecipes, setFavoriteRecipes] = useState([]);
+  const [activeTab, setActiveTab] = useState('friends'); // Initialize state with 'friends'
 
   // Create a new function to fetch favorite recipes
   async function fetchFavoriteRecipes() {
@@ -64,9 +63,8 @@ const Account = ({ navigation, route }) => {
     React.useCallback(() => {
       fetchFavoriteRecipes();
       return () => { };
-    }, [favoriteRecipes])
+    }, [activeTab])
   );
-
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -93,7 +91,6 @@ const Account = ({ navigation, route }) => {
 
   const RecipeView = ({ item }) => {
     const isFavorite = favoriteRecipes.some(fav => fav.recipeId === item.recipeId);
-  
     return (
       <Pressable>
         <Box
@@ -199,47 +196,60 @@ const Account = ({ navigation, route }) => {
         <Button size='xs' onPress={() => handleSubmit()}>Log Out</Button>
       </View>
       <Text style={styles.header}> Hello, {email} </Text>
-      <Text style={styles.subtitle}> Friends:</Text>
-      <FlatList
-        data={friends}
-        keyExtractor={(friend) => friend.friendEmail}
-        renderItem={({ item: friend }) => (
-          <View key={friend.friendEmail} style={styles.listItem}>
-            <Text style={styles.listText}>{friend.friendEmail}</Text>
-            <Button
-              onPress={() => handleUnfriend(friend, uid)}
-              style={styles.friendButton}
-              variant='outline'
-              size='xs'
-              color="#e57507"
-            >
-              Unfriend
-            </Button>
-          </View>
-        )}
-        ListEmptyComponent={<Text style={styles.noItems}>You are not friends with anyone.</Text>}
-      />
-      <SafeAreaView style={styles.listContainer}>
-        <VStack justifyContent="center" alignItems="center" h="full">
-          <Heading>Favorite Recipes</Heading>
-          {favoriteRecipes.length === 0 ? (
-            <Center>
-              <Text mt="4">No favorite recipes found.</Text>
-            </Center>
-          ) : (
+      <View style={styles.friendsFavoritesCont}>
+        <View style={styles.activeTabRow}>
+          <Button onPress={() => setActiveTab('friends')} w='50%'rounded='none' variant={activeTab === 'friends' ? 'solid' : 'outline'}>
+            Friends
+          </Button>
+          <Button onPress={() => setActiveTab('favorites')} w='50%' rounded='none' variant={activeTab === 'favorites' ? 'solid' : 'outline'}>
+            Favorites
+          </Button>
+        </View>
+        {activeTab == 'friends' ? (
+          <SafeAreaView style={styles.listContainer}>
             <FlatList
-              data={favoriteRecipes}
-              renderItem={RecipeView}
-              keyExtractor={(item) => item.recipeId}
-              contentContainerStyle={{ padding: 10 }}
-              ListHeaderComponent={() => <View style={{ height: 10 }} />}
-              ListFooterComponent={() => <View style={{ height: 10 }} />}
-              ItemSeparatorComponent={() => <View style={{ height: 50 }} />}
-              showsVerticalScrollIndicator={false}
+              data={friends}
+              keyExtractor={(friend) => friend.friendEmail}
+              renderItem={({ item: friend }) => (
+                <View key={friend.friendEmail} style={styles.listItem}>
+                  <Text style={styles.listText}>{friend.friendEmail}</Text>
+                  <Button
+                    onPress={() => handleUnfriend(friend, uid)}
+                    style={styles.friendButton}
+                    variant='outline'
+                    size='xs'
+                    color="#e57507"
+                  >
+                    Unfriend
+                  </Button>
+                </View>
+              )}
+              ListEmptyComponent={<Text style={styles.noItems}>You are not friends with anyone.</Text>}
             />
-          )}
-        </VStack>
-      </SafeAreaView>
+          </SafeAreaView>
+        ) : (
+          <SafeAreaView style={styles.listContainer}>
+            <VStack justifyContent="center" alignItems="center" h="full">
+              {favoriteRecipes.length === 0 ? (
+                <Center>
+                  <Text mt="4">No favorite recipes found.</Text>
+                </Center>
+              ) : (
+                <FlatList
+                  data={favoriteRecipes}
+                  renderItem={RecipeView}
+                  keyExtractor={(item) => item.recipeId}
+                  contentContainerStyle={{ padding: 10 }}
+                  ListHeaderComponent={() => <View style={{ height: 10 }} />}
+                  ListFooterComponent={() => <View style={{ height: 10 }} />}
+                  ItemSeparatorComponent={() => <View style={{ height: 50 }} />}
+                  showsVerticalScrollIndicator={false}
+                />
+              )}
+            </VStack>
+          </SafeAreaView>
+        )}
+      </View>
     </View>
   );
 };
@@ -280,6 +290,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+    padding: 10,
   },
   listText: {
     fontSize: 16,
@@ -310,6 +321,16 @@ const styles = StyleSheet.create({
     color: 'blue',
     textDecorationLine: 'underline',
   },
+  activeTabRow: {
+    flexDirection:'row',
+    justifyContent: 'center',
+  },
+  friendsFavoritesCont: {
+    borderWidth: 3,
+    borderColor: '#b45309',
+    justifyContent: 'center',
+    height: 450,
+  }
 });
 
 export { Account };

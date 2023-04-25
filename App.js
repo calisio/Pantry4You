@@ -298,21 +298,21 @@ function Pages({isAuthenticated, setIsAuthenticated}) {
           }}
         />
         <Tab.Screen
-  name="Account"
-  component={Account}
-  options={{
-    tabBarLabel: 'Account',
-    tabBarIcon: ({ theme, size, focused }) => (
-      <MaterialCommunityIcons name={focused ? 'account-circle' : 'account-circle-outline'} color="#e57507" size={size} />
-    ),
-  }}
-  initialParams={{
-    handleLogout: handleLogout,
-    uid: uid,
-    email: email,
-     // pass the function here
-  }}
-/>
+          name="Account"
+          component={Account}
+          options={{
+            tabBarLabel: 'Account',
+            tabBarIcon: ({ theme, size, focused }) => (
+              <MaterialCommunityIcons name={focused ? 'account-circle' : 'account-circle-outline'} color="#e57507" size={size} />
+            ),
+          }}
+          initialParams={{
+            handleLogout: handleLogout,
+            uid: uid,
+            email: email,
+            // pass the function here
+          }}
+        />
       </Tab.Navigator>
     );
   }
